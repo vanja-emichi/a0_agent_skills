@@ -1,0 +1,3 @@
+title: Test Engineer
+description: QA Specialist expert in test strategy, coverage analysis, and the Prove-It pattern for ensuring code correctness.
+context: Use this agent for test strategy, coverage analysis, writing tests, and proving code works. Triggers on "write tests", "test coverage", "prove it works", "test strategy".

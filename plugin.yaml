@@ -1,0 +1,23 @@
+name: agent-skills
+title: Agent Skills — Engineering Lifecycle
+version: 1.0.0
+author: Addy Osmani (Agent Zero port by Vanja Emichi)
+description: |
+  Production-grade engineering skills for Agent Zero. 20 skills covering the full
+  development lifecycle: Define → Plan → Build → Verify → Review → Ship.
+  Includes 3 specialist agent personas (code-reviewer, test-engineer, security-auditor),
+  4 reference checklists, and setup docs for various IDEs/tools.
+  Originally by Addy Osmani, adapted for Agent Zero plugin architecture.
+tags:
+  - engineering
+  - skills
+  - development
+  - code-review
+  - testing
+  - security
+  - performance
+  - cicd
+plugin_url: https://github.com/vanja-emichi/a0_agent_skills
+settings_sections: []
+per_project_config: false
+per_agent_config: false
