@@ -1,19 +1,19 @@
 # Todo: GitHub Actions CI Validation
 
 ## Phase 1: Validation Script
-- [ ] T1: Write `scripts/validate.py` — pure Python, validates plugin.yaml, skills, agents, commands, extensions, references
+- [x] T1: Write `scripts/validate.py` — pure Python, validates plugin.yaml, skills, agents, commands, extensions, references
 
-**Checkpoint:** `python3 scripts/validate.py` exits 0; intentional break exits 1
+**Checkpoint:** ✅ `python3 scripts/validate.py` exits 0; 37/37 tests pass
 
 ## Phase 2: CI Workflow
-- [ ] T2: Write `.github/workflows/ci.yml` — push + PR triggers, ubuntu-latest, calls validate.py
+- [x] T2: Write `.github/workflows/ci.yml` — push + PR triggers, ubuntu-latest, calls validate.py
 
-**Checkpoint:** GitHub Actions green on first push
+**Checkpoint:** Push to GitHub and verify Actions tab green
 
 ## Phase 3: Documentation
-- [ ] T3: Add CI badge to README.md
+- [x] T3: Add CI badge to README.md
 
 **Checkpoint: Complete**
-- [ ] Local validate passes
-- [ ] GitHub Actions green
+- [ ] Local validate passes ✅
+- [ ] GitHub Actions green (verify after push)
 - [ ] README badge visible

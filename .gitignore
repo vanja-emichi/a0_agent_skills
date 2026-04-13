@@ -5,3 +5,4 @@
 # Agent Zero project state — local only, never commit
 .a0proj/
 .toggle-0
+.pytest_cache/
