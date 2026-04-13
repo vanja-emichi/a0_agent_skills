@@ -1,8 +1,12 @@
 """Register agent-skills slash commands into the Commands plugin on agent init.
 
-The Commands plugin only reads from its own scope directory. This extension
-creates symlinks from the Commands plugin's commands/ dir to our command files
-so they appear automatically when the Commands plugin is active.
+The Commands plugin scopes commands differently depending on whether a project
+is active:
+  - No project: scope = /a0/usr/plugins/commands/commands/
+  - Project active: scope = /a0/usr/projects/<project>/.a0proj/plugins/commands/commands/
+
+When validating a command path, it checks ONLY against the active scope.
+So we must create symlinks in BOTH scopes to handle either case.
 """
 from __future__ import annotations
 
@@ -14,40 +18,53 @@ from helpers.print_style import PrintStyle
 
 
 PLUGIN_NAME = "agent-skills"
-COMMANDS_PLUGIN_DIR = Path("/a0/usr/plugins/commands/commands")
+PLUGIN_ROOT = Path("/a0/usr/projects/agent_skills")
+
+# Global scope: when no project is active
+GLOBAL_COMMANDS_DIR = Path("/a0/usr/plugins/commands/commands")
+
+# Project scope: when agent_skills project is active
+# Commands plugin resolves this as: projects.get_project_meta('agent_skills') / plugins/commands/commands
+PROJECT_COMMANDS_DIR = PLUGIN_ROOT / ".a0proj" / "plugins" / "commands" / "commands"
 
 
 class RegisterCommands(Extension):
-    async def execute(self, **kwargs):
+    def execute(self, **kwargs):
         try:
-            # Find our commands directory — resolve through symlink
-            this_plugin = Path(__file__).resolve().parents[3]  # plugin root
-            our_commands_dir = this_plugin / "commands"
+            our_commands_dir = PLUGIN_ROOT / "commands"
 
             if not our_commands_dir.is_dir():
                 return
 
-            if not COMMANDS_PLUGIN_DIR.exists():
-                # Commands plugin not installed — skip silently
-                return
+            # Determine which scope directories to populate
+            scopes: list[Path] = []
 
-            # Symlink each command file pair into the Commands plugin directory
-            registered = []
-            for src_file in our_commands_dir.iterdir():
-                if not src_file.is_file():
-                    continue
-                dest = COMMANDS_PLUGIN_DIR / src_file.name
-                if dest.exists() or dest.is_symlink():
-                    # Already registered — update symlink if target changed
-                    if dest.is_symlink() and os.readlink(dest) == str(src_file):
+            # Global scope — only if Commands plugin is installed
+            if GLOBAL_COMMANDS_DIR.parent.parent.exists():
+                scopes.append(GLOBAL_COMMANDS_DIR)
+
+            # Project scope — always register so commands work when project is active
+            scopes.append(PROJECT_COMMANDS_DIR)
+
+            registered = 0
+            for scope_dir in scopes:
+                scope_dir.mkdir(parents=True, exist_ok=True)
+                for src_file in sorted(our_commands_dir.iterdir()):
+                    if not src_file.is_file():
                         continue
-                    dest.unlink()
-                dest.symlink_to(src_file)
-                registered.append(src_file.name)
+                    dest = scope_dir / src_file.name
+                    if dest.is_symlink():
+                        if os.readlink(dest) == str(src_file):
+                            continue  # Already correct
+                        dest.unlink()
+                    elif dest.exists():
+                        dest.unlink()
+                    dest.symlink_to(src_file)
+                    registered += 1
 
             if registered:
                 PrintStyle.hint(
-                    f"[{PLUGIN_NAME}] Registered {len(registered)} slash commands"
+                    f"[{PLUGIN_NAME}] Registered {registered} slash command symlinks"
                 )
         except Exception as e:
             PrintStyle.error(f"[{PLUGIN_NAME}] Failed to register commands: {e}")
