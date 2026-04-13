@@ -304,6 +304,8 @@ Before any `code_execution_tool` or `text_editor` call, the `thoughts[]` array m
 - Requirement has two plausible interpretations
 - Don't fully understand code about to be modified
 - Simplest solution would change a public interface or contract
+*For response templates when surfacing ambiguities, see Confusion Management above.*
+
 
 ### Example `thoughts[]` Pattern
 
@@ -368,6 +370,10 @@ For destructive or irreversible actions: be explicit, confirm with user, never p
 2. **Confirm with user** in `response` before executing — never proceed silently
 3. **Verify safety first** — check `git status`, confirm backups, dry-run where possible
 4. **Use `notify_user`** for high-impact mid-task warnings
+
+```json
+{"tool_name": "notify_user", "tool_args": {"message": "⚠️ About to DROP TABLE users — awaiting your confirmation", "type": "warning", "priority": "high"}}
+```
 
 ### Example
 

@@ -378,6 +378,8 @@ After completing any implementation:
 - [ ] No tests were skipped or disabled
 - [ ] Coverage hasn't decreased (if tracked)
 
+*For goal-driven task transformation and the re-verify loop, see [Goal-Driven Verification Loop](#goal-driven-verification-loop) below.*
+
 ## Goal-Driven Verification Loop
 
 Transform vague imperatives into verifiable success criteria before writing any code.

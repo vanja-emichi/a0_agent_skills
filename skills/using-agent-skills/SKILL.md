@@ -179,4 +179,6 @@ Some skills live outside this plugin but complement it:
 
 | Skill | Location | When to Load |
 |-------|----------|--------------|
-| `karpathy-coding-guidelines` | Global (`/a0/usr/skills/`) | Before any non-trivial coding task. Provides full A0 behavioral discipline: Think-Before-Coding, Surgical-Changes, Safe-Operations, Terse-Commits, Structured-Review. The A0-specific principles from this skill are embedded into the individual skills above — this is the full reference. |
+| `karpathy-coding-guidelines` | Global (`/a0/usr/skills/`) | Before any non-trivial coding task |
+
+> Provides full A0 behavioral discipline: Think-Before-Coding, Surgical-Changes, Safe-Operations, Terse-Commits, Structured-Review. The principles from this skill are embedded into individual plugin skills above — this is the full reference.

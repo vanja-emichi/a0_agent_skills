@@ -68,7 +68,7 @@ Commit messages explain the *why*, not just the *what*:
 
 ```
 # Good: Explains intent
-feat: add email validation to registration endpoint
+feat: add email validation to signup
 
 Prevents invalid email formats from reaching the database.
 Uses Zod schema validation at the route handler level,
@@ -93,7 +93,7 @@ update auth.ts
 - `docs` — Documentation only
 - `chore` — Tooling, dependencies, config
 
-### A0 Commit Strictness
+#### A0 Commit Strictness
 
 Tighter rules for Agent Zero context:
 

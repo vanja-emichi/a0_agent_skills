@@ -128,6 +128,8 @@ REFRAMED SUCCESS CRITERIA:
 
 This lets you loop, retry, and problem-solve toward a clear goal rather than guessing what "faster" means.
 
+*For A0-specific stop-and-ask triggers, see [Agent Zero Clarification Protocol](#agent-zero-clarification-protocol) below.*
+
 ### Phase 2: Plan
 
 With the validated spec, generate a technical implementation plan:
@@ -225,3 +227,8 @@ Before writing any spec or proceeding to implementation, surface ambiguities exp
 ### Read Before Specifying
 
 For changes to existing systems, always read the relevant code before writing the spec. Specs written without reading existing code create conflicts between spec and reality.
+
+**Example problem:**
+> Spec assumes REST endpoints. Code is GraphQL. Spec is invalidated before a line is written.
+
+**Correct approach:** Run `text_editor:read` on the relevant files first, then write a spec that reflects what actually exists — not what you imagine might exist.

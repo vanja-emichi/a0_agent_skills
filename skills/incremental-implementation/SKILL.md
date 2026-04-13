@@ -112,7 +112,7 @@ SIMPLICITY CHECK:
 
 Three similar lines of code is better than a premature abstraction. Implement the naive, obviously-correct version first. Optimize only after correctness is proven with tests.
 
-### A0 Tool Selection Guide
+#### A0 Tool Selection Guide
 
 Choose the simplest tool that accomplishes the task:
 
@@ -144,7 +144,7 @@ NOTICED BUT NOT TOUCHING:
 → Want me to create tasks for these?
 ```
 
-### A0 Tool Discipline
+#### A0 Tool Discipline
 
 Always read before editing:
 

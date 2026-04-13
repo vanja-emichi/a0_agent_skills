@@ -165,7 +165,7 @@ Label every comment with its severity so the author knows what's required vs opt
 | **FYI** | Informational only | No action needed — context for future reference |
 
 This prevents authors from treating all feedback as mandatory and wasting time on optional suggestions.
-### Per-Line Notation (Compact Format)
+#### Per-Line Notation (Compact Format)
 
 For surgical, line-level findings, use this compact format as a complement to the severity labels above:
 
