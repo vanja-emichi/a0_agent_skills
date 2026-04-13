@@ -165,6 +165,32 @@ Label every comment with its severity so the author knows what's required vs opt
 | **FYI** | Informational only | No action needed — context for future reference |
 
 This prevents authors from treating all feedback as mandatory and wasting time on optional suggestions.
+### Per-Line Notation (Compact Format)
+
+For surgical, line-level findings, use this compact format as a complement to the severity labels above:
+
+```
+L<line>: <severity> <problem>. <fix>.
+```
+
+**Severity labels:**
+- `🔴 bug:` — broken behavior, will cause incident
+- `🟡 risk:` — works but fragile (null check, race, swallowed error)
+- `🔵 nit:` — style/naming — author can ignore
+- `❓ q:` — genuine question, not a suggestion
+
+**Examples:**
+```
+L42: 🔴 bug: user can be null after .find(). Add guard before .email.
+L88-140: 🔵 nit: 50-line fn does 4 things. Extract validate/normalize/persist.
+L23: 🟡 risk: no retry on 429. Wrap in withBackoff(3).
+L71: ❓ q: why sort descending here? ascending matches the UI order.
+```
+
+**Drop from comments:** "I noticed that...", "You might want to consider...", hedging phrases, restating what the line does.
+
+**Auto-clarity exception:** Write a full paragraph for CVE-class security bugs, architectural disagreements, or onboarding contexts. Resume one-liners after.
+
 
 ### Step 5: Verify the Verification
 

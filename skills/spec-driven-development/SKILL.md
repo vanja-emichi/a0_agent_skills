@@ -198,3 +198,30 @@ Before proceeding to implementation, confirm:
 - [ ] Success criteria are specific and testable
 - [ ] Boundaries (Always/Ask First/Never) are defined
 - [ ] The spec is saved to a file in the repository
+
+## Agent Zero Clarification Protocol
+
+Before writing any spec or proceeding to implementation, surface ambiguities explicitly.
+
+### When to Stop and Ask vs Proceed
+
+| Situation | Action |
+|-----------|--------|
+| Requirement has two plausible interpretations | Present both options — don't pick silently |
+| Missing context about existing code | Read existing code before specifying |
+| Scope boundary is unclear | Ask which parts are in scope |
+| Tech stack assumption not confirmed | State assumption, ask to confirm |
+
+### Present Options, Don't Pick Silently
+
+**Bad:** Picking interpretation A and writing a spec for it without telling the user.
+
+**Good:**
+> Two interpretations possible:
+> A) Validate email format only (fast, no network call)
+> B) Validate email deliverability via SMTP probe (slow, external dependency)
+> Which do you want?
+
+### Read Before Specifying
+
+For changes to existing systems, always read the relevant code before writing the spec. Specs written without reading existing code create conflicts between spec and reality.

@@ -287,3 +287,97 @@ After setting up context, confirm:
 - [ ] Agent output follows the patterns shown in the rules file
 - [ ] Agent references actual project files and APIs (not hallucinated ones)
 - [ ] Context is refreshed when switching between major tasks
+
+## Agent Zero Discipline (Think Before Coding)
+
+Before any `code_execution_tool` or `text_editor` call, the `thoughts[]` array must answer:
+
+1. **What is the task?** Restate the goal in your own words
+2. **What are my assumptions?** List them explicitly — ask if uncertain
+3. **Are there multiple interpretations?** Present them — don't pick silently
+4. **Is there a simpler approach?** Propose it before implementing a complex one
+5. **What context do I need?** Read existing code first
+
+### Stop and Ask When
+
+- About to guess a file path or function name
+- Requirement has two plausible interpretations
+- Don't fully understand code about to be modified
+- Simplest solution would change a public interface or contract
+
+### Example `thoughts[]` Pattern
+
+```json
+"thoughts": [
+    "Task: add email validation to registration endpoint",
+    "Assumption: validation in existing validator module — not new module",
+    "Assumption: format check only, not deliverability",
+    "Simpler: add check inside existing validate_user() rather than new module",
+    "Need to read validator file before writing anything"
+]
+```
+
+### Complete A0 Coding Workflow
+
+```
+TASK RECEIVED
+     │
+     ▼
+[thoughts] Restate goal · List assumptions · Identify ambiguities
+     │
+     ├── Ambiguous? ──► Ask user before any code
+     │
+     ▼
+[text_editor:read] Read all relevant files and sections
+     │
+     ▼
+[thoughts] State plan + verifiable success criteria
+     │
+     ▼
+[text_editor:patch OR code_execution_tool] Implement — minimum code only
+     │
+     ▼
+[code_execution_tool] Verify — run tests / execute / check output
+     │
+     ├── Failed? ──► Diagnose → Fix → Re-verify (loop; never surrender)
+     │
+     ▼
+[terminal] git diff — confirm surgical changes only
+     │
+     ├── Collateral changes? ──► Revert them
+     │
+     ▼
+[response] Report result with verification evidence
+```
+
+## Safe Operations Protocol
+
+For destructive or irreversible actions: be explicit, confirm with user, never proceed silently.
+
+### What Counts as Destructive
+
+- File/directory deletion (`rm`, `rmtree`, `DELETE FROM`)
+- Database drops or schema changes (`DROP TABLE`, `ALTER TABLE`, migrations)
+- Git force operations (`git reset --hard`, `git push --force`, `git clean -fd`)
+- Production deploys or environment-altering changes
+- API calls that cannot be undone (send email, charge payment, publish)
+
+### Rules
+
+1. **State the full implication** in `thoughts` — what data/state is permanently lost
+2. **Confirm with user** in `response` before executing — never proceed silently
+3. **Verify safety first** — check `git status`, confirm backups, dry-run where possible
+4. **Use `notify_user`** for high-impact mid-task warnings
+
+### Example
+
+```json
+"thoughts": [
+    "User asked to drop the users table",
+    "WARNING: permanently deletes all rows — cannot be undone",
+    "Will confirm with user before running DROP TABLE"
+]
+```
+
+Then in `response`:
+> ⚠️ **Warning:** This will permanently delete the `users` table and all its data. Cannot be undone. Confirm to proceed.

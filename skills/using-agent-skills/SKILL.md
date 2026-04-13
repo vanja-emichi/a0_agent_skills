@@ -172,3 +172,11 @@ Not every task needs every skill. A bug fix might only need: `debugging-and-erro
 | Ship | ci-cd-and-automation | Automated quality gates on every change |
 | Ship | documentation-and-adrs | Document the why, not just the what |
 | Ship | shipping-and-launch | Pre-launch checklist, monitoring, rollback plan |
+
+## External Reference Skills
+
+Some skills live outside this plugin but complement it:
+
+| Skill | Location | When to Load |
+|-------|----------|--------------|
+| `karpathy-coding-guidelines` | Global (`/a0/usr/skills/`) | Before any non-trivial coding task. Provides full A0 behavioral discipline: Think-Before-Coding, Surgical-Changes, Safe-Operations, Terse-Commits, Structured-Review. The A0-specific principles from this skill are embedded into the individual skills above — this is the full reference. |

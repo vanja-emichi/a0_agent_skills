@@ -377,3 +377,53 @@ After completing any implementation:
 - [ ] Test names describe the behavior being verified
 - [ ] No tests were skipped or disabled
 - [ ] Coverage hasn't decreased (if tracked)
+
+## Goal-Driven Verification Loop
+
+Transform vague imperatives into verifiable success criteria before writing any code.
+
+### Weak → Strong Task Transformation
+
+| Imperative (weak) | Goal-Driven (strong) |
+|---|---|
+| "Add validation" | "Write tests for invalid inputs → make them pass" |
+| "Fix the bug" | "Write a test that reproduces it → make it pass" |
+| "Refactor X" | "Tests pass before; tests pass after; diff is smaller" |
+| "Improve performance" | "Benchmark before → implement → confirm X% improvement" |
+
+### Verification Mandate
+
+- **Never report success without showing verification output** — attach test output, not just "tests pass"
+- If verification fails → diagnose root cause → fix → re-verify (loop — don't give up)
+- Always run and show output:
+
+```bash
+# Python
+python -m pytest tests/ -v
+
+# Node.js
+npm test
+
+# Quick smoke test
+python script.py && echo "OK"
+```
+
+### The Re-Verify Loop
+
+```
+Verification fails
+      │
+      ▼
+ Diagnose root cause (don't guess)
+      │
+      ▼
+ Implement fix
+      │
+      ▼
+ Re-verify — show output
+      │
+      ├── Still failing? ──► Loop again (never surrender, never report partial success)
+      │
+      ▼
+ Verification passes → attach output to response
+```

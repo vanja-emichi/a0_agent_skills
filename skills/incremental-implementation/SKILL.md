@@ -112,6 +112,18 @@ SIMPLICITY CHECK:
 
 Three similar lines of code is better than a premature abstraction. Implement the naive, obviously-correct version first. Optimize only after correctness is proven with tests.
 
+### A0 Tool Selection Guide
+
+Choose the simplest tool that accomplishes the task:
+
+| Situation | Preferred Approach |
+|-----------|-------------------|
+| Simple text transformation | `terminal` with `sed`, `awk`, `grep` |
+| File inspection | `text_editor:read` — not a Python script |
+| Targeted edit to existing file | `text_editor:patch` — not `text_editor:write` |
+| Multi-step logic or computation | Python in `code_execution_tool` |
+| Reusable component | Only modularize if reuse was asked for |
+
 ### Rule 0.5: Scope Discipline
 
 Touch only what the task requires.
@@ -131,6 +143,15 @@ NOTICED BUT NOT TOUCHING:
 - The auth middleware could use better error messages (separate task)
 → Want me to create tasks for these?
 ```
+
+### A0 Tool Discipline
+
+Always read before editing:
+
+- `text_editor:read` the file/section before any patch
+- Use `text_editor:patch` for edits to existing files — `text_editor:write` only for new files
+- Run `git diff --stat && git diff` before responding — every changed line must trace to the request
+- Collateral changes seen? Revert them, mention in response instead
 
 ### Rule 1: One Thing at a Time
 
