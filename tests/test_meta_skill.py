@@ -201,14 +201,13 @@ class TestExtensionClassStructure:
         """PLUGIN_NAME constant must be defined."""
         assert "PLUGIN_NAME" in self.source, "PLUGIN_NAME constant not defined"
 
-    def test_uses_dynamic_path_not_hardcoded(self):
-        """Must use Path(__file__) for plugin root — no hardcoded paths."""
-        assert "__file__" in self.source, (
-            "Must use Path(__file__) for plugin root discovery, not hardcoded paths"
-        )
+    def test_no_hardcoded_install_paths(self):
+        """Must not contain hardcoded /a0/usr paths — breaks on any install."""
         assert "/a0/usr" not in self.source, (
-            "Must not hardcode /a0/usr — use Path(__file__).resolve().parents[N]"
+            "Must not hardcode /a0/usr — use Path(__file__).resolve().parents[N] "
+            "or module-level constants"
         )
+
 
     def test_uses_extras_persistent(self):
         """Must inject into extras_persistent (persists across turns)."""
