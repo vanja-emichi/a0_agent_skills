@@ -10,28 +10,35 @@ Verifies that:
 
 from pathlib import Path
 import subprocess
+import pytest
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
-# Files that must NOT be in the public repo root (they are dev-tracking artifacts)
+# Files that must NOT exist in the public repo root.
+# Adding an entry here automatically adds a failing test if that path
+# re-appears in the root — no other change needed.
 DEV_TRACKING_FILES_NOT_IN_ROOT = [
     "SPEC.md",
     "tasks",
 ]
 
-# Dev tracking paths that must exist under .a0proj/ (gitignored)
+# Dev tracking paths that must exist under .a0proj/ (gitignored).
+# Adding an entry here automatically adds a failing test if that path
+# goes missing from .a0proj/ — no other change needed.
 DEV_TRACKING_PATHS_IN_A0PROJ = [
     ".a0proj/specs/SPEC.md",
     ".a0proj/tasks/plan.md",
     ".a0proj/tasks/todo.md",
 ]
 
-# Paths that must be in .gitignore
+# Patterns that must appear in .gitignore.
+# Adding a pattern here automatically tests that it is gitignored.
 GITIGNORED_PATTERNS = [
     ".a0proj/",
 ]
 
-# Files/dirs that SHOULD be in repo root (public plugin artifacts)
+# Plugin artifacts that must remain in the public repo root.
+# Adding an entry here automatically guards it against accidental deletion.
 PUBLIC_ROOT_ARTIFACTS = [
     "skills",
     "commands",
@@ -50,23 +57,25 @@ PUBLIC_ROOT_ARTIFACTS = [
 
 
 class TestDevTrackingNotInRoot:
-    """Dev tracking files must not appear in the public repo root."""
+    """Dev tracking files must not appear in the public repo root.
 
-    def test_spec_md_not_in_root(self):
-        """SPEC.md must not be in repo root — it belongs in .a0proj/specs/."""
-        assert not (PROJECT_ROOT / "SPEC.md").exists(), (
-            "SPEC.md found in repo root — dev tracking must live in .a0proj/specs/SPEC.md"
-        )
+    Parametrized over DEV_TRACKING_FILES_NOT_IN_ROOT — add a path to that
+    list to automatically require it to be absent from the root.
+    """
 
-    def test_tasks_dir_not_in_root(self):
-        """tasks/ directory must not be in repo root — it belongs in .a0proj/tasks/."""
-        assert not (PROJECT_ROOT / "tasks").exists(), (
-            "tasks/ directory found in repo root — dev tracking must live in .a0proj/tasks/"
+    @pytest.mark.parametrize("name", DEV_TRACKING_FILES_NOT_IN_ROOT)
+    def test_dev_tracking_file_not_in_root(self, name):
+        assert not (PROJECT_ROOT / name).exists(), (
+            f"'{name}' found in repo root — dev tracking must live in .a0proj/"
         )
 
 
 class TestDevTrackingInA0Proj:
-    """Dev tracking files must exist under .a0proj/ (gitignored)."""
+    """Dev tracking files must exist under .a0proj/ (gitignored).
+
+    Parametrized over DEV_TRACKING_PATHS_IN_A0PROJ — add a path to that
+    list to automatically require it to exist under .a0proj/.
+    """
 
     def test_a0proj_dir_exists(self):
         assert (PROJECT_ROOT / ".a0proj").exists(), ".a0proj/ directory must exist"
@@ -77,33 +86,22 @@ class TestDevTrackingInA0Proj:
     def test_a0proj_tasks_dir_exists(self):
         assert (PROJECT_ROOT / ".a0proj" / "tasks").exists(), ".a0proj/tasks/ must exist"
 
-    def test_spec_md_in_a0proj(self):
-        """SPEC.md must exist at .a0proj/specs/SPEC.md."""
-        assert (PROJECT_ROOT / ".a0proj" / "specs" / "SPEC.md").exists(), (
-            ".a0proj/specs/SPEC.md must exist"
-        )
-
-    def test_plan_md_in_a0proj(self):
-        """plan.md must exist at .a0proj/tasks/plan.md."""
-        assert (PROJECT_ROOT / ".a0proj" / "tasks" / "plan.md").exists(), (
-            ".a0proj/tasks/plan.md must exist"
-        )
-
-    def test_todo_md_in_a0proj(self):
-        """todo.md must exist at .a0proj/tasks/todo.md."""
-        assert (PROJECT_ROOT / ".a0proj" / "tasks" / "todo.md").exists(), (
-            ".a0proj/tasks/todo.md must exist"
+    @pytest.mark.parametrize("rel_path", DEV_TRACKING_PATHS_IN_A0PROJ)
+    def test_dev_tracking_file_in_a0proj(self, rel_path):
+        assert (PROJECT_ROOT / rel_path).exists(), (
+            f"Dev tracking file missing: {rel_path} — should exist under .a0proj/"
         )
 
 
 class TestGitIgnoreCoversDevTracking:
     """Verify .gitignore permanently excludes dev tracking from version control."""
 
-    def test_gitignore_covers_a0proj(self):
-        """'.a0proj/' must appear in .gitignore."""
+    @pytest.mark.parametrize("pattern", GITIGNORED_PATTERNS)
+    def test_pattern_in_gitignore(self, pattern):
+        """Each GITIGNORED_PATTERNS entry must appear literally in .gitignore."""
         gitignore = (PROJECT_ROOT / ".gitignore").read_text()
-        assert ".a0proj/" in gitignore, (
-            "'.a0proj/' must be in .gitignore to prevent dev tracking from being committed"
+        assert pattern in gitignore, (
+            f"'{pattern}' must be in .gitignore to prevent dev tracking from being committed"
         )
 
     def test_spec_md_is_gitignored(self):
@@ -139,31 +137,14 @@ class TestGitIgnoreCoversDevTracking:
 
 
 class TestPublicRootArtifactsPresent:
-    """All public plugin artifacts must still be present in repo root."""
+    """All public plugin artifacts must still be present in repo root.
 
-    def test_skills_dir_present(self):
-        assert (PROJECT_ROOT / "skills").exists()
+    Parametrized over PUBLIC_ROOT_ARTIFACTS — add an entry to that list
+    to automatically guard it against accidental deletion.
+    """
 
-    def test_commands_dir_present(self):
-        assert (PROJECT_ROOT / "commands").exists()
-
-    def test_extensions_dir_present(self):
-        assert (PROJECT_ROOT / "extensions").exists()
-
-    def test_agents_dir_present(self):
-        assert (PROJECT_ROOT / "agents").exists()
-
-    def test_tests_dir_present(self):
-        assert (PROJECT_ROOT / "tests").exists()
-
-    def test_readme_present(self):
-        assert (PROJECT_ROOT / "README.md").exists()
-
-    def test_plugin_yaml_present(self):
-        assert (PROJECT_ROOT / "plugin.yaml").exists()
-
-    def test_docs_dir_present(self):
-        assert (PROJECT_ROOT / "docs").exists()
-
-    def test_references_dir_present(self):
-        assert (PROJECT_ROOT / "references").exists()
+    @pytest.mark.parametrize("artifact", PUBLIC_ROOT_ARTIFACTS)
+    def test_public_artifact_present(self, artifact):
+        assert (PROJECT_ROOT / artifact).exists(), (
+            f"Public artifact '{artifact}' missing from repo root"
+        )
