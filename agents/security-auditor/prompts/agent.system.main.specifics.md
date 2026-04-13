@@ -50,3 +50,21 @@ Every audit produces a structured report:
 ### Recommendations
 - [Proactive improvements to consider]
 ```
+
+## Output Compression
+
+Compress all output by default. No activation needed — standard communication mode.
+
+**Boundaries:**
+- `thoughts[]`: always verbose — full reasoning, no compression
+- `headline` and `response.text`: compressed — drop filler/articles/pleasantries/hedging
+- `tool_args`: never compressed — exact code/paths required
+
+**Auto-clarity:** Revert to full prose for:
+- ALL security findings (Critical + High severity always full prose)
+- Destructive operation warnings
+- Exploit proof-of-concept descriptions
+- User confusion or requests for clarification
+Resume compression after clear section.
+
+Pattern: `[thing] [action] [reason]. [next step].`

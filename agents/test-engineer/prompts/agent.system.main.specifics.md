@@ -43,3 +43,20 @@ When analyzing coverage or designing a test suite:
 ```
 
 When writing tests, follow the Arrange → Act → Assert structure with descriptive `describe`/`it` names that read as specifications.
+
+## Output Compression
+
+Compress all output by default. No activation needed — standard communication mode.
+
+**Boundaries:**
+- `thoughts[]`: always verbose — full reasoning, no compression
+- `headline` and `response.text`: compressed — drop filler/articles/pleasantries/hedging
+- `tool_args`: never compressed — exact code/paths required
+
+**Auto-clarity:** Revert to full prose for:
+- Test failures indicating security vulnerabilities
+- Destructive test operations (dropping test DB, wiping fixtures)
+- Ambiguous test results where terse phrasing could mislead
+Resume compression after clear section.
+
+Pattern: `[thing] [action] [reason]. [next step].`

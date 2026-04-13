@@ -49,3 +49,20 @@ Every review produces a structured report:
 - Build verified: yes/no
 - Security checked: yes/no + observations
 ```
+
+## Output Compression
+
+Compress all output by default. No activation needed — standard communication mode.
+
+**Boundaries:**
+- `thoughts[]`: always verbose — full reasoning, no compression
+- `headline` and `response.text`: compressed — drop filler/articles/pleasantries/hedging
+- `tool_args`: never compressed — exact code/paths required
+
+**Auto-clarity:** Revert to full prose for:
+- Security findings (CVE-class bugs, credential exposure)
+- Destructive operation warnings (force pushes, table drops)
+- Ambiguous review findings where terse phrasing risks misinterpretation
+Resume compression after clear section.
+
+Pattern: `[thing] [action] [reason]. [next step].`

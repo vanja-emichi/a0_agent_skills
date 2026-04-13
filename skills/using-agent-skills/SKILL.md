@@ -180,5 +180,6 @@ Some skills live outside this plugin but complement it:
 | Skill | Location | When to Load |
 |-------|----------|--------------|
 | `karpathy-coding-guidelines` | Global (`/a0/usr/skills/`) | Before any non-trivial coding task |
+| `caveman` | Global (`/a0/usr/skills/caveman/`) | For full compression reference + intensity switching |
 
-> Full A0 behavioral discipline: Think-Before-Coding, Surgical-Changes, Safe-Operations, Terse-Commits, Structured-Review. Principles are embedded into individual plugin skills above; this is the canonical reference.
+> Full A0 behavioral discipline: Think-Before-Coding, Surgical-Changes, Safe-Operations, Terse-Commits, Structured-Review, Output-Compression. Principles are embedded into individual plugin skills above; these are the canonical references.
