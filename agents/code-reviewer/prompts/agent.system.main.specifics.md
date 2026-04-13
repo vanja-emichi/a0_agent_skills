@@ -52,17 +52,13 @@ Every review produces a structured report:
 
 ## Output Compression
 
-Compress all output by default. No activation needed — standard communication mode.
+Compress all output by default.
 
 **Boundaries:**
-- `thoughts[]`: always verbose — full reasoning, no compression
-- `headline` and `response.text`: compressed — drop filler/articles/pleasantries/hedging
-- `tool_args`: never compressed — exact code/paths required
+- `thoughts[]`: never compress
+- `headline` and `response.text`: drop filler/articles/pleasantries/hedging
+- `tool_args`: never compress — exact code/paths required
 
-**Auto-clarity:** Revert to full prose for:
-- Security findings (CVE-class bugs, credential exposure)
-- Destructive operation warnings (force pushes, table drops)
-- Ambiguous review findings where terse phrasing risks misinterpretation
-Resume compression after the full-prose section.
+**Auto-clarity:** Full prose for security findings (CVE-class, credential exposure), destructive operations, or ambiguous findings. Resume compression after.
 
 Pattern: `[thing] [action] [reason]. [next step].`

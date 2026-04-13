@@ -376,13 +376,13 @@ For destructive or irreversible actions: be explicit, confirm with user, never p
 
 ### Communication Override
 
-When any Safe Operations trigger fires, revert to full prose — no compression, no fragments, complete sentences with full context. Resume compression after the full-prose section.
+When a Safe Operations trigger fires, revert to full prose — complete sentences, full context. Resume compression after.
 
-**Triggers for full prose:**
-- Security warnings — CVE-class bugs, credential exposure
-- Irreversible actions — `rm -rf`, `DROP TABLE`, `git push --force`, prod deploy
+**Triggers:**
+- Security warnings (CVE-class bugs, credential exposure)
+- Irreversible actions (`rm -rf`, `DROP TABLE`, `git push --force`, prod deploy)
 - Multi-step sequences where fragment order risks misread
-- User confusion — repeating question or asking for clarification
+- User confusion (repeating question, asking for clarification)
 
 ### Example
 
@@ -399,25 +399,25 @@ When any Safe Operations trigger fires, revert to full prose — no compression,
 
 ## Output Compression
 
-Compress output by default. Target ~75% token reduction while preserving all technical substance.
+Compress output by default. Target ~75% token reduction.
 
 ### A0 Compression Boundaries
 
 | A0 JSON field | Compressed? | Reason |
 |--------------|------------|--------|
-| `thoughts[]` | ❌ Never | Internal reasoning — always verbose |
+| `thoughts[]` | ❌ Never | Internal reasoning must stay verbose |
 | `headline` | ✅ Yes | User-facing summary |
-| `tool_name` / `tool_args` | ❌ Never | Literal API ids + code/paths must be exact |
+| `tool_name` / `tool_args` | ❌ Never | API ids and code must be exact |
 | `response.text` | ✅ Yes | Primary user output |
 
 ### Compression Rules
 
-**Drop:** articles (a/an/the), filler (just/really/basically/actually/simply), pleasantries ("sure"/"certainly"/"of course"), hedging ("it might be worth"/"you could consider").
+**Drop:** articles, filler (just/really/basically/actually/simply), pleasantries, hedging.
 
-**Keep:** all technical terms exact, code blocks unchanged, error messages quoted verbatim, numbers/versions/paths exact.
+**Keep:** technical terms, code blocks, error messages, numbers/versions/paths — all exact.
 
 **Pattern:** `[thing] [action] [reason]. [next step].`
 
 ### Persistence
 
-Compression stays active every response until explicitly turned off. Does not revert after many turns, topic changes, or new skill loads.
+Active until explicitly turned off. Does not revert on topic change or skill load.
