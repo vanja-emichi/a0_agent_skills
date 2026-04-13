@@ -1,190 +1,227 @@
-# Spec: Karpathy Coding Guidelines Integration (Option B)
+# Spec: Caveman Communication Compression Integration (Option B)
 
 ## Objective
 
-Merge the unique, Agent Zero-specific parts of `karpathy-coding-guidelines` into existing agent-skills. No new skill is created. No content is duplicated. Each skill receives a targeted patch adding only the Karpathy content that is NOT already covered.
+Merge the unique, Agent Zero-specific parts of `caveman` into existing agent-skills. No new skill is created. No content is duplicated. Each target receives a targeted patch adding only the Caveman content that is NOT already covered by the global skill or existing skills.
 
-**Target users:** Agent Zero developers using the plugin — all 20 skills become richer without needing to explicitly load a separate karpathy skill.
+**Key decisions (confirmed by user):**
+1. Auto-compress at agent level — agents ALWAYS use compressed output, no activation needed
+2. Remove wenyan levels (Chinese) — keep lite, full, ultra only
+3. Global caveman skill stays at `/a0/usr/skills/caveman/` as full reference
+4. Agents benefit automatically — specifics.md updated, no separate skill load
 
-**Primary value:** The A0-specific behavioral patterns (tool discipline, safe operations, thoughts[] structure, verification loop, per-line review notation) are embedded into the skills where they're most relevant. A developer following any skill automatically gets Karpathy-quality discipline.
+**Primary value:** All agents compress output by default (~75% token reduction). The A0 Compression Boundaries table ensures thoughts[] stay verbose (reasoning quality) while headline and response.text go terse (token efficiency). Auto-clarity rule ensures safety-critical moments revert to full prose.
 
 **What we do NOT do:**
-- Duplicate content that already exists in the skill
-- Rewrite existing sections
-- Add Karpathy content that has >80% overlap with existing content (see Overlap Analysis below)
+- Duplicate content from the global caveman skill (pattern examples, intensity examples)
 - Create a new standalone skill
+- Add activation instructions (auto-compress is the default)
+- Include wenyan/Chinese levels (removed per user decision)
+- Add general communication advice already covered by existing skills
 
 ---
 
 ## Overlap Analysis — What We Skip
 
-| Karpathy Principle | Existing Skill | Overlap | Decision |
+| Caveman Content | Existing Coverage | Overlap | Decision |
 |---|---|---|---|
-| P2 Simplicity First (general) | `incremental-implementation` Rule 0 | ~85% | Skip rewrite. Add A0 tool selection table only. |
-| P3 Surgical Changes (general) | `incremental-implementation` Rule 0.5 | ~80% | Skip rewrite. Add A0 tool discipline commands only. |
-| P6 Terse Commits (general) | `git-workflow-and-versioning` Descriptive Messages | ~70% | Add ≤50 chars rule + no-AI-attribution rule only. |
-| P7 Structured Review (general 5-axis) | `code-review-and-quality` Step 4 | ~60% | Add per-line L<line> notation as complement to 5-axis. |
+| Activation instructions (behaviour_adjustment) | N/A — auto-compress, no activation | N/A | **Skip entirely.** Agents auto-compress. |
+| Wenyan intensity levels (wenyan-lite/full/ultra) | N/A — removed per user | N/A | **Skip entirely.** User decided Chinese levels out of scope. |
+| Pattern examples (lite/full/ultra) | Global caveman skill only | 0% in plugin | **Skip.** Stay in global skill as reference. |
+| General communication advice | `using-agent-skills` Core Operating Behaviors | ~60% | **Skip.** Already covered. |
+| Intensity level descriptions (lite/full/ultra) | Global caveman skill | 100% | **Skip.** Already in global skill. |
+| Drop rules (articles/filler/pleasantries/hedging) | No existing coverage | 0% | **Integrate** into Output Compression section. |
+| A0 Compression Boundaries table | No existing coverage | 0% | **Integrate** into Output Compression section. |
+| Auto-clarity rule | `context-engineering` Safe Operations (destructive ops) | ~40% behavioral overlap | **Integrate** into Safe Operations as Communication Override. |
+| Persistence model (active until off) | No existing coverage | 0% | **Integrate** into Output Compression section. |
 
 ---
 
-## What Gets Integrated — The 7 Patches
+## What Gets Integrated — The 6 Patches
 
-### Patch 1 — `skills/context-engineering/SKILL.md`
+### Patch 1 — `skills/context-engineering/SKILL.md`: Output Compression Section
 
-**Adds two new sections:**
+**Location:** New `## Output Compression` section after the existing Safe Operations Protocol section (after line 388).
 
-**Section A: A0 Agent Discipline (from P1 Think Before Coding)**
+**Adds:**
 
-Before any `code_execution_tool` or `text_editor` call, `thoughts[]` must answer:
-1. What is the task? (restate goal)
-2. What are my assumptions? (list explicitly)
-3. Are there multiple interpretations? (present — don't pick silently)
-4. Is there a simpler approach? (propose before complex one)
-5. What context do I need? (read existing code first)
+1. **A0 Compression Boundaries table** — which JSON fields get compressed and which stay verbose:
 
-Stop-and-ask triggers:
-- About to guess a file path or function name
-- Requirement has two plausible interpretations
-- Don't fully understand code about to be modified
-- Simplest solution would change a public interface
+| A0 JSON field | Compressed? | Reason |
+|--------------|------------|--------|
+| `thoughts[]` | ❌ Never | Internal reasoning — always verbose |
+| `headline` | ✅ Yes | User-facing summary |
+| `tool_name` / `tool_args` | ❌ Never | Literal API ids + code/paths must be exact |
+| `response.text` | ✅ Yes | Primary user output |
 
-Example `thoughts[]` pattern (P1 format).
+2. **Compression rules** — what to drop and what to keep:
 
-**Section B: Safe Operations Protocol (from P5 — UNIQUE, not in any existing skill)**
+Drop: articles (a/an/the), filler (just/really/basically/actually/simply), pleasantries ("sure"/"certainly"/"of course"), hedging ("it might be worth"/"you could consider").
 
-What counts as destructive: file/dir deletion, database drops, git force operations, production deploys, irreversible API calls.
+Keep: all technical terms exact, code blocks unchanged, error messages quoted verbatim, numbers/versions/paths exact.
 
-Rules:
-1. State full implication in `thoughts` — what data/state is permanently lost
-2. Confirm with user in `response` before executing — never proceed silently
-3. Verify safety first — `git status`, confirm backups, dry-run where possible
-4. Use `notify_user` for high-impact mid-task warnings
+Pattern: `[thing] [action] [reason]. [next step].`
 
-Example thoughts pattern + response warning format.
+3. **Persistence model** — compression stays active every response until explicitly turned off. Does not revert after many turns, topic changes, or new skill loads.
 
-**Rationale for context-engineering:** Both A0 discipline and safe operations are about HOW the agent operates — not about code quality or testing. context-engineering is the skill about agent setup and behavioral discipline. security-and-hardening is about OWASP/code vulnerabilities, not agent behavioral safety.
+**Rationale:** context-engineering is the skill for A0 behavioral patterns. It already houses Agent Zero Discipline (thoughts[] structure) and Safe Operations Protocol (destructive action handling). Output Compression is the third pillar of A0 agent behavior — how the agent communicates. All three belong together.
+
+**Estimated addition:** ~25-30 lines. Current file: 388 lines → ~415-418 lines (under 500).
 
 ---
 
-### Patch 2 — `skills/spec-driven-development/SKILL.md`
+### Patch 2 — `skills/context-engineering/SKILL.md`: Communication Override in Safe Operations
 
-**Adds one section: A0 Clarification Protocol (from P1 — stop-and-ask)**
+**Location:** New `### Communication Override` subsection inside the existing `## Safe Operations Protocol` section (after line 375, after the Rules list, before the Example subsection).
 
-Before writing any spec or proceeding to implementation, surface:
-- Ambiguous requirements → ask before proceeding
-- Multiple plausible interpretations → present options, don't pick silently
-- Missing context → read existing code before specifying
+**Adds:**
 
-This extends the existing "Ask Clarifying Questions" section with A0-specific stop-and-ask triggers.
+A subsection stating: when any Safe Operations trigger fires (destructive action, security warning, irreversible operation), the agent reverts to full prose — no compression, no fragments, complete sentences with full context. Resume compression after the clear section.
 
-**Rationale:** spec-driven-development already covers clarification, but not the specific triggers for WHEN to stop and ask vs proceed. Karpathy P1's stop-and-ask list fills this gap.
+Triggers for reverting to full prose:
+- Security warnings — CVE-class bugs, credential exposure
+- Irreversible actions — `rm -rf`, `DROP TABLE`, `git push --force`, prod deploy
+- Multi-step sequences where fragment order risks misread
+- User confusion — repeating question or asking for clarification
 
----
+**Rationale:** Safe Operations already defines WHAT counts as destructive and HOW to handle it (confirm, verify, notify). The Communication Override defines HOW TO COMMUNICATE during those moments — switch from compressed to full prose. One place for all safety-related behavior (both action and communication) is cleaner than splitting across sections.
 
-### Patch 3 — `skills/incremental-implementation/SKILL.md`
-
-**Adds to Rule 0 (Simplicity First): A0 Tool Selection Guide**
-
-| Situation | Preferred Approach |
-|-----------|-------------------|
-| Simple text transformation | `terminal` with `sed`, `awk`, `grep` |
-| File inspection | `text_editor:read` — not a Python script |
-| Targeted edit to existing file | `text_editor:patch` — not `text_editor:write` |
-| Multi-step logic or computation | Python in `code_execution_tool` |
-| Reusable component | Only modularize if reuse was asked for |
-
-**Adds to Rule 0.5 (Scope Discipline): A0 Tool Discipline**
-
-Always read before editing:
-- `text_editor:read` the file/section before any patch
-- Use `text_editor:patch` for edits to existing files — `text_editor:write` only for new files
-- Run `git diff --stat && git diff` before responding — every changed line must trace to the request
-- Collateral changes seen? Revert them, mention in response instead
-
-**Rationale:** These are pure Agent Zero tool mechanics. The existing Rule 0 and Rule 0.5 cover the principle but not the A0-specific tool commands.
+**Estimated addition:** ~12-15 lines. Combined with Patch 1, context-engineering goes to ~430-433 lines (under 500).
 
 ---
 
-### Patch 4 — `skills/test-driven-development/SKILL.md`
+### Patch 3 — `agents/code-reviewer/prompts/agent.system.main.specifics.md`
 
-**Adds to Verification section: Goal-Driven Verification Loop (from P4)**
+**Location:** New `## Output Compression` section at end of file (after line 51).
 
-| Imperative (weak) | Goal-Driven (strong) |
-|---|---|
-| "Add validation" | "Write tests for invalid inputs → make them pass" |
-| "Fix the bug" | "Write a test that reproduces it → make it pass" |
-| "Refactor X" | "Tests pass before; tests pass after; diff is smaller" |
-
-Verification mandate:
-- Never report success without showing verification output
-- If verification fails → diagnose root cause → fix → re-verify (loop — don't give up)
-- Always run and attach output: `python -m pytest tests/ -v` or `npm test`
-
-**Rationale:** TDD skill covers Red-Green-Refactor but not the explicit "never report success without evidence" mandate, nor the re-verify loop. This strengthens the verification story.
-
----
-
-### Patch 5 — `skills/git-workflow-and-versioning/SKILL.md`
-
-**Adds strictness to Section 3 (Descriptive Messages):**
-
-- Subject ≤50 chars — count characters, not words
-- Imperative mood only: `add`, `fix`, `remove` — not `added`, `fixes`, `fixing`
-- No trailing period on subject line
-- Never include AI attribution in commits (`Co-authored-by: Claude`, `Generated by AI`, etc.)
-- Body only when the *why* is not obvious — not a summary of what the diff shows
-
-**Rationale:** git-workflow-and-versioning covers format but is looser on length and doesn't address AI attribution (increasingly common issue in A0 context).
-
----
-
-### Patch 6 — `skills/code-review-and-quality/SKILL.md`
-
-**Adds to Step 4 (Categorize Findings): Per-Line Notation**
-
-For surgical, line-level findings, use the compact format as complement to the 5-axis severity labels:
+**Adds:**
 
 ```
-L<line>: <severity> <problem>. <fix>.
+## Output Compression
+
+Compress all output by default. No activation needed — this is your standard communication mode.
+
+**Boundaries:**
+- `thoughts[]`: always verbose — full reasoning, no compression
+- `headline` and `response.text`: compressed — drop filler/articles/pleasantries/hedging
+- `tool_args`: never compressed — exact code/paths required
+
+**Auto-clarity:** Revert to full prose for:
+- Security findings (CVE-class bugs, credential exposure)
+- Destructive operation warnings (force pushes, table drops)
+- Ambiguous review findings where terse phrasing risks misinterpretation
+Resume compression after clear section.
+
+Pattern: `[thing] [action] [reason]. [next step].`
 ```
 
-Severity labels:
-- `🔴 bug:` — broken behavior, will cause incident
-- `🟡 risk:` — works but fragile (null check, race, swallowed error)
-- `🔵 nit:` — style/naming — author can ignore
-- `❓ q:` — genuine question, not a suggestion
+**Rationale:** Code reviewers produce structured reports. Compression makes reports denser and faster to read. But security findings and destructive-operation warnings must never be compressed — a terse "bug in auth" could be missed when it's actually a credential leak. The auto-clarity rule ensures critical findings get full prose.
 
-Examples:
-```
-L42: 🔴 bug: user can be null after .find(). Add guard before .email.
-L88-140: 🔵 nit: 50-line fn does 4 things. Extract validate/normalize/persist.
-L23: 🟡 risk: no retry on 429. Wrap in withBackoff(3).
-```
-
-Drop: "I noticed that...", "You might want to consider...", hedging, restating what the line does.
-
-**Rationale:** The existing skill uses Critical/Nit/Optional/FYI labels which are broad and paragraph-oriented. The L<line> notation complements this for surgical, line-level findings — particularly useful in agent-to-agent reviews.
+**Estimated addition:** ~15-18 lines. Current file: 51 lines → ~66-69 lines.
 
 ---
 
-### Patch 7 — `skills/using-agent-skills/SKILL.md`
+### Patch 4 — `agents/test-engineer/prompts/agent.system.main.specifics.md`
 
-**Adds reference to karpathy-coding-guidelines** in the meta-skill discovery section:
+**Location:** New `## Output Compression` section at end of file (after line 45).
 
-- `karpathy-coding-guidelines` — load before any non-trivial coding task for A0 behavioral discipline (full principles reference)
-- Note that Karpathy principles are now embedded in individual skills — the standalone skill is the full reference, the plugin skills are the embedded practice
+**Adds:**
 
-**Rationale:** The meta-skill governs discovery. Users who want the full Karpathy reference should know it exists as a global skill.
+```
+## Output Compression
+
+Compress all output by default. No activation needed — this is your standard communication mode.
+
+**Boundaries:**
+- `thoughts[]`: always verbose — full reasoning, no compression
+- `headline` and `response.text`: compressed — drop filler/articles/pleasantries/hedging
+- `tool_args`: never compressed — exact code/paths required
+
+**Auto-clarity:** Revert to full prose for:
+- Test failures indicating security vulnerabilities
+- Destructive test operations (dropping test DB, wiping fixtures)
+- Ambiguous test results where terse phrasing could mislead
+Resume compression after clear section.
+
+Pattern: `[thing] [action] [reason]. [next step].`
+```
+
+**Rationale:** Test engineers report results frequently. Compression reduces noise in pass/fail reports. But security-relevant test failures and destructive test setup must use full prose for clarity.
+
+**Estimated addition:** ~15-18 lines. Current file: 45 lines → ~60-63 lines.
 
 ---
 
-## Tech Stack / Constraints
+### Patch 5 — `agents/security-auditor/prompts/agent.system.main.specifics.md`
 
-- Pure Markdown patches — no code changes
-- Follow `docs/skill-anatomy.md` format for any new sections
-- Keep SKILL.md files under 500 lines
-- No duplication: if content is >80% same as existing, add a cross-reference instead
-- Patch style: add clearly-labeled sections (e.g. `## Agent Zero Tool Discipline`), don't rewrite existing sections
+**Location:** New `## Output Compression` section at end of file (after line 52).
+
+**Adds:**
+
+```
+## Output Compression
+
+Compress all output by default. No activation needed — this is your standard communication mode.
+
+**Boundaries:**
+- `thoughts[]`: always verbose — full reasoning, no compression
+- `headline` and `response.text`: compressed — drop filler/articles/pleasantries/hedging
+- `tool_args`: never compressed — exact code/paths required
+
+**Auto-clarity:** Revert to full prose for:
+- ALL security findings (Critical + High severity always full prose)
+- Destructive operation warnings
+- Exploit proof-of-concept descriptions
+- User confusion or requests for clarification
+Resume compression after clear section.
+
+Pattern: `[thing] [action] [reason]. [next step].`
+```
+
+**Rationale:** Security auditors handle the most sensitive findings. While general audit prose can be compressed, ALL Critical/High findings must use full prose — terse "SQL injection in login" could be missed when it's actually exploitable. This agent has the most aggressive auto-clarity triggers.
+
+**Estimated addition:** ~17-20 lines. Current file: 52 lines → ~69-72 lines.
+
+---
+
+### Patch 6 — `skills/using-agent-skills/SKILL.md`: External Reference
+
+**Location:** Add row to the `## External Reference Skills` table (line 180-184).
+
+**Adds:**
+
+| `caveman` | Global (`/a0/usr/skills/caveman/`) | For full compression reference + intensity switching |
+
+Update the note below the table:
+
+> Full A0 behavioral discipline: Think-Before-Coding, Surgical-Changes, Safe-Operations, Terse-Commits, Structured-Review, Output-Compression. Principles are embedded into individual plugin skills above; these are the canonical references.
+
+**Rationale:** The meta-skill governs discovery. Users who want the full caveman reference (intensity switching, pattern examples, wenyan levels) should know it exists as a global skill. The embedded version is the auto-compress default.
+
+**Estimated addition:** ~3-4 lines. Current file: 184 lines → ~187-188 lines.
+
+---
+
+## Project Structure (Files Modified)
+
+```
+skills/context-engineering/SKILL.md        ← Patch 1 + 2 (Output Compression + Communication Override)
+agents/code-reviewer/prompts/agent.system.main.specifics.md  ← Patch 3
+agents/test-engineer/prompts/agent.system.main.specifics.md   ← Patch 4
+agents/security-auditor/prompts/agent.system.main.specifics.md ← Patch 5
+skills/using-agent-skills/SKILL.md         ← Patch 6
+```
+
+**Files NOT modified:**
+- All other 19 skills (no relevant overlap)
+- Global caveman skill (`/a0/usr/skills/caveman/`) — stays as-is, full reference
+- No new files created
+
+---
+
+## Commands
+
+N/A — This integration is pure Markdown patches. No code, scripts, or commands added.
 
 ---
 
@@ -192,17 +229,50 @@ Drop: "I noticed that...", "You might want to consider...", hedging, restating w
 
 - New sections use `##` or `###` headings consistent with the file's existing heading depth
 - Tables, code blocks, and bullet lists — match the skill's existing formatting style
-- A0-specific content labeled clearly ("Agent Zero", "A0", or "In Agent Zero Terms")
+- A0-specific content labeled clearly ("Agent Zero", "A0", or section title contains "Output Compression")
 - Every patch is self-contained — can be reverted without affecting surrounding content
+- Agent specifics patches use identical structure for consistency across the 3 agents
+- Patch-only approach: add clearly-labeled sections, never rewrite existing content
 
 ---
 
 ## Testing Strategy
 
-- Manual: load each patched skill via `skills_tool:load` and verify it loads without error
-- Manual: read each patched SKILL.md and verify the new section is present and correct
-- CI: `scripts/validate.py` validates all SKILL.md frontmatter — run and confirm 0 failures
-- No unit tests required — these are Markdown patches
+### Validation
+- Run `python3 scripts/validate.py` — all 44 checks must pass (frontmatter, line counts, etc.)
+- Run `python3 -m pytest tests/ -v` — all 39 tests must pass
+- Verify line counts: `wc -l skills/context-engineering/SKILL.md skills/using-agent-skills/SKILL.md agents/*/prompts/agent.system.main.specifics.md` — all under 500 lines
+
+### Manual Verification
+- Load each patched skill via `skills_tool:load` and verify it loads without error
+- Read each patched file and verify the new section is present and correct
+- Verify grep for key content:
+
+```bash
+# Verify Output Compression section exists in context-engineering
+grep -ic 'output compression' skills/context-engineering/SKILL.md && echo '✅'
+
+# Verify Communication Override exists in context-engineering Safe Operations
+grep -ic 'communication override' skills/context-engineering/SKILL.md && echo '✅'
+
+# Verify A0 Compression Boundaries table exists
+grep -ic 'compression boundaries' skills/context-engineering/SKILL.md && echo '✅'
+
+# Verify auto-clarity in each agent specifics
+for agent in code-reviewer test-engineer security-auditor; do
+  count=$(grep -ic 'auto-clarity' agents/$agent/prompts/agent.system.main.specifics.md)
+  [ "$count" -gt 0 ] && echo "✅ $agent" || echo "❌ $agent"
+done
+
+# Verify caveman reference in using-agent-skills
+grep -ic 'caveman' skills/using-agent-skills/SKILL.md && echo '✅'
+
+# Verify line counts under 500
+for f in skills/context-engineering/SKILL.md skills/using-agent-skills/SKILL.md agents/*/prompts/agent.system.main.specifics.md; do
+  lines=$(wc -l < $f)
+  [ $lines -lt 500 ] && echo "✅ $lines $f" || echo "❌ $lines $f"
+done
+```
 
 ---
 
@@ -210,36 +280,51 @@ Drop: "I noticed that...", "You might want to consider...", hedging, restating w
 
 **Always:**
 - Patch only — never rewrite existing sections
-- New content must be uniquely Karpathy / A0-specific — no general advice
-- Keep each patch focused: one concept, one section, one skill
+- New content must be uniquely Caveman / A0-specific — no general advice
+- Keep each patch focused: one concept, one section, one target
+- Use identical structure for the 3 agent specifics patches (maintain consistency)
+- Respect the auto-compress decision: no activation instructions, no "load caveman skill first"
 
 **Ask first:**
 - If a patch would exceed 500 lines for the target skill
-- If a principle maps equally well to two skills
+- If auto-clarity triggers should differ across the 3 agents (currently differentiated)
+- If the Communication Override should be a standalone section vs subsection of Safe Operations
 
 **Never:**
-- Duplicate content between skills
-- Remove or rewrite existing skill content
-- Add general software engineering advice that has no A0-specific angle
-- Add karpathy-coding-guidelines as a plugin skill (it's a global skill — leave it there)
+- Duplicate content between skills or agent specifics
+- Remove or rewrite existing skill/spec content
+- Add wenyan/Chinese levels (removed per user decision)
+- Add activation instructions (auto-compress is the default)
+- Add caveman as a plugin skill (it's a global skill — leave it there)
+- Include pattern examples from the global skill (they stay there as reference)
+- Compress `thoughts[]` or `tool_args` — ever
 
 ---
 
 ## Success Criteria
 
-- [ ] All 7 patches applied — 6 skills updated + using-agent-skills
-- [ ] Each patch adds only unique, non-duplicated content
+- [ ] All 6 patches applied — 2 to context-engineering, 3 agent specifics, 1 using-agent-skills
+- [ ] Output Compression section exists in `context-engineering` with boundaries table
+- [ ] Communication Override subsection exists inside Safe Operations in `context-engineering`
+- [ ] Compression rules (drop/keep/pattern) present in `context-engineering`
+- [ ] Persistence model present in `context-engineering`
+- [ ] All 3 agent specifics have `## Output Compression` section
+- [ ] All 3 agent specifics have auto-clarity with agent-appropriate triggers
+- [ ] `using-agent-skills` references caveman in External Reference Skills table
 - [ ] No SKILL.md exceeds 500 lines after patches
-- [ ] `python3 scripts/validate.py` exits 0 — all frontmatter valid
+- [ ] `python3 scripts/validate.py` exits 0 — all 44 checks pass
+- [ ] `python3 -m pytest tests/ -v` exits 0 — all 39 tests pass
 - [ ] Each patched skill loads correctly via `skills_tool:load`
-- [ ] The A0 Safe Operations protocol is present in `context-engineering`
-- [ ] The `thoughts[]` pattern is present in `context-engineering`
-- [ ] Per-line L<line> notation is present in `code-review-and-quality`
-- [ ] Commit message: `feat: integrate karpathy A0-specific discipline into skills (Option B)`
+- [ ] Commit message: `docs: spec for caveman Option B integration`
 
 ---
 
 ## Open Questions
 
-- Should the `git diff --stat` audit step be added to CI as an automated check?
-- Should the A0 Complete Coding Workflow diagram from karpathy-coding-guidelines be embedded in `context-engineering` as a summary diagram, or is it better left in the standalone karpathy skill?
+1. **Auto-clarity trigger differentiation:** The 3 agent specifics currently have slightly different auto-clarity triggers (security-auditor has the most aggressive). Is this differentiation correct, or should all 3 use identical triggers?
+
+2. **Output Compression in agent specifics vs context-engineering:** The 3 agent specifics each get a self-contained compression section. This is slight duplication (~15 lines × 3), but ensures each agent works standalone without needing to load context-engineering first. Acceptable trade-off?
+
+3. **Intensity level mention:** Should the Output Compression section in context-engineering mention lite/full/ultra as available modes, or leave that entirely to the global skill?
+
+4. **Future karpathy+caveman synergy:** The Safe Operations Protocol (from karpathy) now has Communication Override (from caveman). Should we add a cross-reference note linking Agent Zero Discipline → Output Compression → Safe Operations as a unified A0 behavior model?
