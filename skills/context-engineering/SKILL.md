@@ -374,10 +374,9 @@ For destructive or irreversible actions: be explicit, confirm with user, never p
 {"tool_name": "notify_user", "tool_args": {"message": "⚠️ About to DROP TABLE users — awaiting your confirmation", "type": "warning", "priority": "high"}}
 ```
 
-
 ### Communication Override
 
-When any Safe Operations trigger fires, revert to full prose — no compression, no fragments, complete sentences with full context. Resume compression after the clear section.
+When any Safe Operations trigger fires, revert to full prose — no compression, no fragments, complete sentences with full context. Resume compression after the full-prose section.
 
 **Triggers for full prose:**
 - Security warnings — CVE-class bugs, credential exposure
@@ -400,7 +399,7 @@ When any Safe Operations trigger fires, revert to full prose — no compression,
 
 ## Output Compression
 
-Compress output by default. ~75% token reduction while preserving all technical substance.
+Compress output by default. Target ~75% token reduction while preserving all technical substance.
 
 ### A0 Compression Boundaries
 

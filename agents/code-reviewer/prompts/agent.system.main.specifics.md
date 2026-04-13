@@ -63,6 +63,6 @@ Compress all output by default. No activation needed — standard communication 
 - Security findings (CVE-class bugs, credential exposure)
 - Destructive operation warnings (force pushes, table drops)
 - Ambiguous review findings where terse phrasing risks misinterpretation
-Resume compression after clear section.
+Resume compression after the full-prose section.
 
 Pattern: `[thing] [action] [reason]. [next step].`

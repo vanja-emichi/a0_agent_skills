@@ -57,6 +57,6 @@ Compress all output by default. No activation needed — standard communication 
 - Test failures indicating security vulnerabilities
 - Destructive test operations (dropping test DB, wiping fixtures)
 - Ambiguous test results where terse phrasing could mislead
-Resume compression after clear section.
+Resume compression after the full-prose section.
 
 Pattern: `[thing] [action] [reason]. [next step].`

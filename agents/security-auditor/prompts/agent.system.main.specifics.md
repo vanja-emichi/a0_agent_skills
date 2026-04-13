@@ -65,6 +65,6 @@ Compress all output by default. No activation needed — standard communication 
 - Destructive operation warnings
 - Exploit proof-of-concept descriptions
 - User confusion or requests for clarification
-Resume compression after clear section.
+Resume compression after the full-prose section.
 
 Pattern: `[thing] [action] [reason]. [next step].`
