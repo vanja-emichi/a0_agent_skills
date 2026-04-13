@@ -14,8 +14,6 @@ every turn. Token cost is negligible. Follows the ladybug_memory pattern.
 """
 from __future__ import annotations
 
-from pathlib import Path
-
 from agent import LoopData
 from helpers.extension import Extension
 from helpers.print_style import PrintStyle
