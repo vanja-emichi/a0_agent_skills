@@ -48,7 +48,7 @@ Two complementary approaches — use both:
 ```bash
 # Synthetic: Lighthouse in Chrome DevTools (or CI)
 # Chrome DevTools → Performance tab → Record
-# Chrome DevTools MCP → Performance trace
+# playwright-cli tracing-start / tracing-stop → Playwright trace (network timing + action timeline)
 
 # RUM: Web Vitals library in code
 import { onLCP, onINP, onCLS } from 'web-vitals';
