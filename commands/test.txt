@@ -12,6 +12,6 @@ For bug fixes (Prove-It pattern):
 4. Confirm the test passes
 5. Run the full test suite for regressions
 
-For browser-related issues, also load `skills_tool:load browser-testing-with-devtools` to verify with Chrome DevTools MCP.
+For browser-related issues, also load `skills_tool:load browser-testing-with-devtools` to verify with `playwright-cli`.
 
 {raw}
