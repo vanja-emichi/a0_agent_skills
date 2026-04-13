@@ -6,6 +6,7 @@ Verifies that:
 - All required playwright-cli commands are documented
 - Security boundaries are preserved
 - Command .txt files are free of stale MCP references
+- docs/ and README.md describe browser skill with playwright-cli, not Chrome DevTools
 """
 
 from pathlib import Path
@@ -14,6 +15,8 @@ import pytest
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 SKILLS_DIR = PROJECT_ROOT / "skills"
 COMMANDS_DIR = PROJECT_ROOT / "commands"
+DOCS_DIR = PROJECT_ROOT / "docs"
+README_MD = PROJECT_ROOT / "README.md"
 BROWSER_SKILL = SKILLS_DIR / "browser-testing-with-devtools" / "SKILL.md"
 
 # Stale references that must not exist anywhere in skills or commands
@@ -23,6 +26,13 @@ STALE_MCP_PATTERNS = [
     "mcpServers",
     ".mcp.json",
     "Chrome DevTools MCP",
+]
+
+# Broader stale patterns for docs/ and README where descriptions must reference
+# playwright-cli rather than Chrome DevTools tooling.
+DOCS_STALE_PATTERNS = STALE_MCP_PATTERNS + [
+    "`chrome-devtools` MCP",   # gemini-cli-setup: "`chrome-devtools` MCP extension"
+    "via Chrome DevTools",     # README: "via Chrome DevTools"
 ]
 
 # playwright-cli commands that must appear in browser-testing-with-devtools.
@@ -51,25 +61,28 @@ REQUIRED_SECURITY_PHRASES = [
 ]
 
 
-def _stale_mcp_violations(files, name_fn):
+def _stale_mcp_violations(files, name_fn, patterns=None):
     """Return violation messages for any file containing a stale MCP pattern.
 
     Args:
         files: iterable of Path objects to scan
         name_fn: callable(Path) -> str for the violation label (e.g. file name)
+        patterns: list of patterns to check; defaults to STALE_MCP_PATTERNS
     Returns:
         List of "<label>: contains '<pattern>'" strings; empty if clean.
     """
+    if patterns is None:
+        patterns = STALE_MCP_PATTERNS
     return [
         f"{name_fn(f)}: contains '{pattern}'"
         for f in files
-        for pattern in STALE_MCP_PATTERNS
+        for pattern in patterns
         if pattern in f.read_text()
     ]
 
 
 class TestNoStaleMCPReferences:
-    """No skill or command file may reference Chrome DevTools MCP."""
+    """No skill, command, docs, or README file may reference Chrome DevTools MCP."""
 
     def test_skills_dir_exists(self):
         assert SKILLS_DIR.exists(), "skills/ directory must exist"
@@ -96,6 +109,26 @@ class TestNoStaleMCPReferences:
         )
         assert not violations, (
             "Stale MCP references found in command files:\n" + "\n".join(violations)
+        )
+
+    def test_no_stale_mcp_in_docs_md_files(self):
+        """docs/*.md must not describe browser skill with Chrome DevTools tooling."""
+        violations = _stale_mcp_violations(
+            DOCS_DIR.glob("*.md"), lambda f: f"docs/{f.name}",
+            patterns=DOCS_STALE_PATTERNS,
+        )
+        assert not violations, (
+            "Stale Chrome DevTools references found in docs:\n" + "\n".join(violations)
+        )
+
+    def test_no_stale_mcp_in_readme(self):
+        """README.md must describe browser skill with playwright-cli, not Chrome DevTools."""
+        violations = _stale_mcp_violations(
+            [README_MD], lambda f: f.name,
+            patterns=DOCS_STALE_PATTERNS,
+        )
+        assert not violations, (
+            "Stale Chrome DevTools references found in README:\n" + "\n".join(violations)
         )
 
 

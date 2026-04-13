@@ -61,7 +61,7 @@ Skills activate automatically based on context — no configuration needed.
 
 | Skill | Purpose |
 |-------|----------|
-| `browser-testing-with-devtools` | Live runtime data via Chrome DevTools |
+| `browser-testing-with-devtools` | Live runtime browser data via playwright-cli |
 | `debugging-and-error-recovery` | Systematic root-cause debugging |
 
 **Review:**
