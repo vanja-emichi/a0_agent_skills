@@ -1,156 +1,315 @@
-# Implementation Plan: GitHub Actions CI Validation
+# Implementation Plan: Karpathy Coding Guidelines — Option B Integration
 
 ## Overview
 
-Add a GitHub Actions CI pipeline that validates the plugin structure on every push and pull request. The pipeline runs a pure-Python validation script that checks all plugin components — no external tools or Claude Code CLI required. The script is also runnable locally for pre-commit validation.
+Patch 7 existing skill files with the unique, A0-specific content from `karpathy-coding-guidelines`. No new skills created. No existing sections rewritten. Each patch is self-contained and independently revertable.
 
-## Architecture Decisions
+## Principles
 
-- **Pure Python script, no external deps** — Upstream used `claude plugin validate .` (Claude Code CLI). We write our own validator using only Python stdlib (yaml via `python3-yaml`, pathlib, sys). No npm install, no Claude CLI. Runs anywhere Python 3.8+ is available.
-- **Script-first, CI-second** — The validation script is the primary artifact. CI just calls it. This makes local validation identical to CI validation.
-- **Exit code contract** — Script exits 0 on full pass, 1 on any failure. CI fails the workflow on non-zero exit.
-- **Clear per-check output** — Each check prints PASS/FAIL with the file path and reason. Human-readable and machine-parseable.
+- **Patch-only** — `text_editor:patch`, never `text_editor:write` on existing files
+- **Read first** — `text_editor:read` the full skill before patching
+- **Verify after** — check line count doesn't exceed 500, skill loads without error
+- **No duplication** — new sections add only what the karpathy SKILL.md has that the target skill doesn't
 
 ## Dependency Graph
 
 ```
 SPEC.md (existing)
-    │
-    ├── scripts/validate.py          ← T1: validation logic
-    │       │
-    │       └── .github/workflows/ci.yml  ← T2: calls script in CI
-    │               │
-    │               └── README.md update  ← T3: CI badge
+     │
+     ├── T1: context-engineering          ─┐
+     ├── T2: spec-driven-development       │
+     ├── T3: incremental-implementation    │  All independent
+     ├── T4: test-driven-development       │  (different files)
+     ├── T5: git-workflow-and-versioning   │
+     ├── T6: code-review-and-quality      ─┘
+     ├── T7: using-agent-skills
+     │
+     └── T8: CI validation + commit
 ```
 
-Implementation order: T1 → T2 → T3 (each depends on prior).
+All T1–T7 are independent and could be parallelized. T8 is a gate that runs after all patches are applied.
 
 ---
 
 ## Tasks
 
-### Phase 1: Validation Script
+### Phase 1: High-Value Unique Content
 
-#### Task 1: Python validation script
+The most unique Karpathy content — not covered by any existing skill.
 
-**Description:** Write `scripts/validate.py` — a standalone Python 3 script that validates the plugin structure. Covers all components defined in SPEC.md. Runs locally and in CI. Produces clear per-check output.
+#### Task 1 — `skills/context-engineering/SKILL.md`
 
-**What it validates:**
+**Adds two new sections at the end of the file:**
 
-| Check | Rule |
-|-------|------|
-| `plugin.yaml` | Must exist; must have `name`, `title`, `version`, `description` fields |
-| `skills/*/SKILL.md` | Each skill dir must have SKILL.md; must have YAML frontmatter with `name` and `description` |
-| `agents/*/agent.yaml` | Each agent dir must have agent.yaml; must have `title`, `description`, `context` |
-| `agents/*/prompts/agent.system.main.specifics.md` | Must exist for each agent |
-| `commands/*.command.yaml` | Must have `name`, `description`, `type`, `template_path`; paired `.txt` must exist |
-| `extensions/**/*.py` | Files named `_NN_*.py` — valid Python syntax (`py_compile`) |
-| `references/*.md` | Must be non-empty |
+**Section A: `## Agent Zero Discipline (Think Before Coding)`**
+
+Content from Karpathy P1 — A0-specific `thoughts[]` pattern:
+- Pre-coding `thoughts[]` checklist: restate goal, list assumptions, surface interpretations, propose simple approach, read first
+- Stop-and-ask triggers: guessing file paths, ambiguous requirements, code not understood, public interface change
+- Example `thoughts[]` pattern with inline comments
+- Complete A0 coding workflow diagram (from karpathy SKILL.md)
+
+**Section B: `## Safe Operations Protocol`**
+
+Content from Karpathy P5 — fully missing from all existing skills:
+- What counts as destructive (rm, DROP TABLE, git push --force, production deploys, irreversible API calls)
+- 4 rules: state implication in thoughts → confirm with user → verify safety first → use notify_user
+- Example thoughts pattern for destructive ops
+- Example response warning template
 
 **Acceptance criteria:**
-- [ ] Script exits 0 on this repo (all checks currently pass)
-- [ ] Script exits 1 if any check fails
-- [ ] Each check prints `PASS` or `FAIL [reason] [path]`
-- [ ] Summary at end: `N checks passed, M failed`
-- [ ] Runs with `python3 scripts/validate.py` from repo root
-- [ ] No external pip dependencies (only stdlib + PyYAML which is always available)
+- [ ] Section A present in context-engineering SKILL.md
+- [ ] Section B present with full Safe Operations rules
+- [ ] File still valid YAML frontmatter
+- [ ] File under 500 lines after patch
+- [ ] No content duplicated from existing sections
 
 **Verification:**
 ```bash
-cd /a0/usr/projects/agent_skills
+wc -l skills/context-engineering/SKILL.md   # must be ≤ 500
+grep -c 'Safe Operations' skills/context-engineering/SKILL.md   # must be ≥ 1
+grep -c 'thoughts' skills/context-engineering/SKILL.md           # must be ≥ 1
 python3 scripts/validate.py
-echo "Exit: $?"
 ```
 
-**Dependencies:** None (first task)
+**Files touched:** `skills/context-engineering/SKILL.md` (patch)
 
-**Files touched:**
-- `scripts/validate.py` (new)
-
-**Estimated scope:** S (1 file, ~80-100 lines)
+**Estimated scope:** M (two sections, ~40-60 lines of new content)
 
 ---
 
-### Checkpoint: After Task 1
+#### Task 2 — `skills/spec-driven-development/SKILL.md`
 
-- [ ] `python3 scripts/validate.py` runs and exits 0
-- [ ] All 7 check categories produce PASS output
-- [ ] Intentionally breaking a check (e.g., removing a required field) produces FAIL + exits 1
+**Adds one new section: `## Agent Zero Clarification Protocol`**
 
----
-
-### Phase 2: CI Workflow
-
-#### Task 2: GitHub Actions workflow
-
-**Description:** Write `.github/workflows/ci.yml` that runs the validation script on every push and pull request. No external tools needed — just Python 3 (pre-installed on all GitHub runners).
+Content from Karpathy P1 stop-and-ask, adapted for spec context:
+- When to stop and ask vs proceed: ambiguous requirements, multiple interpretations, missing context
+- Read existing code before specifying (not just ask questions)
+- Example of presenting options vs picking silently
 
 **Acceptance criteria:**
-- [ ] Workflow triggers on `push` and `pull_request` to `main`
-- [ ] Uses `ubuntu-latest` runner
-- [ ] Steps: checkout → run `python3 scripts/validate.py`
-- [ ] Workflow YAML is valid
-- [ ] CI passes on first push after this task
-- [ ] Workflow name and job name are human-readable in GitHub UI
+- [ ] New section present in spec-driven-development SKILL.md
+- [ ] Contains stop-and-ask triggers specific to spec phase
+- [ ] File under 500 lines
+- [ ] No duplication with existing "Ask Clarifying Questions" section
 
 **Verification:**
 ```bash
-# Local YAML syntax check
-python3 -c "import yaml; yaml.safe_load(open('.github/workflows/ci.yml'))"
-echo "YAML valid: $?"
-# Then: push to GitHub and verify Actions tab shows green
+wc -l skills/spec-driven-development/SKILL.md
+grep -c 'Clarification Protocol\|stop.*ask\|present.*options' skills/spec-driven-development/SKILL.md
+python3 scripts/validate.py
 ```
 
-**Dependencies:** Task 1 (script must exist)
+**Files touched:** `skills/spec-driven-development/SKILL.md` (patch)
 
-**Files touched:**
-- `.github/workflows/ci.yml` (new)
-- `.github/` directory (new)
-
-**Estimated scope:** XS (~25 lines YAML)
+**Estimated scope:** S (~15-20 lines)
 
 ---
 
-### Checkpoint: After Task 2
+### Phase 2: Tool Discipline
 
-- [ ] GitHub Actions run visible at `https://github.com/vanja-emichi/a0_agent_skills/actions`
-- [ ] Most recent run shows green checkmark
-- [ ] All 7 check categories pass in CI log
+#### Task 3 — `skills/incremental-implementation/SKILL.md`
 
----
+**Adds to Rule 0: `### A0 Tool Selection Guide` subsection**
 
-### Phase 3: Documentation
+Table from Karpathy P2:
 
-#### Task 3: README CI badge
+| Situation | Preferred Approach |
+|-----------|-------------------|
+| Simple text transformation | `terminal` with `sed`, `awk`, `grep` |
+| File inspection | `text_editor:read` — not a Python script |
+| Targeted edit to existing file | `text_editor:patch` — not `text_editor:write` |
+| Multi-step logic or computation | Python in `code_execution_tool` |
+| Reusable component | Only modularize if reuse was asked for |
 
-**Description:** Add GitHub Actions CI badge to README.md so plugin users can see build status at a glance.
+**Adds to Rule 0.5: `### A0 Tool Discipline` subsection**
+
+Content from Karpathy P3:
+- `text_editor:read` the file before any patch
+- Use `text_editor:patch` for edits — `text_editor:write` only for new files
+- `git diff --stat && git diff` audit before responding
+- Collateral changes → revert, mention in response
 
 **Acceptance criteria:**
-- [ ] Badge at top of README, below the title
-- [ ] Badge links to the Actions workflow runs page
-- [ ] Badge shows current status (green after Task 2 CI passes)
+- [ ] Tool selection table present under Rule 0
+- [ ] Tool discipline rules present under Rule 0.5
+- [ ] File under 500 lines
+- [ ] No duplication with existing Rule 0 / Rule 0.5 content
 
 **Verification:**
 ```bash
-# Check badge markdown is correct
-head -10 README.md | grep actions
+wc -l skills/incremental-implementation/SKILL.md
+grep -c 'text_editor:patch\|Tool Selection' skills/incremental-implementation/SKILL.md
+python3 scripts/validate.py
 ```
 
-**Dependencies:** Task 2 (CI must exist to have a badge URL)
+**Files touched:** `skills/incremental-implementation/SKILL.md` (patch)
 
-**Files touched:**
-- `README.md` (patch — add 1 line)
-
-**Estimated scope:** XS (1 line)
+**Estimated scope:** S (~25-30 lines)
 
 ---
 
-### Checkpoint: Complete
+### Phase 3: Verification & Review
 
-- [ ] `python3 scripts/validate.py` passes locally
-- [ ] GitHub Actions shows green on latest commit
-- [ ] README badge visible and green
-- [ ] All success criteria from SPEC.md CI section met
+#### Task 4 — `skills/test-driven-development/SKILL.md`
+
+**Adds to Verification section: `### Goal-Driven Verification Loop`**
+
+Content from Karpathy P4:
+- Weak→strong task transformation table
+- Never-report-success-without-output mandate
+- Re-verify loop — diagnose → fix → re-verify (don't give up)
+- Verification commands cheatsheet (pytest, npm test, smoke test)
+
+**Acceptance criteria:**
+- [ ] Goal-driven table present
+- [ ] "never report success without verification output" rule present
+- [ ] File under 500 lines
+- [ ] No duplication with existing Verification section checklist
+
+**Verification:**
+```bash
+wc -l skills/test-driven-development/SKILL.md
+grep -c 'Goal-Driven\|never report' skills/test-driven-development/SKILL.md
+python3 scripts/validate.py
+```
+
+**Files touched:** `skills/test-driven-development/SKILL.md` (patch)
+
+**Estimated scope:** S (~25-30 lines)
+
+---
+
+#### Task 5 — `skills/git-workflow-and-versioning/SKILL.md`
+
+**Adds to Section 3 (Descriptive Messages): `### A0 Commit Strictness`**
+
+Content from Karpathy P6 — stricter than existing rules:
+- Subject ≤50 chars rule (count characters, not words)
+- Imperative mood only: `add`, `fix`, `remove` — not `added`, `fixes`, `fixing`
+- No trailing period on subject line
+- Never include AI attribution (`Co-authored-by: Claude`, `Generated by AI`, etc.)
+- Body only when the *why* is not obvious — not a summary of the diff
+
+**Acceptance criteria:**
+- [ ] ≤50 chars rule present
+- [ ] No AI attribution rule present
+- [ ] File under 500 lines
+- [ ] No duplication with existing "Descriptive Messages" section
+
+**Verification:**
+```bash
+wc -l skills/git-workflow-and-versioning/SKILL.md
+grep -c 'AI attribution\|50 char' skills/git-workflow-and-versioning/SKILL.md
+python3 scripts/validate.py
+```
+
+**Files touched:** `skills/git-workflow-and-versioning/SKILL.md` (patch)
+
+**Estimated scope:** S (~20 lines)
+
+---
+
+#### Task 6 — `skills/code-review-and-quality/SKILL.md`
+
+**Adds to Step 4 (Categorize Findings): `### Per-Line Notation (Compact Format)`**
+
+Content from Karpathy P7 — complement to existing 5-axis severity labels:
+- Format: `L<line>: <severity> <problem>. <fix>.`
+- Severity labels: 🔴 bug, 🟡 risk, 🔵 nit, ❓ q
+- 3 examples showing the format in use
+- What to drop (hedging, "I noticed that...", restating what the line does)
+- Auto-clarity exception (write full paragraph for CVE-class bugs)
+
+**Acceptance criteria:**
+- [ ] Per-line notation section present under Step 4
+- [ ] All 4 severity emoji labels documented
+- [ ] 3 examples present
+- [ ] File under 500 lines
+- [ ] Does not replace existing Critical/Nit/Optional/FYI labels — complements them
+
+**Verification:**
+```bash
+wc -l skills/code-review-and-quality/SKILL.md
+grep -c 'Per-Line Notation\|L<line>' skills/code-review-and-quality/SKILL.md
+python3 scripts/validate.py
+```
+
+**Files touched:** `skills/code-review-and-quality/SKILL.md` (patch)
+
+**Estimated scope:** S (~25-30 lines)
+
+---
+
+### Phase 4: Meta-Skill Update
+
+#### Task 7 — `skills/using-agent-skills/SKILL.md`
+
+**Adds reference to karpathy-coding-guidelines in skill discovery section**
+
+Content:
+- `karpathy-coding-guidelines` entry in the skill reference table/list
+- Note: Karpathy principles are now embedded in individual skills — this is the full reference
+- When to load it directly: before any non-trivial coding task as full principles reference
+
+**Acceptance criteria:**
+- [ ] `karpathy-coding-guidelines` referenced in using-agent-skills
+- [ ] Correct description of relationship (embedded vs full reference)
+- [ ] File under 500 lines
+
+**Verification:**
+```bash
+wc -l skills/using-agent-skills/SKILL.md
+grep -c 'karpathy' skills/using-agent-skills/SKILL.md
+python3 scripts/validate.py
+```
+
+**Files touched:** `skills/using-agent-skills/SKILL.md` (patch)
+
+**Estimated scope:** XS (~10 lines)
+
+---
+
+### Phase 5: Validation & Commit
+
+#### Task 8 — CI validation + single commit
+
+**After all 7 patches are applied:**
+
+1. Run `python3 scripts/validate.py` — must exit 0 (44 checks, all PASS)
+2. Run `python3 -m pytest tests/ -v` — 39/39 must pass (no test changes needed)
+3. Check each patched skill line count ≤ 500
+4. Single commit: `feat: integrate karpathy A0-specific discipline into skills (Option B)`
+5. Push to GitHub, verify CI green
+
+**Acceptance criteria:**
+- [ ] All 7 patches applied
+- [ ] `python3 scripts/validate.py` exits 0
+- [ ] `python3 -m pytest tests/ -v` → 39 passed
+- [ ] No SKILL.md exceeds 500 lines
+- [ ] CI green on GitHub Actions
+
+**Verification:**
+```bash
+python3 scripts/validate.py
+python3 -m pytest tests/ -v
+for f in skills/*/SKILL.md; do lines=$(wc -l < $f); echo "$lines $f"; done | sort -rn | head -5
+git log --oneline -1
+```
+
+---
+
+## Checkpoints
+
+**After Phase 1 (T1+T2):** context-engineering has both unique sections, spec-driven-development has clarification protocol. Both validate OK.
+
+**After Phase 2 (T3):** incremental-implementation has A0 tool discipline embedded. Validate OK.
+
+**After Phase 3 (T4+T5+T6):** TDD, git, and code review skills all enriched. Validate OK.
+
+**After Phase 4 (T7):** Meta-skill links to karpathy reference. Validate OK.
+
+**Final (T8):** Full validation suite passes. CI green. Single commit.
 
 ---
 
@@ -158,11 +317,7 @@ head -10 README.md | grep actions
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| PyYAML not available on runner | Medium | GitHub ubuntu-latest has python3-yaml pre-installed; add `pip install pyyaml` step as fallback |
-| Validation too strict, breaks on edge cases | Low | Test locally first on real repo before pushing CI |
-| Symlinks in .a0proj not committed | None | .a0proj is gitignored; validation script only checks tracked files |
-
-## Open Questions
-
-- Should CI also validate Python extension syntax beyond `py_compile` (e.g., import check)? Currently: no, too risky without A0 framework available in CI.
-- Should we add a `workflow_dispatch` trigger for manual runs? Nice to have — easy to add.
+| Patch pushes a skill over 500 lines | Medium | Check `wc -l` after each patch; split into smaller additions if needed |
+| Content accidentally duplicates existing section | Medium | Read full skill before patching; compare with karpathy content |
+| Patch applies to wrong line numbers (file drifts) | Low | Always `text_editor:read` immediately before `text_editor:patch` |
+| CI fails due to frontmatter issue | Low | `python3 scripts/validate.py` catches this before push |
