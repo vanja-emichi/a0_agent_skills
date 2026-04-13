@@ -59,6 +59,7 @@ skills_tool:load <skill-name>
 | Writing docs / ADRs | `documentation-and-adrs` |
 | Removing old systems | `deprecation-and-migration` |
 | Deploying / launching | `shipping-and-launch` |
+| Discover which skill applies | `using-agent-skills` |
 
 **Rules:** Check for an applicable skill before starting. Skills are workflows,
 not suggestions — follow steps in order. Multiple skills can chain (e.g.
