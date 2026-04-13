@@ -43,10 +43,8 @@ def _pass(msg: str) -> Result:
 
 
 def _fail(reason: str, path: str = "") -> Result:
-    parts = ["FAIL", reason]
-    if path:
-        parts.append(str(path))
-    return (False, " ".join(parts))
+    suffix = f" {path}" if path else ""
+    return (False, f"FAIL {reason}{suffix}")
 
 
 # ---------------------------------------------------------------------------
@@ -94,11 +92,10 @@ def _parse_frontmatter(text: str) -> dict | None:
     if not lines or lines[0].strip() != "---":
         return None
     # Find closing ---
-    end_idx = None
-    for i, line in enumerate(lines[1:], start=1):
-        if line.strip() == "---":
-            end_idx = i
-            break
+    end_idx = next(
+        (i for i, line in enumerate(lines[1:], start=1) if line.strip() == "---"),
+        None,
+    )
     if end_idx is None:
         return None
     fm_text = "\n".join(lines[1:end_idx])

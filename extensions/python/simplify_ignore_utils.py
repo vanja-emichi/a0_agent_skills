@@ -38,6 +38,12 @@ def _block_hash(content: str) -> str:
     return hashlib.sha1(content.encode('utf-8', errors='replace')).hexdigest()[:8]
 
 
+def _placeholder_line(h: str, prefix: str, suffix: str, reason: str) -> str:
+    if reason:
+        return f'{prefix}BLOCK_{h}: {reason}{suffix}'
+    return f'{prefix}BLOCK_{h}{suffix}'
+
+
 # ── Marker line parsing ───────────────────────────────────────────────────────
 
 def _parse_start_line(line: str):
@@ -67,7 +73,6 @@ def _parse_start_line(line: str):
     marker = 'simplify-ignore-start:'
     if marker in line:
         after = line[line.index(marker) + len(marker):]
-        after = after.strip()
         # Strip closing comment delimiter and trailing whitespace
         after = re.sub(r'\s*\*/.*$', '', after)
         after = re.sub(r'\s*-->.*$', '', after)
@@ -126,10 +131,7 @@ def filter_content(content: str, file_path: str = '<unknown>'):
                 count += 1
                 blocks[h] = {'content': buf, 'reason': reason,
                              'prefix': prefix, 'suffix': suffix}
-                if reason:
-                    output_lines.append(f'{prefix}BLOCK_{h}: {reason}{suffix}')
-                else:
-                    output_lines.append(f'{prefix}BLOCK_{h}{suffix}')
+                output_lines.append(_placeholder_line(h, prefix, suffix, reason))
                 buf_lines = []
                 reason = prefix = suffix = ''
             # else: multi-line block opened — start line is NOT written to output
@@ -148,10 +150,7 @@ def filter_content(content: str, file_path: str = '<unknown>'):
         count += 1
         blocks[h] = {'content': buf, 'reason': reason,
                      'prefix': prefix, 'suffix': suffix}
-        if reason:
-            output_lines.append(f'{prefix}BLOCK_{h}: {reason}{suffix}')
-        else:
-            output_lines.append(f'{prefix}BLOCK_{h}{suffix}')
+        output_lines.append(_placeholder_line(h, prefix, suffix, reason))
         buf_lines = []
         reason = prefix = suffix = ''
 
@@ -211,10 +210,7 @@ def expand_content(content: str, blocks: dict, file_path: str = '<unknown>'):
             block_text  = info['content']
 
             # ── Level 1: full placeholder (with reason) ───────────────────────
-            if reason:
-                placeholder = f'{prefix}BLOCK_{h}: {reason}{suffix}'
-            else:
-                placeholder = f'{prefix}BLOCK_{h}{suffix}'
+            placeholder = _placeholder_line(h, prefix, suffix, reason)
 
             if placeholder in line:
                 line = line.replace(placeholder, block_text)

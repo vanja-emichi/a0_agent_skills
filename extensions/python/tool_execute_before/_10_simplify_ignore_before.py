@@ -16,7 +16,7 @@ Skips files whose name starts with `simplify-ignore` or `SIMPLIFY-IGNORE`
 from __future__ import annotations
 
 import importlib.util
-import os
+import sys
 from pathlib import Path
 
 from helpers.extension import Extension
@@ -49,7 +49,6 @@ class SimplifyIgnoreBefore(Extension):
             await self._run(**kwargs)
         except Exception as exc:
             # Extension failures must never break the tool call.
-            import sys
             print(f'[simplify-ignore-before] unexpected error: {exc}', file=sys.stderr)
 
     async def _run(self, **kwargs):
@@ -68,12 +67,12 @@ class SimplifyIgnoreBefore(Extension):
         file_path = str(Path(file_path).resolve())
 
         # Skip hook source files themselves
-        basename = os.path.basename(file_path)
+        basename = Path(file_path).name
         if basename.startswith('simplify-ignore') or basename.startswith('SIMPLIFY-IGNORE'):
             return
 
         # Skip non-existent files (let the real tool surface the error)
-        if not os.path.isfile(file_path):
+        if not Path(file_path).is_file():
             return
 
         # ── Context cache ────────────────────────────────────────────────────
@@ -111,7 +110,6 @@ class SimplifyIgnoreBefore(Extension):
             with open(file_path, 'w', encoding='utf-8') as fh:
                 fh.write(filtered)
         except OSError as exc:
-            import sys
             print(f'[simplify-ignore-before] could not write filtered file: {exc}',
                   file=sys.stderr)
             # Rollback context entry so nothing is half-done

@@ -10,7 +10,6 @@ So we must create symlinks in BOTH scopes to handle either case.
 """
 from __future__ import annotations
 
-import os
 from pathlib import Path
 
 from helpers.extension import Extension
@@ -58,7 +57,7 @@ class RegisterCommands(Extension):
                         continue
                     dest = scope_dir / src_file.name
                     if dest.is_symlink():
-                        if os.readlink(dest) == str(src_file):
+                        if dest.readlink() == src_file:
                             continue  # Already correct
                         dest.unlink()
                     elif dest.exists():
