@@ -1,323 +1,383 @@
-# Implementation Plan: Karpathy Coding Guidelines — Option B Integration
+# Implementation Plan: Caveman Communication Compression — Option B Integration
 
 ## Overview
 
-Patch 7 existing skill files with the unique, A0-specific content from `karpathy-coding-guidelines`. No new skills created. No existing sections rewritten. Each patch is self-contained and independently revertable.
+Patch 5 files with 6 patches adding the unique, A0-specific parts of `caveman` compression into existing agent-skills. No new skills created. No existing sections rewritten. Each patch is self-contained and independently revertable.
 
 ## Principles
 
 - **Patch-only** — `text_editor:patch`, never `text_editor:write` on existing files
 - **Read first** — `text_editor:read` the full skill before patching
-- **Verify after** — check line count doesn't exceed 500, skill loads without error
-- **No duplication** — new sections add only what the karpathy SKILL.md has that the target skill doesn't
+- **Verify after** — grep + line count after each patch
+- **Checkpoint between phases** — validate.py + pytest at each checkpoint
+
+## Source Material
+
+- **SPEC.md** at `/a0/usr/projects/agent_skills/SPEC.md` — full specification
+- **Caveman skill** at `/a0/usr/skills/caveman/SKILL.md` (161 lines) — source content
 
 ## Dependency Graph
 
 ```
-SPEC.md (existing)
-     │
-     ├── T1: context-engineering          ─┐
-     ├── T2: spec-driven-development       │
-     ├── T3: incremental-implementation    │  All independent
-     ├── T4: test-driven-development       │  (different files)
-     ├── T5: git-workflow-and-versioning   │
-     ├── T6: code-review-and-quality      ─┘
-     ├── T7: using-agent-skills
-     │
-     └── T8: CI validation + commit
+Phase 1: P1 + P2  (context-engineering/SKILL.md)
+    │
+    │  context-engineering is the canonical home for A0 behavioral patterns.
+    │  Agents reference it conceptually but are self-contained.
+    │
+    ▼
+Checkpoint 1: validate.py + pytest
+    │
+    ▼
+Phase 2: P3 + P4 + P5  (agent specifics — independent, parallelizable)
+    │
+    │
+    ▼
+Checkpoint 2: validate.py + pytest
+    │
+    ▼
+Phase 3: P6  (using-agent-skills/SKILL.md)
+    │
+    │
+    ▼
+Final Checkpoint: validate.py + pytest + manual grep verification
 ```
 
-All T1–T7 are independent and could be parallelized. T8 is a gate that runs after all patches are applied.
+## Baseline Line Counts
+
+| File | Current Lines | Max | Headroom |
+|------|--------------|-----|----------|
+| `skills/context-engineering/SKILL.md` | 388 | 500 | 112 |
+| `agents/code-reviewer/prompts/agent.system.main.specifics.md` | 51 | 75 | 24 |
+| `agents/test-engineer/prompts/agent.system.main.specifics.md` | 45 | 75 | 30 |
+| `agents/security-auditor/prompts/agent.system.main.specifics.md` | 52 | 75 | 23 |
+| `skills/using-agent-skills/SKILL.md` | 184 | 500 | 316 |
 
 ---
 
-## Tasks
+## Phase 1: context-engineering (P1 + P2)
 
-### Phase 1: High-Value Unique Content
+### Task 1.1 — P1: Output Compression Section
 
-The most unique Karpathy content — not covered by any existing skill.
+**Target:** `skills/context-engineering/SKILL.md`
+**Location:** New `## Output Compression` section appended after line 388 (end of file)
+**Estimated addition:** ~25-30 lines
+**Post-patch lines:** ~413-418
 
-#### Task 1 — `skills/context-engineering/SKILL.md`
+**Content to add:**
 
-**Adds two new sections at the end of the file:**
+```markdown
 
-**Section A: `## Agent Zero Discipline (Think Before Coding)`**
+## Output Compression
 
-Content from Karpathy P1 — A0-specific `thoughts[]` pattern:
-- Pre-coding `thoughts[]` checklist: restate goal, list assumptions, surface interpretations, propose simple approach, read first
-- Stop-and-ask triggers: guessing file paths, ambiguous requirements, code not understood, public interface change
-- Example `thoughts[]` pattern with inline comments
-- Complete A0 coding workflow diagram (from karpathy SKILL.md)
+Compress output by default. ~75% token reduction while preserving all technical substance.
 
-**Section B: `## Safe Operations Protocol`**
+### A0 Compression Boundaries
 
-Content from Karpathy P5 — fully missing from all existing skills:
-- What counts as destructive (rm, DROP TABLE, git push --force, production deploys, irreversible API calls)
-- 4 rules: state implication in thoughts → confirm with user → verify safety first → use notify_user
-- Example thoughts pattern for destructive ops
-- Example response warning template
+| A0 JSON field | Compressed? | Reason |
+|--------------|------------|--------|
+| `thoughts[]` | ❌ Never | Internal reasoning — always verbose |
+| `headline` | ✅ Yes | User-facing summary |
+| `tool_name` / `tool_args` | ❌ Never | Literal API ids + code/paths must be exact |
+| `response.text` | ✅ Yes | Primary user output |
 
-**Acceptance criteria:**
-- [ ] Section A present in context-engineering SKILL.md
-- [ ] Section B present with full Safe Operations rules
-- [ ] File still valid YAML frontmatter
-- [ ] File under 500 lines after patch
-- [ ] No content duplicated from existing sections
+### Compression Rules
 
-**Verification:**
-```bash
-wc -l skills/context-engineering/SKILL.md   # must be ≤ 500
-grep -c 'Safe Operations' skills/context-engineering/SKILL.md   # must be ≥ 1
-grep -c 'thoughts' skills/context-engineering/SKILL.md           # must be ≥ 1
-python3 scripts/validate.py
+**Drop:** articles (a/an/the), filler (just/really/basically/actually/simply), pleasantries ("sure"/"certainly"/"of course"), hedging ("it might be worth"/"you could consider").
+
+**Keep:** all technical terms exact, code blocks unchanged, error messages quoted verbatim, numbers/versions/paths exact.
+
+**Pattern:** `[thing] [action] [reason]. [next step].`
+
+### Persistence
+
+Compression stays active every response until explicitly turned off. Does not revert after many turns, topic changes, or new skill loads.
 ```
 
-**Files touched:** `skills/context-engineering/SKILL.md` (patch)
-
-**Estimated scope:** M (two sections, ~40-60 lines of new content)
-
----
-
-#### Task 2 — `skills/spec-driven-development/SKILL.md`
-
-**Adds one new section: `## Agent Zero Clarification Protocol`**
-
-Content from Karpathy P1 stop-and-ask, adapted for spec context:
-- When to stop and ask vs proceed: ambiguous requirements, multiple interpretations, missing context
-- Read existing code before specifying (not just ask questions)
-- Example of presenting options vs picking silently
-
 **Acceptance criteria:**
-- [ ] New section present in spec-driven-development SKILL.md
-- [ ] Contains stop-and-ask triggers specific to spec phase
-- [ ] File under 500 lines
-- [ ] No duplication with existing "Ask Clarifying Questions" section
-
-**Verification:**
-```bash
-wc -l skills/spec-driven-development/SKILL.md
-grep -c 'Clarification Protocol\|stop.*ask\|present.*options' skills/spec-driven-development/SKILL.md
-python3 scripts/validate.py
-```
-
-**Files touched:** `skills/spec-driven-development/SKILL.md` (patch)
-
-**Estimated scope:** S (~15-20 lines)
-
----
-
-### Phase 2: Tool Discipline
-
-#### Task 3 — `skills/incremental-implementation/SKILL.md`
-
-**Adds to Rule 0: `### A0 Tool Selection Guide` subsection**
-
-Table from Karpathy P2:
-
-| Situation | Preferred Approach |
-|-----------|-------------------|
-| Simple text transformation | `terminal` with `sed`, `awk`, `grep` |
-| File inspection | `text_editor:read` — not a Python script |
-| Targeted edit to existing file | `text_editor:patch` — not `text_editor:write` |
-| Multi-step logic or computation | Python in `code_execution_tool` |
-| Reusable component | Only modularize if reuse was asked for |
-
-**Adds to Rule 0.5: `### A0 Tool Discipline` subsection**
-
-Content from Karpathy P3:
-- `text_editor:read` the file before any patch
-- Use `text_editor:patch` for edits — `text_editor:write` only for new files
-- `git diff --stat && git diff` audit before responding
-- Collateral changes → revert, mention in response
-
-**Acceptance criteria:**
-- [ ] Tool selection table present under Rule 0
-- [ ] Tool discipline rules present under Rule 0.5
-- [ ] File under 500 lines
-- [ ] No duplication with existing Rule 0 / Rule 0.5 content
-
-**Verification:**
-```bash
-wc -l skills/incremental-implementation/SKILL.md
-grep -c 'text_editor:patch\|Tool Selection' skills/incremental-implementation/SKILL.md
-python3 scripts/validate.py
-```
-
-**Files touched:** `skills/incremental-implementation/SKILL.md` (patch)
-
-**Estimated scope:** S (~25-30 lines)
-
----
-
-### Phase 3: Verification & Review
-
-#### Task 4 — `skills/test-driven-development/SKILL.md`
-
-**Adds to Verification section: `### Goal-Driven Verification Loop`**
-
-Content from Karpathy P4:
-- Weak→strong task transformation table
-- Never-report-success-without-output mandate
-- Re-verify loop — diagnose → fix → re-verify (don't give up)
-- Verification commands cheatsheet (pytest, npm test, smoke test)
-
-**Acceptance criteria:**
-- [ ] Goal-driven table present
-- [ ] "never report success without verification output" rule present
-- [ ] File under 500 lines
-- [ ] No duplication with existing Verification section checklist
-
-**Verification:**
-```bash
-wc -l skills/test-driven-development/SKILL.md
-grep -c 'Goal-Driven\|never report' skills/test-driven-development/SKILL.md
-python3 scripts/validate.py
-```
-
-**Files touched:** `skills/test-driven-development/SKILL.md` (patch)
-
-**Estimated scope:** S (~25-30 lines)
-
----
-
-#### Task 5 — `skills/git-workflow-and-versioning/SKILL.md`
-
-**Adds to Section 3 (Descriptive Messages): `### A0 Commit Strictness`**
-
-Content from Karpathy P6 — stricter than existing rules:
-- Subject ≤50 chars rule (count characters, not words)
-- Imperative mood only: `add`, `fix`, `remove` — not `added`, `fixes`, `fixing`
-- No trailing period on subject line
-- Never include AI attribution (`Co-authored-by: Claude`, `Generated by AI`, etc.)
-- Body only when the *why* is not obvious — not a summary of the diff
-
-**Acceptance criteria:**
-- [ ] ≤50 chars rule present
-- [ ] No AI attribution rule present
-- [ ] File under 500 lines
-- [ ] No duplication with existing "Descriptive Messages" section
-
-**Verification:**
-```bash
-wc -l skills/git-workflow-and-versioning/SKILL.md
-grep -c 'AI attribution\|50 char' skills/git-workflow-and-versioning/SKILL.md
-python3 scripts/validate.py
-```
-
-**Files touched:** `skills/git-workflow-and-versioning/SKILL.md` (patch)
-
-**Estimated scope:** S (~20 lines)
-
----
-
-#### Task 6 — `skills/code-review-and-quality/SKILL.md`
-
-**Adds to Step 4 (Categorize Findings): `### Per-Line Notation (Compact Format)`**
-
-Content from Karpathy P7 — complement to existing 5-axis severity labels:
-- Format: `L<line>: <severity> <problem>. <fix>.`
-- Severity labels: 🔴 bug, 🟡 risk, 🔵 nit, ❓ q
-- 3 examples showing the format in use
-- What to drop (hedging, "I noticed that...", restating what the line does)
-- Auto-clarity exception (write full paragraph for CVE-class bugs)
-
-**Acceptance criteria:**
-- [ ] Per-line notation section present under Step 4
-- [ ] All 4 severity emoji labels documented
-- [ ] 3 examples present
-- [ ] File under 500 lines
-- [ ] Does not replace existing Critical/Nit/Optional/FYI labels — complements them
-
-**Verification:**
-```bash
-wc -l skills/code-review-and-quality/SKILL.md
-grep -c 'Per-Line Notation\|L<line>' skills/code-review-and-quality/SKILL.md
-python3 scripts/validate.py
-```
-
-**Files touched:** `skills/code-review-and-quality/SKILL.md` (patch)
-
-**Estimated scope:** S (~25-30 lines)
-
----
-
-### Phase 4: Meta-Skill Update
-
-#### Task 7 — `skills/using-agent-skills/SKILL.md`
-
-**Adds reference to karpathy-coding-guidelines in skill discovery section**
-
-Content:
-- `karpathy-coding-guidelines` entry in the skill reference table/list
-- Note: Karpathy principles are now embedded in individual skills — this is the full reference
-- When to load it directly: before any non-trivial coding task as full principles reference
-
-**Acceptance criteria:**
-- [ ] `karpathy-coding-guidelines` referenced in using-agent-skills
-- [ ] Correct description of relationship (embedded vs full reference)
+- [ ] `## Output Compression` heading exists after line 388
+- [ ] A0 Compression Boundaries table with 4 rows present
+- [ ] Compression rules (drop/keep/pattern) present
+- [ ] Persistence statement present
 - [ ] File under 500 lines
 
 **Verification:**
 ```bash
+grep -ic 'output compression' skills/context-engineering/SKILL.md
+grep -ic 'compression boundaries' skills/context-engineering/SKILL.md
+grep -ic 'drop.*articles.*filler' skills/context-engineering/SKILL.md
+wc -l skills/context-engineering/SKILL.md
+```
+
+---
+
+### Task 1.2 — P2: Communication Override Subsection
+
+**Target:** `skills/context-engineering/SKILL.md`
+**Location:** New `### Communication Override` subsection inside `## Safe Operations Protocol`, inserted after line 375 (after the Rules `notify_user` code block), before line 377 (`### Example`)
+**Estimated addition:** ~12-15 lines
+**Post-patch lines:** ~425-433
+
+**Content to insert (before `### Example`):**
+
+```markdown
+
+### Communication Override
+
+When any Safe Operations trigger fires, revert to full prose — no compression, no fragments, complete sentences with full context. Resume compression after the clear section.
+
+**Triggers for full prose:**
+- Security warnings — CVE-class bugs, credential exposure
+- Irreversible actions — `rm -rf`, `DROP TABLE`, `git push --force`, prod deploy
+- Multi-step sequences where fragment order risks misread
+- User confusion — repeating question or asking for clarification
+```
+
+**Acceptance criteria:**
+- [ ] `### Communication Override` exists inside `## Safe Operations Protocol`
+- [ ] Positioned after Rules, before Example
+- [ ] 4 trigger types listed
+- [ ] File under 500 lines
+
+**Verification:**
+```bash
+grep -ic 'communication override' skills/context-engineering/SKILL.md
+grep -ic 'triggers for full prose' skills/context-engineering/SKILL.md
+wc -l skills/context-engineering/SKILL.md
+```
+
+### Checkpoint 1
+
+```bash
+cd /a0/usr/projects/agent_skills
+python3 scripts/validate.py   # 44/44 pass
+python3 -m pytest tests/ -v   # 39/39 pass
+wc -l skills/context-engineering/SKILL.md  # under 500
+```
+
+---
+
+## Phase 2: Agent Specifics (P3 + P4 + P5)
+
+These 3 patches are independent — can be applied in any order. Each adds a self-contained `## Output Compression` section at the end of the file.
+
+### Task 2.1 — P3: code-reviewer Output Compression
+
+**Target:** `agents/code-reviewer/prompts/agent.system.main.specifics.md`
+**Location:** New `## Output Compression` section appended after line 51
+**Estimated addition:** ~15-18 lines
+**Post-patch lines:** ~66-69
+
+**Content to add:**
+
+```markdown
+
+## Output Compression
+
+Compress all output by default. No activation needed — standard communication mode.
+
+**Boundaries:**
+- `thoughts[]`: always verbose — full reasoning, no compression
+- `headline` and `response.text`: compressed — drop filler/articles/pleasantries/hedging
+- `tool_args`: never compressed — exact code/paths required
+
+**Auto-clarity:** Revert to full prose for:
+- Security findings (CVE-class bugs, credential exposure)
+- Destructive operation warnings (force pushes, table drops)
+- Ambiguous review findings where terse phrasing risks misinterpretation
+Resume compression after clear section.
+
+Pattern: `[thing] [action] [reason]. [next step].`
+```
+
+**Acceptance criteria:**
+- [ ] `## Output Compression` heading at end of file
+- [ ] Boundaries (3 bullet points) present
+- [ ] Auto-clarity with 3 agent-specific triggers present
+- [ ] Pattern line present
+- [ ] File under 75 lines
+
+**Verification:**
+```bash
+grep -ic 'output compression' agents/code-reviewer/prompts/agent.system.main.specifics.md
+grep -ic 'auto-clarity' agents/code-reviewer/prompts/agent.system.main.specifics.md
+wc -l agents/code-reviewer/prompts/agent.system.main.specifics.md
+```
+
+---
+
+### Task 2.2 — P4: test-engineer Output Compression
+
+**Target:** `agents/test-engineer/prompts/agent.system.main.specifics.md`
+**Location:** New `## Output Compression` section appended after line 45
+**Estimated addition:** ~15-18 lines
+**Post-patch lines:** ~60-63
+
+**Content to add:**
+
+```markdown
+
+## Output Compression
+
+Compress all output by default. No activation needed — standard communication mode.
+
+**Boundaries:**
+- `thoughts[]`: always verbose — full reasoning, no compression
+- `headline` and `response.text`: compressed — drop filler/articles/pleasantries/hedging
+- `tool_args`: never compressed — exact code/paths required
+
+**Auto-clarity:** Revert to full prose for:
+- Test failures indicating security vulnerabilities
+- Destructive test operations (dropping test DB, wiping fixtures)
+- Ambiguous test results where terse phrasing could mislead
+Resume compression after clear section.
+
+Pattern: `[thing] [action] [reason]. [next step].`
+```
+
+**Acceptance criteria:**
+- [ ] `## Output Compression` heading at end of file
+- [ ] Boundaries (3 bullet points) present
+- [ ] Auto-clarity with 3 agent-specific triggers present
+- [ ] Pattern line present
+- [ ] File under 75 lines
+
+**Verification:**
+```bash
+grep -ic 'output compression' agents/test-engineer/prompts/agent.system.main.specifics.md
+grep -ic 'auto-clarity' agents/test-engineer/prompts/agent.system.main.specifics.md
+wc -l agents/test-engineer/prompts/agent.system.main.specifics.md
+```
+
+---
+
+### Task 2.3 — P5: security-auditor Output Compression
+
+**Target:** `agents/security-auditor/prompts/agent.system.main.specifics.md`
+**Location:** New `## Output Compression` section appended after line 52
+**Estimated addition:** ~17-20 lines
+**Post-patch lines:** ~69-72
+
+**Content to add:**
+
+```markdown
+
+## Output Compression
+
+Compress all output by default. No activation needed — standard communication mode.
+
+**Boundaries:**
+- `thoughts[]`: always verbose — full reasoning, no compression
+- `headline` and `response.text`: compressed — drop filler/articles/pleasantries/hedging
+- `tool_args`: never compressed — exact code/paths required
+
+**Auto-clarity:** Revert to full prose for:
+- ALL security findings (Critical + High severity always full prose)
+- Destructive operation warnings
+- Exploit proof-of-concept descriptions
+- User confusion or requests for clarification
+Resume compression after clear section.
+
+Pattern: `[thing] [action] [reason]. [next step].`
+```
+
+**Note:** Security-auditor has the most aggressive auto-clarity — ALL Critical/High findings use full prose, plus exploit PoC descriptions.
+
+**Acceptance criteria:**
+- [ ] `## Output Compression` heading at end of file
+- [ ] Boundaries (3 bullet points) present
+- [ ] Auto-clarity with 4 triggers (most aggressive of the 3 agents) present
+- [ ] Pattern line present
+- [ ] File under 75 lines
+
+**Verification:**
+```bash
+grep -ic 'output compression' agents/security-auditor/prompts/agent.system.main.specifics.md
+grep -ic 'auto-clarity' agents/security-auditor/prompts/agent.system.main.specifics.md
+grep -ic 'Critical.*High.*full prose' agents/security-auditor/prompts/agent.system.main.specifics.md
+wc -l agents/security-auditor/prompts/agent.system.main.specifics.md
+```
+
+### Checkpoint 2
+
+```bash
+cd /a0/usr/projects/agent_skills
+python3 scripts/validate.py   # 44/44 pass
+python3 -m pytest tests/ -v   # 39/39 pass
+for f in agents/*/prompts/agent.system.main.specifics.md; do wc -l < $f; done  # all under 75
+```
+
+---
+
+## Phase 3: Meta-Skill Reference (P6)
+
+### Task 3.1 — P6: Caveman Reference in using-agent-skills
+
+**Target:** `skills/using-agent-skills/SKILL.md`
+**Location:** Add row to External Reference Skills table (after line 182), update blockquote (line 184)
+**Estimated addition:** ~3-4 lines
+**Post-patch lines:** ~187-188
+
+**Changes:**
+
+1. After line 182 (`| karpathy-coding-guidelines | ... |`), insert:
+
+```markdown
+| `caveman` | Global (`/a0/usr/skills/caveman/`) | For full compression reference + intensity switching |
+```
+
+2. Replace line 184 blockquote with:
+
+```markdown
+> Full A0 behavioral discipline: Think-Before-Coding, Surgical-Changes, Safe-Operations, Terse-Commits, Structured-Review, Output-Compression. Principles are embedded into individual plugin skills above; these are the canonical references.
+```
+
+**Acceptance criteria:**
+- [ ] `caveman` row exists in External Reference Skills table
+- [ ] Blockquote updated to include Output-Compression
+- [ ] File under 500 lines
+
+**Verification:**
+```bash
+grep -ic 'caveman' skills/using-agent-skills/SKILL.md
+grep -ic 'output-compression' skills/using-agent-skills/SKILL.md
 wc -l skills/using-agent-skills/SKILL.md
-grep -c 'karpathy' skills/using-agent-skills/SKILL.md
-python3 scripts/validate.py
 ```
 
-**Files touched:** `skills/using-agent-skills/SKILL.md` (patch)
+### Final Checkpoint
 
-**Estimated scope:** XS (~10 lines)
-
----
-
-### Phase 5: Validation & Commit
-
-#### Task 8 — CI validation + single commit
-
-**After all 7 patches are applied:**
-
-1. Run `python3 scripts/validate.py` — must exit 0 (44 checks, all PASS)
-2. Run `python3 -m pytest tests/ -v` — 39/39 must pass (no test changes needed)
-3. Check each patched skill line count ≤ 500
-4. Single commit: `feat: integrate karpathy A0-specific discipline into skills (Option B)`
-5. Push to GitHub, verify CI green
-
-**Acceptance criteria:**
-- [ ] All 7 patches applied
-- [ ] `python3 scripts/validate.py` exits 0
-- [ ] `python3 -m pytest tests/ -v` → 39 passed
-- [ ] No SKILL.md exceeds 500 lines
-- [ ] CI green on GitHub Actions
-
-**Verification:**
 ```bash
-python3 scripts/validate.py
-python3 -m pytest tests/ -v
-for f in skills/*/SKILL.md; do lines=$(wc -l < $f); echo "$lines $f"; done | sort -rn | head -5
-git log --oneline -1
+cd /a0/usr/projects/agent_skills
+python3 scripts/validate.py   # 44/44 pass
+python3 -m pytest tests/ -v   # 39/39 pass
+
+# Full manual verification
+grep -ic 'output compression' skills/context-engineering/SKILL.md && echo '✅ P1'
+grep -ic 'communication override' skills/context-engineering/SKILL.md && echo '✅ P2'
+for agent in code-reviewer test-engineer security-auditor; do
+  count=$(grep -ic 'auto-clarity' agents/$agent/prompts/agent.system.main.specifics.md)
+  [ "$count" -gt 0 ] && echo "✅ $agent" || echo "❌ $agent"
+done
+grep -ic 'caveman' skills/using-agent-skills/SKILL.md && echo '✅ P6'
+
+# Line counts
+wc -l skills/context-engineering/SKILL.md skills/using-agent-skills/SKILL.md agents/*/prompts/agent.system.main.specifics.md
 ```
 
 ---
 
-## Checkpoints
+## Execution Order Summary
 
-**After Phase 1 (T1+T2):** context-engineering has both unique sections, spec-driven-development has clarification protocol. Both validate OK.
+| Step | Task | File | Lines Added | Post-Patch Lines |
+|------|------|------|-------------|------------------|
+| 1 | P1: Output Compression section | context-engineering/SKILL.md | ~27 | ~415 |
+| 2 | P2: Communication Override | context-engineering/SKILL.md | ~14 | ~429 |
+| CP1 | Validate + test | — | — | — |
+| 3 | P3: Output Compression | code-reviewer specifics.md | ~16 | ~67 |
+| 4 | P4: Output Compression | test-engineer specifics.md | ~16 | ~61 |
+| 5 | P5: Output Compression | security-auditor specifics.md | ~18 | ~70 |
+| CP2 | Validate + test | — | — | — |
+| 6 | P6: Caveman reference | using-agent-skills/SKILL.md | ~3 | ~187 |
+| CP3 | Final validate + test + grep | — | — | — |
+| 7 | Commit | — | — | — |
 
-**After Phase 2 (T3):** incremental-implementation has A0 tool discipline embedded. Validate OK.
-
-**After Phase 3 (T4+T5+T6):** TDD, git, and code review skills all enriched. Validate OK.
-
-**After Phase 4 (T7):** Meta-skill links to karpathy reference. Validate OK.
-
-**Final (T8):** Full validation suite passes. CI green. Single commit.
-
----
-
-## Risks and Mitigations
-
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| Patch pushes a skill over 500 lines | Medium | Check `wc -l` after each patch; split into smaller additions if needed |
-| Content accidentally duplicates existing section | Medium | Read full skill before patching; compare with karpathy content |
-| Patch applies to wrong line numbers (file drifts) | Low | Always `text_editor:read` immediately before `text_editor:patch` |
-| CI fails due to frontmatter issue | Low | `python3 scripts/validate.py` catches this before push |
+**Total estimated additions:** ~94 lines across 5 files
