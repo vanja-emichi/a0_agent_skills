@@ -1,6 +1,6 @@
 # Agent Skills — Agent Zero Plugin
 
-[![CI](https://github.com/vanja-emichi/a0_agent_skills/actions/workflows/ci.yml/badge.svg)](https://github.com/vanja-emichi/a0_agent_skills/actions/workflows/ci.yml) ![v1.0.0](https://img.shields.io/badge/version-1.0.0-blue)
+[![CI](https://github.com/vanja-emichi/a0_agent_skills/actions/workflows/ci.yml/badge.svg)](https://github.com/vanja-emichi/a0_agent_skills/actions/workflows/ci.yml) ![v0.1.0](https://img.shields.io/badge/version-0.1.0-blue)
 
 **Production-grade engineering skills for Agent Zero.** 21 skills covering the full development lifecycle, 3 specialist agent personas, 7 slash commands, and 4 reference checklists.
 

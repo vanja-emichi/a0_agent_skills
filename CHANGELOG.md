@@ -5,7 +5,7 @@ All notable changes to the Agent Skills plugin are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2026-04-13
+## [0.1.0] - 2026-04-13
 
 ### Added
 - 21 engineering skills covering Define → Plan → Build → Verify → Review → Ship
@@ -27,10 +27,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - CI pip caching added and install steps consolidated
 
 ### Changed
-- Plugin name normalized to `agent_skills` (regex compliance for Plugin Index)
+- Plugin name set to `a0_agent_skills` (regex compliance for Plugin Index)
 - simplify_ignore_utils.py moved to lib/ (clean extension layout)
 - GLOBAL_COMMANDS_DIR derived dynamically from PLUGIN_ROOT
 - Stale Claude Code path removed from idea-refine skill
 - PrintStyle tests parametrized (3 classes → 1)
 
-[1.0.0]: https://github.com/vanja-emichi/a0_agent_skills/releases/tag/v1.0.0
+[0.1.0]: https://github.com/vanja-emichi/a0_agent_skills/releases/tag/v0.1.0

@@ -1,6 +1,6 @@
-name: agent_skills
+name: a0_agent_skills
 title: Agent Skills — Engineering Lifecycle
-version: 1.0.0
+version: 0.1.0
 author: Addy Osmani (Agent Zero port by Vanja Emichi)
 description: |
   Production-grade engineering skills for Agent Zero. 21 skills covering the full
