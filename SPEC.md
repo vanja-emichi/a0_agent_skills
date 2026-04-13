@@ -1,230 +1,245 @@
-# Spec: a0_agent_skills — Agent Zero Plugin
+# Spec: Karpathy Coding Guidelines Integration (Option B)
 
 ## Objective
 
-A production-grade engineering skills plugin for Agent Zero. It extends Agent Zero with a complete software development lifecycle toolkit: 20 skills covering spec → plan → build → verify → review → ship, 3 specialist subordinate agents, 7 slash commands, and a simplify-ignore code protection mechanism.
+Merge the unique, Agent Zero-specific parts of `karpathy-coding-guidelines` into existing agent-skills. No new skill is created. No content is duplicated. Each skill receives a targeted patch adding only the Karpathy content that is NOT already covered.
 
-**Target user:** Agent Zero developers — anyone using Agent Zero to build or maintain software.
+**Target users:** Agent Zero developers using the plugin — all 20 skills become richer without needing to explicitly load a separate karpathy skill.
 
-**Primary value:** Skills are the core. Every skill is an actionable, verified workflow — not advice. Agents and commands are delivery mechanisms that activate skills.
+**Primary value:** The A0-specific behavioral patterns (tool discipline, safe operations, thoughts[] structure, verification loop, per-line review notation) are embedded into the skills where they're most relevant. A developer following any skill automatically gets Karpathy-quality discipline.
 
-**Success criteria:**
-- Any Agent Zero developer can install the plugin and immediately use structured engineering workflows
-- The 3 specialist agents (code-reviewer, test-engineer, security-auditor) can be called by agent0 via `call_subordinate` and execute their respective skills correctly
-- All 7 slash commands load and activate the right skill
-- The simplify-ignore extension protects marked code blocks during `/code-simplify`
-- Plugin installs and works correctly on first run in any Agent Zero Docker deployment
-
----
-
-## Tech Stack
-
-- **Runtime:** Python 3.11+ inside Agent Zero Docker container (Kali Linux)
-- **Framework:** Agent Zero (latest; `/a0/` root)
-- **Plugin system:** Agent Zero plugin format (plugin.yaml + skills/ + agents/ + extensions/ + commands/)
-- **Extensions:** Python async extensions (helpers.extension.Extension subclasses)
-- **Commands:** Agent Zero Commands plugin format (.command.yaml + .txt pairs)
-- **Skills:** SKILL.md format with YAML frontmatter (name + description fields)
-- **No external dependencies** beyond what Agent Zero provides
+**What we do NOT do:**
+- Duplicate content that already exists in the skill
+- Rewrite existing sections
+- Add Karpathy content that has >80% overlap with existing content (see Overlap Analysis below)
+- Create a new standalone skill
 
 ---
 
-## Commands
+## Overlap Analysis — What We Skip
 
-```bash
-# Install (via Plugin Hub)
-/plugin install vanja-emichi/a0_agent_skills
-
-# Install (manual)
-git clone https://github.com/vanja-emichi/a0_agent_skills.git /path/to/a0/usr/plugins/agent-skills
-
-# Development (this repo IS the plugin)
-cd /a0/usr/projects/agent_skills
-git status
-git add . && git commit -m "..."
-git push origin main
-
-# Validate SKILL.md frontmatter
-grep -l 'name:' skills/*/SKILL.md
-
-# Check extensions load
-python3 -c "from extensions.python.agent_init._10_register_commands import RegisterCommands; print('OK')"
-```
+| Karpathy Principle | Existing Skill | Overlap | Decision |
+|---|---|---|---|
+| P2 Simplicity First (general) | `incremental-implementation` Rule 0 | ~85% | Skip rewrite. Add A0 tool selection table only. |
+| P3 Surgical Changes (general) | `incremental-implementation` Rule 0.5 | ~80% | Skip rewrite. Add A0 tool discipline commands only. |
+| P6 Terse Commits (general) | `git-workflow-and-versioning` Descriptive Messages | ~70% | Add ≤50 chars rule + no-AI-attribution rule only. |
+| P7 Structured Review (general 5-axis) | `code-review-and-quality` Step 4 | ~60% | Add per-line L<line> notation as complement to 5-axis. |
 
 ---
 
-## Project Structure
+## What Gets Integrated — The 7 Patches
+
+### Patch 1 — `skills/context-engineering/SKILL.md`
+
+**Adds two new sections:**
+
+**Section A: A0 Agent Discipline (from P1 Think Before Coding)**
+
+Before any `code_execution_tool` or `text_editor` call, `thoughts[]` must answer:
+1. What is the task? (restate goal)
+2. What are my assumptions? (list explicitly)
+3. Are there multiple interpretations? (present — don't pick silently)
+4. Is there a simpler approach? (propose before complex one)
+5. What context do I need? (read existing code first)
+
+Stop-and-ask triggers:
+- About to guess a file path or function name
+- Requirement has two plausible interpretations
+- Don't fully understand code about to be modified
+- Simplest solution would change a public interface
+
+Example `thoughts[]` pattern (P1 format).
+
+**Section B: Safe Operations Protocol (from P5 — UNIQUE, not in any existing skill)**
+
+What counts as destructive: file/dir deletion, database drops, git force operations, production deploys, irreversible API calls.
+
+Rules:
+1. State full implication in `thoughts` — what data/state is permanently lost
+2. Confirm with user in `response` before executing — never proceed silently
+3. Verify safety first — `git status`, confirm backups, dry-run where possible
+4. Use `notify_user` for high-impact mid-task warnings
+
+Example thoughts pattern + response warning format.
+
+**Rationale for context-engineering:** Both A0 discipline and safe operations are about HOW the agent operates — not about code quality or testing. context-engineering is the skill about agent setup and behavioral discipline. security-and-hardening is about OWASP/code vulnerabilities, not agent behavioral safety.
+
+---
+
+### Patch 2 — `skills/spec-driven-development/SKILL.md`
+
+**Adds one section: A0 Clarification Protocol (from P1 — stop-and-ask)**
+
+Before writing any spec or proceeding to implementation, surface:
+- Ambiguous requirements → ask before proceeding
+- Multiple plausible interpretations → present options, don't pick silently
+- Missing context → read existing code before specifying
+
+This extends the existing "Ask Clarifying Questions" section with A0-specific stop-and-ask triggers.
+
+**Rationale:** spec-driven-development already covers clarification, but not the specific triggers for WHEN to stop and ask vs proceed. Karpathy P1's stop-and-ask list fills this gap.
+
+---
+
+### Patch 3 — `skills/incremental-implementation/SKILL.md`
+
+**Adds to Rule 0 (Simplicity First): A0 Tool Selection Guide**
+
+| Situation | Preferred Approach |
+|-----------|-------------------|
+| Simple text transformation | `terminal` with `sed`, `awk`, `grep` |
+| File inspection | `text_editor:read` — not a Python script |
+| Targeted edit to existing file | `text_editor:patch` — not `text_editor:write` |
+| Multi-step logic or computation | Python in `code_execution_tool` |
+| Reusable component | Only modularize if reuse was asked for |
+
+**Adds to Rule 0.5 (Scope Discipline): A0 Tool Discipline**
+
+Always read before editing:
+- `text_editor:read` the file/section before any patch
+- Use `text_editor:patch` for edits to existing files — `text_editor:write` only for new files
+- Run `git diff --stat && git diff` before responding — every changed line must trace to the request
+- Collateral changes seen? Revert them, mention in response instead
+
+**Rationale:** These are pure Agent Zero tool mechanics. The existing Rule 0 and Rule 0.5 cover the principle but not the A0-specific tool commands.
+
+---
+
+### Patch 4 — `skills/test-driven-development/SKILL.md`
+
+**Adds to Verification section: Goal-Driven Verification Loop (from P4)**
+
+| Imperative (weak) | Goal-Driven (strong) |
+|---|---|
+| "Add validation" | "Write tests for invalid inputs → make them pass" |
+| "Fix the bug" | "Write a test that reproduces it → make it pass" |
+| "Refactor X" | "Tests pass before; tests pass after; diff is smaller" |
+
+Verification mandate:
+- Never report success without showing verification output
+- If verification fails → diagnose root cause → fix → re-verify (loop — don't give up)
+- Always run and attach output: `python -m pytest tests/ -v` or `npm test`
+
+**Rationale:** TDD skill covers Red-Green-Refactor but not the explicit "never report success without evidence" mandate, nor the re-verify loop. This strengthens the verification story.
+
+---
+
+### Patch 5 — `skills/git-workflow-and-versioning/SKILL.md`
+
+**Adds strictness to Section 3 (Descriptive Messages):**
+
+- Subject ≤50 chars — count characters, not words
+- Imperative mood only: `add`, `fix`, `remove` — not `added`, `fixes`, `fixing`
+- No trailing period on subject line
+- Never include AI attribution in commits (`Co-authored-by: Claude`, `Generated by AI`, etc.)
+- Body only when the *why* is not obvious — not a summary of what the diff shows
+
+**Rationale:** git-workflow-and-versioning covers format but is looser on length and doesn't address AI attribution (increasingly common issue in A0 context).
+
+---
+
+### Patch 6 — `skills/code-review-and-quality/SKILL.md`
+
+**Adds to Step 4 (Categorize Findings): Per-Line Notation**
+
+For surgical, line-level findings, use the compact format as complement to the 5-axis severity labels:
 
 ```
-a0_agent_skills/                  → Plugin root (git repo)
-├── plugin.yaml                   → Agent Zero plugin manifest
-├── README.md                     → Plugin documentation
-├── LICENSE                       → MIT
-├── .gitignore                    → Excludes .a0proj/
-│
-├── skills/                       → 20 engineering skills
-│   └── <skill-name>/
-│       └── SKILL.md              → Skill definition (YAML frontmatter + body)
-│
-├── agents/                       → 3 specialist subordinate profiles
-│   └── <agent-name>/
-│       ├── agent.yaml            → title, description, context
-│       └── prompts/
-│           └── agent.system.main.specifics.md  → specialist identity + skill to load
-│
-├── commands/                     → 7 slash commands
-│   ├── <name>.command.yaml       → Command metadata
-│   └── <name>.txt                → Command body (loads skill + instructs agent)
-│
-├── extensions/python/            → Lifecycle extensions
-│   ├── simplify_ignore_utils.py  → Shared logic for block protection
-│   ├── agent_init/               → Runs on agent init
-│   │   └── _10_register_commands.py   → Symlinks commands into Commands plugin scopes
-│   ├── tool_execute_before/      → Runs before tool execution
-│   │   └── _10_simplify_ignore_before.py → Filter blocks before text_editor:read
-│   ├── tool_execute_after/       → Runs after tool execution
-│   │   └── _10_simplify_ignore_after.py  → Expand blocks after text_editor:patch/write
-│   └── monologue_end/            → Runs when agent monologue ends
-│       └── _10_simplify_ignore_restore.py → Restore all files
-│
-├── references/                   → Supplementary checklists (referenced by skills)
-│   ├── performance-checklist.md
-│   ├── security-checklist.md
-│   ├── testing-patterns.md
-│   └── accessibility-checklist.md
-│
-├── docs/                         → Human setup guides per IDE/tool
-│   ├── getting-started.md
-│   ├── skill-anatomy.md
-│   └── <tool>-setup.md           → cursor, gemini-cli, opencode, copilot, windsurf
-│
-└── .a0proj/                      → NOT git-tracked (gitignored)
-    └── source/                   → Upstream addyosmani/agent-skills (reference only)
+L<line>: <severity> <problem>. <fix>.
 ```
+
+Severity labels:
+- `🔴 bug:` — broken behavior, will cause incident
+- `🟡 risk:` — works but fragile (null check, race, swallowed error)
+- `🔵 nit:` — style/naming — author can ignore
+- `❓ q:` — genuine question, not a suggestion
+
+Examples:
+```
+L42: 🔴 bug: user can be null after .find(). Add guard before .email.
+L88-140: 🔵 nit: 50-line fn does 4 things. Extract validate/normalize/persist.
+L23: 🟡 risk: no retry on 429. Wrap in withBackoff(3).
+```
+
+Drop: "I noticed that...", "You might want to consider...", hedging, restating what the line does.
+
+**Rationale:** The existing skill uses Critical/Nit/Optional/FYI labels which are broad and paragraph-oriented. The L<line> notation complements this for surgical, line-level findings — particularly useful in agent-to-agent reviews.
+
+---
+
+### Patch 7 — `skills/using-agent-skills/SKILL.md`
+
+**Adds reference to karpathy-coding-guidelines** in the meta-skill discovery section:
+
+- `karpathy-coding-guidelines` — load before any non-trivial coding task for A0 behavioral discipline (full principles reference)
+- Note that Karpathy principles are now embedded in individual skills — the standalone skill is the full reference, the plugin skills are the embedded practice
+
+**Rationale:** The meta-skill governs discovery. Users who want the full Karpathy reference should know it exists as a global skill.
+
+---
+
+## Tech Stack / Constraints
+
+- Pure Markdown patches — no code changes
+- Follow `docs/skill-anatomy.md` format for any new sections
+- Keep SKILL.md files under 500 lines
+- No duplication: if content is >80% same as existing, add a cross-reference instead
+- Patch style: add clearly-labeled sections (e.g. `## Agent Zero Tool Discipline`), don't rewrite existing sections
 
 ---
 
 ## Code Style
 
-**Skills follow the skill-anatomy.md format:**
-
-```markdown
----
-name: skill-name
-description: One sentence. Third person. Trigger conditions ("Use when...").
----
-
-# Skill Title
-
-## Overview
-[What and why — 2-3 sentences]
-
-## When to Use
-[Bullets: when YES, when NOT]
-
-## Process
-[Numbered workflow steps]
-
-## Common Rationalizations
-[Table: rationalization → reality]
-
-## Red Flags
-[Bullets: danger signs]
-
-## Verification
-[Checklist before proceeding]
-```
-
-**Key conventions:**
-- Skill directory names: `kebab-case`
-- SKILL.md: always uppercase, always this exact filename
-- Extensions: `_NN_` numeric prefix, 10-number increments
-- Commands: `<name>.command.yaml` + `<name>.txt` pairs
-- Agent prompts: `agent.system.main.specifics.md` only — no other fragment overrides
-- No inline philosophy — every instruction must be actionable
+- New sections use `##` or `###` headings consistent with the file's existing heading depth
+- Tables, code blocks, and bullet lists — match the skill's existing formatting style
+- A0-specific content labeled clearly ("Agent Zero", "A0", or "In Agent Zero Terms")
+- Every patch is self-contained — can be reverted without affecting surrounding content
 
 ---
 
 ## Testing Strategy
 
-- **Skills:** Manual validation — load each skill with `skills_tool:load`, verify frontmatter has `name` and `description`, verify skill activates in agent context
-- **Extensions:** Unit smoke tests in `simplify_ignore_utils.py`; test filter/expand/restore cycle on sample files with `simplify-ignore-start/end` markers
-- **Commands:** Path validation test — verify both global and project-scoped symlinks resolve correctly and `is_in_dir` passes
-- **Agents:** Load each agent profile via `call_subordinate profile=<name>`, verify `specifics.md` is loaded and skill name is correct
-- **Integration:** End-to-end — trigger `/spec`, `/review`, `/code-simplify` commands in a live session; verify correct skill is loaded
-
-**No test runner required** — this is a documentation/configuration plugin. Validation is behavioral.
+- Manual: load each patched skill via `skills_tool:load` and verify it loads without error
+- Manual: read each patched SKILL.md and verify the new section is present and correct
+- CI: `scripts/validate.py` validates all SKILL.md frontmatter — run and confirm 0 failures
+- No unit tests required — these are Markdown patches
 
 ---
 
 ## Boundaries
 
 **Always:**
-- Follow `skill-anatomy.md` format for every new or updated skill
-- Every skill must have `name` and `description` in YAML frontmatter
-- Agent profiles override only `agent.system.main.specifics.md` — no other prompt fragments
-- Extensions must be silent on success (only log on register or error)
-- Commands must load the corresponding skill as their first action
-- Keep SKILL.md files under 500 lines — put reference material in `references/`
+- Patch only — never rewrite existing sections
+- New content must be uniquely Karpathy / A0-specific — no general advice
+- Keep each patch focused: one concept, one section, one skill
 
 **Ask first:**
-- Adding a new skill (verify it doesn't duplicate an existing one)
-- Changing the upstream sync process or `.a0proj/source/`
-- Modifying extension execution order (numeric prefix changes)
-- Adding new agent profiles beyond the current 3
+- If a patch would exceed 500 lines for the target skill
+- If a principle maps equally well to two skills
 
 **Never:**
-- Add skills that are vague advice instead of actionable processes
-- Duplicate content between skills — reference other skills instead
-- Override `role.md`, `environment.md`, `communication.md`, `solving.md`, or `tips.md` in agent profiles
-- Modify files outside the plugin directory
-- Hardcode paths in Python extensions (use `Path(__file__)` relative resolution)
-- Commit `.a0proj/` directory contents
-
----
-
-## Skills by Lifecycle Phase
-
-| Phase | Skills |
-|-------|--------|
-| **Define** | `spec-driven-development` |
-| **Plan** | `planning-and-task-breakdown` |
-| **Build** | `incremental-implementation`, `test-driven-development`, `context-engineering`, `source-driven-development`, `frontend-ui-engineering`, `api-and-interface-design` |
-| **Verify** | `browser-testing-with-devtools`, `debugging-and-error-recovery` |
-| **Review** | `code-review-and-quality`, `code-simplification`, `security-and-hardening`, `performance-optimization` |
-| **Ship** | `git-workflow-and-versioning`, `ci-cd-and-automation`, `deprecation-and-migration`, `documentation-and-adrs`, `shipping-and-launch` |
-| **Meta** | `using-agent-skills`, `idea-refine` |
-
----
-
-## Slash Commands
-
-| Command | Skill Loaded | Phase |
-|---------|-------------|-------|
-| `/spec` | `spec-driven-development` | Define |
-| `/plan` | `planning-and-task-breakdown` | Plan |
-| `/build` | `incremental-implementation` + `test-driven-development` | Build |
-| `/test` | `test-driven-development` | Build/Verify |
-| `/review` | `code-review-and-quality` | Review |
-| `/code-simplify` | `code-simplification` | Review |
-| `/ship` | `shipping-and-launch` | Ship |
+- Duplicate content between skills
+- Remove or rewrite existing skill content
+- Add general software engineering advice that has no A0-specific angle
+- Add karpathy-coding-guidelines as a plugin skill (it's a global skill — leave it there)
 
 ---
 
 ## Success Criteria
 
-- [ ] `plugin.yaml` is valid and plugin is auto-discovered by Agent Zero
-- [ ] All 20 skills appear in `skills_tool:list` output after install
-- [ ] Each skill loads without error via `skills_tool:load <name>`
-- [ ] `call_subordinate profile=code-reviewer` initializes correctly and loads `code-review-and-quality` skill
-- [ ] `call_subordinate profile=test-engineer` initializes correctly and loads `test-driven-development` skill
-- [ ] `call_subordinate profile=security-auditor` initializes correctly and loads `security-and-hardening` skill
-- [ ] All 7 slash commands appear and execute without "outside scope" error
-- [ ] `simplify-ignore-start/end` blocks are preserved after `/code-simplify` run
-- [ ] Plugin installs cleanly via `git clone` into `/a0/usr/plugins/` with no manual steps
+- [ ] All 7 patches applied — 6 skills updated + using-agent-skills
+- [ ] Each patch adds only unique, non-duplicated content
+- [ ] No SKILL.md exceeds 500 lines after patches
+- [ ] `python3 scripts/validate.py` exits 0 — all frontmatter valid
+- [ ] Each patched skill loads correctly via `skills_tool:load`
+- [ ] The A0 Safe Operations protocol is present in `context-engineering`
+- [ ] The `thoughts[]` pattern is present in `context-engineering`
+- [ ] Per-line L<line> notation is present in `code-review-and-quality`
+- [ ] Commit message: `feat: integrate karpathy A0-specific discipline into skills (Option B)`
+
+---
 
 ## Open Questions
 
-- Upstream sync strategy: how often to pull from `addyosmani/agent-skills` and what's the merge process?
-- GitHub Actions CI: add workflow to validate SKILL.md frontmatter and plugin structure on every push?
-- Plugin Hub submission: ready now or wait for CI and more testing?
+- Should the `git diff --stat` audit step be added to CI as an automated check?
+- Should the A0 Complete Coding Workflow diagram from karpathy-coding-guidelines be embedded in `context-engineering` as a summary diagram, or is it better left in the standalone karpathy skill?
