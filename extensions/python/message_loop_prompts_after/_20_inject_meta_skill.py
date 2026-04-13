@@ -14,7 +14,6 @@ every turn. Token cost is negligible. Follows the ladybug_memory pattern.
 """
 from __future__ import annotations
 
-import sys
 from pathlib import Path
 
 from agent import LoopData
@@ -22,10 +21,6 @@ from helpers.extension import Extension
 from helpers.print_style import PrintStyle
 
 PLUGIN_NAME = "agent-skills"
-# _20_inject_meta_skill.py lives at:
-# <plugin_root>/extensions/python/message_loop_prompts_after/
-# parents[0]=message_loop_prompts_after, [1]=python, [2]=extensions, [3]=plugin_root
-PLUGIN_ROOT = Path(__file__).resolve().parents[3]
 
 # Compact routing table injected every turn.
 # Source: skills/using-agent-skills/SKILL.md — routing flowchart + rules.

@@ -8,8 +8,6 @@ TDD RED → GREEN:
 from __future__ import annotations
 
 import ast
-import importlib.util
-import sys
 from pathlib import Path
 
 import pytest
@@ -49,12 +47,6 @@ ALL_SKILLS = [
     "using-agent-skills",
 ]
 
-
-def _load_module():
-    """Load the extension module without importing A0 framework deps."""
-    source = EXT_PATH.read_text(encoding="utf-8")
-    # Parse only — don't exec (avoids needing A0 runtime imports)
-    return source
 
 
 # ---------------------------------------------------------------------------
