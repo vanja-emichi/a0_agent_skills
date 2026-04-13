@@ -173,13 +173,6 @@ Not every task needs every skill. A bug fix might only need: `debugging-and-erro
 | Ship | documentation-and-adrs | Document the why, not just the what |
 | Ship | shipping-and-launch | Pre-launch checklist, monitoring, rollback plan |
 
-## External Reference Skills
+## Behavioral Discipline
 
-Some skills live outside this plugin but complement it:
-
-| Skill | Location | When to Load |
-|-------|----------|--------------|
-| `karpathy-coding-guidelines` | Global (`/a0/usr/skills/`) | Before any non-trivial coding task |
-| `caveman` | Global (`/a0/usr/skills/caveman/`) | Compression reference + intensity switching |
-
-> A0 behavioral discipline (Think-Before-Coding, Surgical-Changes, Safe-Operations, Terse-Commits, Structured-Review, Output-Compression) embedded into plugin skills above; these are the canonical references.
+A0 behavioral discipline (Think-Before-Coding, Surgical-Changes, Safe-Operations, Terse-Commits, Structured-Review, Output-Compression) is embedded directly into plugin skills above.
