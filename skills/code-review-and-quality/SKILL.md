@@ -167,7 +167,7 @@ Label every comment with its severity so the author knows what's required vs opt
 This prevents authors from treating all feedback as mandatory and wasting time on optional suggestions.
 #### Per-Line Notation (Compact Format)
 
-For surgical, line-level findings, use this compact format as a complement to the severity labels above:
+For line-level findings, use this compact format alongside the severity labels above:
 
 ```
 L<line>: <severity> <problem>. <fix>.
@@ -189,7 +189,7 @@ L71: ❓ q: why sort descending here? ascending matches the UI order.
 
 **Drop from comments:** "I noticed that...", "You might want to consider...", hedging phrases, restating what the line does.
 
-**Auto-clarity exception:** Write a full paragraph for CVE-class security bugs, architectural disagreements, or onboarding contexts. Resume one-liners after.
+**Exception:** Write a full paragraph for CVE-class security bugs or architectural disagreements. Resume one-liners after.
 
 
 ### Step 5: Verify the Verification

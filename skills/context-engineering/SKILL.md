@@ -306,7 +306,6 @@ Before any `code_execution_tool` or `text_editor` call, the `thoughts[]` array m
 - Simplest solution would change a public interface or contract
 *For response templates when surfacing ambiguities, see Confusion Management above.*
 
-
 ### Example `thoughts[]` Pattern
 
 ```json
@@ -385,5 +384,5 @@ For destructive or irreversible actions: be explicit, confirm with user, never p
 ]
 ```
 
-Then in `response`:
+**In `response`:**
 > ⚠️ **Warning:** This will permanently delete the `users` table and all its data. Cannot be undone. Confirm to proceed.

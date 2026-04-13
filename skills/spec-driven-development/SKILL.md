@@ -226,9 +226,9 @@ Before writing any spec or proceeding to implementation, surface ambiguities exp
 
 ### Read Before Specifying
 
-For changes to existing systems, always read the relevant code before writing the spec. Specs written without reading existing code create conflicts between spec and reality.
+For changes to existing systems, always read the relevant code before writing the spec.
 
 **Example problem:**
 > Spec assumes REST endpoints. Code is GraphQL. Spec is invalidated before a line is written.
 
-**Correct approach:** Run `text_editor:read` on the relevant files first, then write a spec that reflects what actually exists — not what you imagine might exist.
+**Correct approach:** Run `text_editor:read` on the relevant files first, then write a spec that reflects what actually exists.
