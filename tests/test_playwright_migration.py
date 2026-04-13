@@ -51,14 +51,25 @@ REQUIRED_SECURITY_PHRASES = [
 ]
 
 
+def _stale_mcp_violations(files, name_fn):
+    """Return violation messages for any file containing a stale MCP pattern.
+
+    Args:
+        files: iterable of Path objects to scan
+        name_fn: callable(Path) -> str for the violation label (e.g. file name)
+    Returns:
+        List of "<label>: contains '<pattern>'" strings; empty if clean.
+    """
+    return [
+        f"{name_fn(f)}: contains '{pattern}'"
+        for f in files
+        for pattern in STALE_MCP_PATTERNS
+        if pattern in f.read_text()
+    ]
+
+
 class TestNoStaleMCPReferences:
     """No skill or command file may reference Chrome DevTools MCP."""
-
-    def _get_all_skill_files(self):
-        return list(SKILLS_DIR.glob("*/SKILL.md"))
-
-    def _get_all_command_txt_files(self):
-        return list(COMMANDS_DIR.glob("*.txt"))
 
     def test_skills_dir_exists(self):
         assert SKILLS_DIR.exists(), "skills/ directory must exist"
@@ -71,24 +82,18 @@ class TestNoStaleMCPReferences:
 
     def test_no_stale_mcp_in_any_skill(self):
         """Zero stale MCP references across all 21 skills."""
-        violations = []
-        for skill_file in self._get_all_skill_files():
-            content = skill_file.read_text()
-            for pattern in STALE_MCP_PATTERNS:
-                if pattern in content:
-                    violations.append(f"{skill_file.parent.name}: contains '{pattern}'")
+        violations = _stale_mcp_violations(
+            SKILLS_DIR.glob("*/SKILL.md"), lambda f: f.parent.name
+        )
         assert not violations, (
             "Stale MCP references found in skills:\n" + "\n".join(violations)
         )
 
     def test_no_stale_mcp_in_command_txt_files(self):
         """Command .txt files must not reference Chrome DevTools MCP."""
-        violations = []
-        for cmd_file in self._get_all_command_txt_files():
-            content = cmd_file.read_text()
-            for pattern in STALE_MCP_PATTERNS:
-                if pattern in content:
-                    violations.append(f"{cmd_file.name}: contains '{pattern}'")
+        violations = _stale_mcp_violations(
+            COMMANDS_DIR.glob("*.txt"), lambda f: f.name
+        )
         assert not violations, (
             "Stale MCP references found in command files:\n" + "\n".join(violations)
         )
