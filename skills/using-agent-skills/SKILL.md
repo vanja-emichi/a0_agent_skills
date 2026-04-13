@@ -9,6 +9,14 @@ description: Discovers and invokes agent skills. Use when starting a session or 
 
 Agent Skills is a collection of engineering workflow skills organized by development phase. Each skill encodes a specific process that senior engineers follow. This meta-skill helps you discover and apply the right skill for your current task.
 
+## When to Use
+
+- At the start of a session to understand available skills
+- When unsure which skill applies to the current task
+- When agent output quality degrades (wrong skill may be active)
+- When switching between development phases
+
+
 ## Skill Discovery
 
 When a task arrives, identify the development phase and apply the corresponding skill:
@@ -176,3 +184,12 @@ Not every task needs every skill. A bug fix might only need: `debugging-and-erro
 ## Behavioral Discipline
 
 A0 behavioral discipline (Think-Before-Coding, Surgical-Changes, Safe-Operations, Terse-Commits, Structured-Review, Output-Compression) is embedded directly into plugin skills above.
+
+## Verification
+
+After skill discovery:
+- [ ] Correct skill identified for the task phase
+- [ ] Skill loaded via `skills_tool:load <name>`
+- [ ] Skill instructions followed in order
+- [ ] Output matches the skill's expected format
+- [ ] Verification step from the skill itself completed

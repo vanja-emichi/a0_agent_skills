@@ -3,7 +3,7 @@
 [![CI](https://github.com/vanja-emichi/a0_agent_skills/actions/workflows/ci.yml/badge.svg)](https://github.com/vanja-emichi/a0_agent_skills/actions/workflows/ci.yml)
 
 
-**Production-grade engineering skills for Agent Zero.** 20 skills covering the full development lifecycle, 3 specialist agent personas, and 4 reference checklists.
+**Production-grade engineering skills for Agent Zero.** 21 skills covering the full development lifecycle, 3 specialist agent personas, and 4 reference checklists.
 
 Originally by [Addy Osmani](https://github.com/addyosmani/agent-skills), adapted for Agent Zero plugin architecture.
 
@@ -29,7 +29,7 @@ Then restart Agent Zero. The plugin auto-registers all skills and agent profiles
 
 ## What's Included
 
-### 20 Engineering Skills
+### 21 Engineering Skills
 
 Skills activate automatically based on context — no configuration needed.
 

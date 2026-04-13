@@ -20,14 +20,13 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
-      - name: Install PyYAML
-        run: pip install "pyyaml>=6.0,<7"
+      - name: Install dependencies
+        run: pip install "pyyaml>=6.0,<7" "pytest>=8,<10"
 
       - name: Run plugin structure validation
         run: python3 scripts/validate.py
 
       - name: Run tests
-        run: |
-          pip install "pytest>=8,<10"
-          python3 -m pytest tests/ -v
+        run: python3 -m pytest tests/ -v

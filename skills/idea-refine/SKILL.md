@@ -1,26 +1,21 @@
 ---
 name: idea-refine
-description: Refines ideas iteratively. Refine ideas through structured divergent and convergent thinking. Use "idea-refine" or "ideate" to trigger.
+description: Refines ideas through structured divergent and convergent thinking. Use when starting with a vague idea that needs refinement before specification.
 ---
 
 # Idea Refine
 
 Refines raw ideas into sharp, actionable concepts worth building through structured divergent and convergent thinking.
 
-## How It Works
+## Overview
 
 1.  **Understand & Expand (Divergent):** Restate the idea, ask sharpening questions, and generate variations.
 2.  **Evaluate & Converge:** Cluster ideas, stress-test them, and surface hidden assumptions.
 3.  **Sharpen & Ship:** Produce a concrete markdown one-pager moving work forward.
 
-## Usage
+## When to Use
 
 This skill is primarily an interactive dialogue. Invoke it with an idea, and the agent will guide you through the process.
-
-```bash
-# Optional: Initialize the ideas directory
-bash /mnt/skills/user/idea-refine/scripts/idea-refine.sh
-```
 
 **Trigger Phrases:**
 - "Help me refine this idea"
@@ -36,7 +31,7 @@ The final output is a markdown one-pager saved to `docs/ideas/[idea-name].md` (a
 - MVP Scope
 - Not Doing list
 
-## Detailed Instructions
+## Process
 
 You are an ideation partner. Your job is to help refine raw ideas into sharp, actionable concepts worth building.
 
