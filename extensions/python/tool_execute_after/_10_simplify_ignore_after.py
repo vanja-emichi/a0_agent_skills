@@ -14,15 +14,16 @@ file is tracked in the simplify-ignore cache, this hook:
   4. Re-filters the file on disk so placeholders remain hidden from the
      agent in subsequent reads.
 
-This mirrors the PostToolUse Edit|Write phase of simplify-ignore.sh.
+NOTE: A0 core (agent.py) does NOT pass tool_args to tool_execute_after.
+We derive the file path from self.agent.loop_data.current_tool.args instead.
 """
 from __future__ import annotations
 
 import importlib.util
-import sys
 from pathlib import Path
 
 from helpers.extension import Extension
+from helpers.print_style import PrintStyle
 
 
 # importlib is used because A0 extensions cannot rely on sys.path
@@ -55,17 +56,26 @@ class SimplifyIgnoreAfter(Extension):
         try:
             await self._run(**kwargs)
         except Exception as exc:
-            print(f'[simplify-ignore-after] unexpected error: {exc}', file=sys.stderr)
+            PrintStyle.error(f'[simplify-ignore-after] unexpected error: {exc}')
 
     async def _run(self, **kwargs):
         tool_name: str = kwargs.get('tool_name', '')
-        tool_args: dict = kwargs.get('tool_args', {}) or {}
 
         # Only act on write-class tools
         if tool_name not in _WRITE_TOOLS:
             return
 
-        file_path: str = tool_args.get('path', '')
+        # A0 core does not pass tool_args to tool_execute_after.
+        # Derive the file path from the still-active current_tool reference
+        # (current_tool is cleared in the finally block AFTER this hook runs).
+        file_path: str = ''
+        try:
+            current_tool = self.agent.loop_data.current_tool
+            if current_tool and current_tool.args:
+                file_path = current_tool.args.get('path', '')
+        except (AttributeError, TypeError):
+            pass
+
         if not file_path:
             return
 
@@ -90,8 +100,7 @@ class SimplifyIgnoreAfter(Extension):
         try:
             on_disk = Path(file_path).read_text(encoding='utf-8', errors='replace')
         except OSError as exc:
-            print(f'[simplify-ignore-after] could not read {file_path}: {exc}',
-                  file=sys.stderr)
+            PrintStyle.error(f'[simplify-ignore-after] could not read {file_path}: {exc}')
             return
 
         # ── 2. Expand placeholders → merged real content ──────────────────────
@@ -102,8 +111,7 @@ class SimplifyIgnoreAfter(Extension):
             with open(file_path, 'w', encoding='utf-8') as fh:
                 fh.write(expanded)
         except OSError as exc:
-            print(f'[simplify-ignore-after] could not write expanded file: {exc}',
-                  file=sys.stderr)
+            PrintStyle.error(f'[simplify-ignore-after] could not write expanded file: {exc}')
             return
 
         # ── 4. Update the 'original' backup with the merged content ───────────
@@ -120,8 +128,7 @@ class SimplifyIgnoreAfter(Extension):
                 with open(file_path, 'w', encoding='utf-8') as fh:
                     fh.write(filtered)
             except OSError as exc:
-                print(f'[simplify-ignore-after] could not write re-filtered file: {exc}',
-                      file=sys.stderr)
+                PrintStyle.error(f'[simplify-ignore-after] could not write re-filtered file: {exc}')
         else:
             # All blocks were deleted by the model — clear tracking for this file
             # (no blocks left to protect; file stays as-is with expanded content)

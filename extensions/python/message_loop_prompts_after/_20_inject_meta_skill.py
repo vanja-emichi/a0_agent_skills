@@ -69,7 +69,7 @@ class InjectMetaSkill(Extension):
     not just the 11 reachable through slash commands.
     """
 
-    async def execute(self, loop_data: LoopData = LoopData(), **kwargs):
+    async def execute(self, loop_data: LoopData, **kwargs):
         try:
             if not self.agent:
                 return

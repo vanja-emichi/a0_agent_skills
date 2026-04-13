@@ -16,11 +16,10 @@ Skips files whose name starts with `simplify-ignore` or `SIMPLIFY-IGNORE`
 from __future__ import annotations
 
 import importlib.util
-import sys
 from pathlib import Path
 
 from helpers.extension import Extension
-
+from helpers.print_style import PrintStyle
 
 # importlib is used because A0 extensions cannot rely on sys.path
 # containing the plugin directory — derive path from __file__ instead.
@@ -49,7 +48,7 @@ class SimplifyIgnoreBefore(Extension):
             await self._run(**kwargs)
         except Exception as exc:
             # Extension failures must never break the tool call.
-            print(f'[simplify-ignore-before] unexpected error: {exc}', file=sys.stderr)
+            PrintStyle.error(f'[simplify-ignore-before] unexpected error: {exc}')
 
     async def _run(self, **kwargs):
         tool_name: str = kwargs.get('tool_name', '')
@@ -110,7 +109,6 @@ class SimplifyIgnoreBefore(Extension):
             with open(file_path, 'w', encoding='utf-8') as fh:
                 fh.write(filtered)
         except OSError as exc:
-            print(f'[simplify-ignore-before] could not write filtered file: {exc}',
-                  file=sys.stderr)
+            PrintStyle.error(f'[simplify-ignore-before] could not write filtered file: {exc}')
             # Rollback context entry so nothing is half-done
             cache.pop(file_path, None)

@@ -17,10 +17,10 @@ from scratch (re-filtering if the file still contains markers).
 from __future__ import annotations
 
 import importlib.util
-import sys
 from pathlib import Path
 
 from helpers.extension import Extension
+from helpers.print_style import PrintStyle
 
 
 # importlib is used because A0 extensions cannot rely on sys.path
@@ -49,7 +49,7 @@ class SimplifyIgnoreRestore(Extension):
         try:
             await self._run(**kwargs)
         except Exception as exc:
-            print(f'[simplify-ignore-restore] unexpected error: {exc}', file=sys.stderr)
+            PrintStyle.error(f'[simplify-ignore-restore] unexpected error: {exc}')
 
     async def _run(self, **kwargs):
         utils = _utils()
@@ -74,17 +74,15 @@ class SimplifyIgnoreRestore(Extension):
                 try:
                     recovered.parent.mkdir(parents=True, exist_ok=True)
                     recovered.write_text(original, encoding='utf-8')
-                    print(
+                    PrintStyle.hint(
                         f'[simplify-ignore-restore] {file_path} was moved/deleted. '
                         f'Recovered original to {recovered}',
-                        file=sys.stderr,
                     )
                     restored.append(file_path)
                 except OSError as exc:
-                    print(
+                    PrintStyle.error(
                         f'[simplify-ignore-restore] could not write recovered file '
                         f'{recovered}: {exc}',
-                        file=sys.stderr,
                     )
                     failed.append(file_path)
                 continue
@@ -95,9 +93,8 @@ class SimplifyIgnoreRestore(Extension):
                     fh.write(original)
                 restored.append(file_path)
             except OSError as exc:
-                print(
+                PrintStyle.error(
                     f'[simplify-ignore-restore] could not restore {file_path}: {exc}',
-                    file=sys.stderr,
                 )
                 failed.append(file_path)
 
@@ -107,20 +104,17 @@ class SimplifyIgnoreRestore(Extension):
             cache.pop(file_path, None)
 
         if restored:
-            print(
+            PrintStyle.hint(
                 f'[simplify-ignore-restore] restored {len(restored)} file(s): '
                 + ', '.join(restored),
-                file=sys.stderr,
             )
         if failed:
-            print(
+            PrintStyle.error(
                 f'[simplify-ignore-restore] WARNING: failed to restore {len(failed)} '
                 f'file(s): ' + ', '.join(failed),
-                file=sys.stderr,
             )
-            print(
+            PrintStyle.error(
                 '[simplify-ignore-restore] These entries remain in cache for retry. '
                 'To recover manually, inspect agent context under key '
                 f'"{utils.CACHE_KEY}" and write the "original" value back to each file.',
-                file=sys.stderr,
             )
