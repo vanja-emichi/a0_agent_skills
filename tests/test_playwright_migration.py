@@ -31,8 +31,8 @@ STALE_MCP_PATTERNS = [
 # Broader stale patterns for docs/ and README where descriptions must reference
 # playwright-cli rather than Chrome DevTools tooling.
 DOCS_STALE_PATTERNS = STALE_MCP_PATTERNS + [
-    "`chrome-devtools` MCP",   # gemini-cli-setup: "`chrome-devtools` MCP extension"
-    "via Chrome DevTools",     # README: "via Chrome DevTools"
+    "`chrome-devtools` MCP",   # pattern for any doc that references chrome-devtools MCP tooling
+    "via Chrome DevTools",     # pattern for any doc that says browser skill works via Chrome DevTools
 ]
 
 # playwright-cli commands that must appear in browser-testing-with-devtools.
