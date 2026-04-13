@@ -22,8 +22,10 @@ PLUGIN_NAME = "agent-skills"
 # parents[0] = agent_init, parents[1] = python, parents[2] = extensions, parents[3] = plugin_root
 PLUGIN_ROOT = Path(__file__).resolve().parents[3]
 
-# Global scope: when no project is active
-GLOBAL_COMMANDS_DIR = Path("/a0/usr/plugins/commands/commands")
+# Global scope: when no project is active.
+# Derive from PLUGIN_ROOT: /a0/usr/projects/agent_skills/ → parents[2] = /a0/
+A0_ROOT = PLUGIN_ROOT.parents[2]
+GLOBAL_COMMANDS_DIR = A0_ROOT / "usr" / "plugins" / "commands" / "commands"
 
 # Project scope: when agent_skills project is active
 # Commands plugin resolves this as: projects.get_project_meta('agent_skills') / plugins/commands/commands

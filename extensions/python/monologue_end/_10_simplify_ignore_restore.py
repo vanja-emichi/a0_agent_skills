@@ -25,13 +25,13 @@ from helpers.print_style import PrintStyle
 
 # importlib is used because A0 extensions cannot rely on sys.path
 # containing the plugin directory — derive path from __file__ instead.
+# Shared utilities now live in <plugin_root>/lib/ for cleaner separation.
 _utils_mod = None
-
 
 def _utils():
     global _utils_mod
     if _utils_mod is None:
-        utils_path = Path(__file__).parent.parent / 'simplify_ignore_utils.py'
+        utils_path = Path(__file__).resolve().parents[3] / 'lib' / 'simplify_ignore_utils.py'
         spec = importlib.util.spec_from_file_location('simplify_ignore_utils', utils_path)
         mod = importlib.util.module_from_spec(spec)   # type: ignore[arg-type]
         spec.loader.exec_module(mod)                  # type: ignore[union-attr]
