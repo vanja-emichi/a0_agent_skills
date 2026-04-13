@@ -266,9 +266,26 @@ class TestCommands:
     def test_no_commands_dir_returns_empty_list(self, tmp_path):
         assert check_commands(tmp_path) == []
 
+    def test_fail_when_template_path_escapes_commands_dir(self, tmp_path):
+        """I3: template_path: ../../README.md must FAIL even when the file exists."""
+        # Create the target that would be reached by path traversal
+        readme = tmp_path / "README.md"
+        readme.write_text("# Root readme\n")
+        self._make_command(
+            tmp_path, "escapecmd",
+            "name: escapecmd\ndescription: Escape test\ntype: text\ntemplate_path: ../../README.md\n",
+            # No txt_name — the point is path escape, not missing file
+        )
+        results = check_commands(tmp_path)
+        assert _fails(results), "expected FAIL for template_path that escapes commands dir"
+        fail_msgs = [msg for _, msg in _fails(results)]
+        assert any("escapes" in m for m in fail_msgs), (
+            f"expected 'escapes' in failure message, got: {fail_msgs}"
+        )
+
 
 # ---------------------------------------------------------------------------
-# Check 6 — extensions/**/*_NN_*.py syntax
+# Check 6 — extensions/**/*.py syntax
 # ---------------------------------------------------------------------------
 
 class TestExtensions:
@@ -287,10 +304,20 @@ class TestExtensions:
         self._make_ext(tmp_path, "python/agent_init", "_20_bad.py", "def broken(\n")
         assert _fails(check_extensions(tmp_path))
 
-    def test_non_pattern_files_ignored(self, tmp_path):
-        # utils.py does NOT match _NN_*.py — broken syntax should not trigger FAIL
-        self._make_ext(tmp_path, "python", "utils.py", "def broken(\n")
-        assert not _fails(check_extensions(tmp_path))
+    def test_utility_module_syntax_error_is_caught(self, tmp_path):
+        """I4: simplify_ignore_utils.py (non-_NN_ name) must be caught too."""
+        self._make_ext(tmp_path, "python", "simplify_ignore_utils.py", "def broken(\n")
+        results = check_extensions(tmp_path)
+        assert _fails(results), (
+            "expected FAIL for syntax error in simplify_ignore_utils.py"
+        )
+
+    def test_utility_module_valid_syntax_passes(self, tmp_path):
+        """I4: simplify_ignore_utils.py with valid syntax produces PASS."""
+        self._make_ext(tmp_path, "python", "simplify_ignore_utils.py", "CACHE_KEY = 'x'\n")
+        results = check_extensions(tmp_path)
+        assert _passes(results)
+        assert not _fails(results)
 
     def test_no_extensions_dir_returns_empty_list(self, tmp_path):
         assert check_extensions(tmp_path) == []

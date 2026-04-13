@@ -23,13 +23,20 @@ from pathlib import Path
 from helpers.extension import Extension
 
 
-# ── lazy-load shared utils from sibling directory ────────────────────────────
+# importlib is used because A0 extensions cannot rely on sys.path
+# containing the plugin directory — derive path from __file__ instead.
+_utils_mod = None
+
+
 def _utils():
-    utils_path = Path(__file__).parent.parent / 'simplify_ignore_utils.py'
-    spec = importlib.util.spec_from_file_location('simplify_ignore_utils', utils_path)
-    mod = importlib.util.module_from_spec(spec)   # type: ignore[arg-type]
-    spec.loader.exec_module(mod)                  # type: ignore[union-attr]
-    return mod
+    global _utils_mod
+    if _utils_mod is None:
+        utils_path = Path(__file__).parent.parent / 'simplify_ignore_utils.py'
+        spec = importlib.util.spec_from_file_location('simplify_ignore_utils', utils_path)
+        mod = importlib.util.module_from_spec(spec)   # type: ignore[arg-type]
+        spec.loader.exec_module(mod)                  # type: ignore[union-attr]
+        _utils_mod = mod
+    return _utils_mod
 
 
 class SimplifyIgnoreRestore(Extension):
@@ -51,8 +58,8 @@ class SimplifyIgnoreRestore(Extension):
         if not cache:
             return  # Nothing to restore
 
-        restored = []
-        failed = []
+        restored: list[str] = []
+        failed: list[str] = []
 
         for file_path, entry in list(cache.items()):
             original: str = entry.get('original', '')
@@ -94,8 +101,10 @@ class SimplifyIgnoreRestore(Extension):
                 )
                 failed.append(file_path)
 
-        # Clear the cache regardless — failed entries would need manual recovery
-        self.agent.context.data.pop(utils.CACHE_KEY, None)
+        # Only clear cache entries that were successfully restored.
+        # Failed entries remain in cache so they can be retried next turn.
+        for file_path in restored:
+            cache.pop(file_path, None)
 
         if restored:
             print(
@@ -107,5 +116,11 @@ class SimplifyIgnoreRestore(Extension):
             print(
                 f'[simplify-ignore-restore] WARNING: failed to restore {len(failed)} '
                 f'file(s): ' + ', '.join(failed),
+                file=sys.stderr,
+            )
+            print(
+                '[simplify-ignore-restore] These entries remain in cache for retry. '
+                'To recover manually, inspect agent context under key '
+                f'"{utils.CACHE_KEY}" and write the "original" value back to each file.',
                 file=sys.stderr,
             )

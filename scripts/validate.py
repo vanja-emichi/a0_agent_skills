@@ -18,7 +18,7 @@ Checks performed:
     3. agents/*/agent.yaml   — exists + has: title, description, context
     4. agents/*/prompts/agent.system.main.specifics.md — exists
     5. commands/*.command.yaml — has: name, description, type, template_path + paired .txt
-    6. extensions/**/_NN_*.py — valid Python syntax
+    6. extensions/**/*.py    — valid Python syntax (all .py files, not just _NN_ pattern)
     7. references/*.md       — non-empty
 
 Skips: .a0proj/ (all targeted checks use explicit subdirectories)
@@ -26,7 +26,6 @@ Skips: .a0proj/ (all targeted checks use explicit subdirectories)
 from __future__ import annotations
 
 import ast
-import re
 import sys
 from pathlib import Path
 
@@ -88,6 +87,9 @@ def _parse_frontmatter(text: str) -> dict | None:
     Expects the file to start with '---' on its own line, followed by YAML
     content, closed by another '---' line.
     """
+    # Known limitation: a YAML multiline description value containing '---'
+    # on its own line will prematurely terminate frontmatter parsing.
+    # In practice, SKILL.md descriptions are single-line, so this is safe.
     lines = text.splitlines()
     if not lines or lines[0].strip() != "---":
         return None
@@ -230,6 +232,7 @@ def check_commands(root: Path) -> list[Result]:
         return []
 
     results: list[Result] = []
+    commands_dir_resolved = commands_dir.resolve()
     for cmd_file in sorted(commands_dir.glob("*.command.yaml")):
         try:
             data = yaml.safe_load(cmd_file.read_text()) or {}
@@ -245,8 +248,16 @@ def check_commands(root: Path) -> list[Result]:
                 f"missing fields: {', '.join(missing)}", str(cmd_file)
             ))
             continue
-        # Check paired template file exists in same directory
-        template_path = commands_dir / data["template_path"]
+        # Resolve template path and verify it stays inside commands/
+        template_path = (commands_dir / data["template_path"]).resolve()
+        try:
+            template_path.relative_to(commands_dir_resolved)
+        except ValueError:
+            results.append(_fail(
+                f"template_path escapes commands dir: {data['template_path']}",
+                str(cmd_file),
+            ))
+            continue
         if not template_path.exists():
             results.append(_fail(
                 f"template_path not found: {data['template_path']}", str(cmd_file)
@@ -258,22 +269,21 @@ def check_commands(root: Path) -> list[Result]:
 
 
 # ---------------------------------------------------------------------------
-# Check 6 — extensions/**/_NN_*.py syntax
+# Check 6 — extensions/**/*.py syntax
 # ---------------------------------------------------------------------------
 
-_EXT_PATTERN = re.compile(r'^_\d+_.+\.py$')
-
-
 def check_extensions(root: Path) -> list[Result]:
-    """Verify all _NN_*.py extension files have valid Python syntax."""
+    """Verify ALL .py extension files have valid Python syntax.
+
+    This includes utility modules like simplify_ignore_utils.py — a syntax
+    error there would silently kill all hooks that import it.
+    """
     ext_dir = root / "extensions"
     if not ext_dir.exists():
         return []
 
     results: list[Result] = []
     for py_file in sorted(ext_dir.rglob("*.py")):
-        if not _EXT_PATTERN.match(py_file.name):
-            continue  # skip non-pattern files (e.g. utils.py)
         source = py_file.read_text(encoding="utf-8", errors="replace")
         try:
             ast.parse(source, filename=str(py_file))
@@ -316,7 +326,7 @@ CHECKS = [
     ("Check 3: agents/*/agent.yaml",                    check_agents_yaml),
     ("Check 4: agents/*/prompts/specifics.md",          check_agent_specifics),
     ("Check 5: commands/*.command.yaml",                check_commands),
-    ("Check 6: extensions/**/_NN_*.py syntax",          check_extensions),
+    ("Check 6: extensions/**/*.py syntax",              check_extensions),
     ("Check 7: references/*.md non-empty",              check_references),
 ]
 

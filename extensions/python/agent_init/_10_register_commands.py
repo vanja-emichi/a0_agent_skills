@@ -18,7 +18,10 @@ from helpers.print_style import PrintStyle
 
 
 PLUGIN_NAME = "agent-skills"
-PLUGIN_ROOT = Path("/a0/usr/projects/agent_skills")
+# Derive plugin root from this file's location — works on any install path.
+# _10_register_commands.py lives at: <plugin_root>/extensions/python/agent_init/
+# parents[0] = agent_init, parents[1] = python, parents[2] = extensions, parents[3] = plugin_root
+PLUGIN_ROOT = Path(__file__).resolve().parents[3]
 
 # Global scope: when no project is active
 GLOBAL_COMMANDS_DIR = Path("/a0/usr/plugins/commands/commands")
@@ -50,7 +53,8 @@ class RegisterCommands(Extension):
             for scope_dir in scopes:
                 scope_dir.mkdir(parents=True, exist_ok=True)
                 for src_file in sorted(our_commands_dir.iterdir()):
-                    if not src_file.is_file():
+                    # Skip non-files and symlinks in the source directory
+                    if not src_file.is_file() or src_file.is_symlink():
                         continue
                     dest = scope_dir / src_file.name
                     if dest.is_symlink():
@@ -58,6 +62,7 @@ class RegisterCommands(Extension):
                             continue  # Already correct
                         dest.unlink()
                     elif dest.exists():
+                        PrintStyle.warning(f"[{PLUGIN_NAME}] Replacing non-symlink file: {dest}")
                         dest.unlink()
                     dest.symlink_to(src_file)
                     registered += 1
