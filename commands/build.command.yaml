@@ -1,0 +1,5 @@
+name: build
+description: Implement the next task incrementally — build, test, verify, commit.
+argument_hint: /build [task or feature]
+type: text
+template_path: build.txt

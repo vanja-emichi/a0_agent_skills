@@ -1,0 +1,5 @@
+name: test
+description: Run TDD workflow — write failing tests, implement, verify. For bugs, use the Prove-It pattern.
+argument_hint: /test [feature or bug description]
+type: text
+template_path: test.txt

@@ -1,0 +1,5 @@
+name: code-simplify
+description: Simplify code for clarity and maintainability — reduce complexity without changing behavior.
+argument_hint: /code-simplify [file or scope]
+type: text
+template_path: code-simplify.txt

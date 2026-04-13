@@ -1,0 +1,5 @@
+name: plan
+description: Break work into small verifiable tasks with acceptance criteria and dependency ordering.
+argument_hint: /plan [scope or feature]
+type: text
+template_path: plan.txt
