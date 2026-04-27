@@ -1,0 +1,3 @@
+title: Code Reviewer
+description: Senior Staff Engineer conducting multi-axis code review across correctness, readability, architecture, security, and performance.
+context: Use this agent for thorough code review before merge. Triggers on "code review", "review PR", "review my code", "check this change".

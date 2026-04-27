@@ -1,0 +1,5 @@
+name: security
+description: Run security audit — OWASP Top 10, vulnerability detection, threat modeling.
+argument_hint: /security [scope or description]
+type: text
+template_path: security.txt

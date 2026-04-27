@@ -1,0 +1,3 @@
+title: Skill Creator
+description: Creates, tests, grades, benchmarks, and optimizes Agent Zero skills through scheduler-based evaluation with subordinate-driven testing.
+context: Use this agent for creating new skills, improving existing skills, running skill tests, grading outputs, benchmarking performance, or optimizing skill descriptions. Triggers on "create a skill", "test this skill", "grade skill output", "benchmark skill", "optimize skill description", "skill creator".

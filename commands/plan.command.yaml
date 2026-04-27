@@ -1,0 +1,5 @@
+name: plan
+description: Initialize a lifecycle runtime, then break work into small verifiable tasks.
+argument_hint: /plan [scope or feature]
+type: text
+template_path: plan.txt

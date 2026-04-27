@@ -1,0 +1,5 @@
+name: ship
+description: Run the pre-launch checklist and prepare for production deployment.
+argument_hint: /ship [target environment]
+type: text
+template_path: ship.txt

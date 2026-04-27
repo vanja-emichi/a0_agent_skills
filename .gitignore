@@ -1,0 +1,16 @@
+**/.DS_Store
+**/__pycache__/
+*.py[cod]
+
+# Agent Zero project state — local only, never commit
+.a0proj/
+.toggle-0
+.pytest_cache/
+
+# Secrets and credentials — never commit
+.env
+.env.*
+*.pem
+*.key
+*.p12
+secrets.yaml

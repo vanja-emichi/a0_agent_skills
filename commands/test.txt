@@ -1,0 +1,36 @@
+Delegate this testing task to the test-engineer specialist:
+
+Before delegating, check if an active lifecycle exists at .a0proj/run/current/. If so, include this context in your delegation message:
+
+[Lifecycle Context]
+Current Phase: (read from state.md)
+Goal: (read from state.md)
+Completed: (count completed phases)
+Findings so far: (count from findings.md) logged
+
+This context helps the specialist understand where their review fits in the engineering lifecycle.
+
+call_subordinate profile=test-engineer message="Execute TDD workflow for the following: {raw}"
+
+The specialist agent will load the test-driven-development skill and execute the full TDD cycle.
+For new features: RED (failing test) → GREEN (minimal implementation) → REFACTOR.
+For bug fixes: Prove-It pattern (reproduce with failing test → fix → verify).
+
+
+## Exit Criteria (must ALL be true before proceeding to /review)
+- [ ] All tests pass (unit, integration)
+- [ ] Test coverage hasn't decreased
+- [ ] Edge cases covered
+- [ ] Bug fixes include reproduction tests
+
+## Anti-Rationalization Table
+| Rationalization | Reality |
+|---|---|
+| "It works, tests are just ceremony" | Tests are proof. "Seems right" is not done. |
+| "Edge cases don't happen in practice" | Edge cases are where the worst bugs live. |
+| "Manual testing is enough" | Manual testing doesn't persist. Tomorrow's change might break it. |
+
+## Red Flags
+- Tests that pass on first run (may not test what you think)
+- Bug fixes without reproduction tests
+- Skipped or disabled tests

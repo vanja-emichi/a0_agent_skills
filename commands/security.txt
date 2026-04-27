@@ -1,0 +1,15 @@
+Delegate this security audit to the security-auditor specialist:
+
+Before delegating, check if an active lifecycle exists at .a0proj/run/current/. If so, include this context in your delegation message:
+
+[Lifecycle Context]
+Current Phase: (read from state.md)
+Goal: (read from state.md)
+Completed: (count completed phases)
+Findings so far: (count from findings.md) logged
+
+This context helps the specialist understand where their review fits in the engineering lifecycle.
+
+call_subordinate profile=security-auditor message="Conduct a security audit on the following scope: {raw}"
+
+The specialist agent will load the security-and-hardening skill and execute the full OWASP-based audit with severity classification.

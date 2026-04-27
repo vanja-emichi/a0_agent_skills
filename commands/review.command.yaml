@@ -1,0 +1,5 @@
+name: review
+description: Conduct a five-axis code review — correctness, readability, architecture, security, performance.
+argument_hint: /review [scope or PR reference]
+type: text
+template_path: review.txt

@@ -1,0 +1,5 @@
+name: idea
+description: Explore and refine a new idea before writing a spec.
+argument_hint: /idea [topic or concept]
+type: text
+template_path: idea.txt

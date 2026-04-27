@@ -1,0 +1,3 @@
+title: Skill Grader
+description: Evaluates skill test outputs against expectations, extracts claims, and writes grading.json.
+context: Use this agent to grade skill test execution results. It reads transcripts and outputs, evaluates assertions, and produces structured grading results.

@@ -1,0 +1,261 @@
+Load the skill `skills_tool:load shipping-and-launch` and follow its instructions.
+
+## Trivial Change Detection
+
+Before starting the review, determine if this is a trivial change.
+
+A change is **trivial ONLY when ALL three conditions are true:**
+
+1. **File count**: ≤2 files changed (excluding formatting-only changes)
+2. **Diff size**: Total diff < 50 lines
+3. **Sensitive areas**: No changes to auth, payments, data access, config/env, or secrets
+
+**If ANY single condition is unmet → this is a non-trivial change → proceed to parallel review (default).**
+
+---
+
+## Sequential Review (trivial changes only)
+
+For trivial changes, run a single sequential review:
+
+```
+call_subordinate profile=code-reviewer
+message: "Review this trivial change for correctness, security, and quality. The change touches [N] files with [M] lines diff. Changed files: {changed_files}"
+```
+
+After the review, if the reviewer approves, proceed to the lifecycle:archive step below.
+
+---
+
+## Parallel Review (default for non-trivial changes)
+
+For non-trivial changes, run 3 concurrent specialist reviews using the scheduler.
+
+### Step 1: Determine lifecycle context
+
+Read the active lifecycle state:
+- phase: SHIP
+- goal: read from `.a0proj/run/current/state.md`
+- slug: project slug from state
+- spec_path: path to SPEC.md
+- changed_files: comma-separated list of all files modified in this change
+
+### Step 2: Create 3 specialist review tasks
+
+Create all 3 tasks first, then run them all:
+
+```
+scheduler:create_adhoc_task
+  name: "Ship - Security Review"
+  system_prompt: "You are a security specialist performing a final security review before code ships to production.
+
+You are operating within the a0_agent_skills lifecycle.
+- Current phase: SHIP
+- Lifecycle goal: {goal from state}
+- Project slug: {slug from state}
+- SPEC.md location: {spec_path}
+- State file: .a0proj/run/current/state.md
+- Changed files: {changed_files}
+
+## Your Task
+
+1. Review all changed files for OWASP Top 10 vulnerabilities.
+2. Check for hardcoded secrets, insecure defaults, missing auth checks.
+3. Verify dependency security (known CVEs in direct/transitive deps).
+4. Assess threat model for the changes.
+
+## Output Format
+
+Write your findings to: .a0proj/run/current/ship-security.md
+
+### Summary
+- Verdict: PASS | FAIL
+- Critical count: N
+- High count: N"
+  dedicated_context: true
+  message: "Perform a security review of the current changes. Review these changed files: {changed_files}. Check for vulnerabilities and write findings to .a0proj/run/current/ship-security.md"
+```
+
+```
+scheduler:create_adhoc_task
+  name: "Ship - Test Verification"
+  system_prompt: "You are a test engineer performing a final test verification before code ships to production.
+
+You are operating within the a0_agent_skills lifecycle.
+- Current phase: SHIP
+- Lifecycle goal: {goal from state}
+- Project slug: {slug from state}
+- SPEC.md location: {spec_path}
+- State file: .a0proj/run/current/state.md
+- Changed files: {changed_files}
+
+## Your Task
+
+1. Verify that all changed code has corresponding test coverage.
+2. Check that tests cover happy paths, edge cases, and error paths.
+3. Confirm test suite passes without skips or known failures.
+4. Identify missing test scenarios that could hide production bugs.
+
+## Output Format
+
+Write your findings to: .a0proj/run/current/ship-tests.md
+
+### Summary
+- Verdict: PASS | FAIL
+- Missing critical tests: N
+- Missing edge cases: N"
+  dedicated_context: true
+  message: "Perform a test verification of the current changes. Review these changed files: {changed_files}. Check coverage, run test suite, and write findings to .a0proj/run/current/ship-tests.md"
+```
+
+```
+scheduler:create_adhoc_task
+  name: "Ship - Code Quality Gate"
+  system_prompt: "You are a senior code quality reviewer performing a final quality gate before code ships to production.
+
+You are operating within the a0_agent_skills lifecycle.
+- Current phase: SHIP
+- Lifecycle goal: {goal from state}
+- Project slug: {slug from state}
+- SPEC.md location: {spec_path}
+- State file: .a0proj/run/current/state.md
+- Changed files: {changed_files}
+
+## Your Task
+
+1. Review correctness — does the code do what it claims?
+2. Review readability — would a new team member understand this?
+3. Review architecture — does it follow project patterns and conventions?
+4. Check for code smells, dead code, and unnecessary complexity.
+
+## Output Format
+
+Write your findings to: .a0proj/run/current/ship-quality.md
+
+### Summary
+- Verdict: PASS | FAIL
+- Critical count: N
+- High count: N"
+  dedicated_context: true
+  message: "Perform a code quality review of the current changes. Review these changed files: {changed_files}. Assess correctness, readability, architecture, and write findings to .a0proj/run/current/ship-quality.md"
+```
+
+### Step 3: Run all tasks and wait for completion
+
+Run all 3 tasks concurrently, then wait for each to complete.
+
+⚠️ **Timeout guidance**: Each `scheduler:wait_for_task` call MUST have an implicit or explicit timeout. If the scheduler tool accepts a timeout parameter, set it to 300 seconds (5 minutes). If no timeout parameter is available, enforce timeout at the orchestration level — after issuing all 3 wait calls, do not block longer than 5 minutes total. If any task has not completed after 5 minutes, treat it as a scheduler failure and proceed to Step 5 (Fallback).
+
+```
+scheduler:run_task <security-task-uuid>
+scheduler:run_task <test-task-uuid>
+scheduler:run_task <quality-task-uuid>
+
+scheduler:wait_for_task <security-task-uuid>
+scheduler:wait_for_task <test-task-uuid>
+scheduler:wait_for_task <quality-task-uuid>
+```
+
+### Step 4: Merge results into GO/NO-GO decision
+
+Read all 3 output files:
+- `.a0proj/run/current/ship-security.md`
+- `.a0proj/run/current/ship-tests.md`
+- `.a0proj/run/current/ship-quality.md`
+
+**GO decision:** All 3 reviews have Verdict: PASS
+**NO-GO decision:** Any review has Verdict: FAIL with Critical or High findings
+
+### Step 5: Fallback on scheduler failure
+
+If any scheduler task fails (timeout, error, resource issue):
+
+```
+call_subordinate profile=code-reviewer
+message: "The parallel /ship review encountered scheduler failures. Perform a comprehensive review covering security, testing, and code quality for the current changes. Changed files: {changed_files}"
+```
+
+### Step 6: Append decision to findings.md
+
+**Always append** — never overwrite findings.md.
+
+The merge output MUST follow this exact format when appended to findings.md:
+
+```markdown
+
+---
+
+## Ship Decision — {ISO-8601 date}
+
+| Review | Verdict | Critical | High |
+|--------|---------|----------|------|
+| Security | PASS/FAIL | N | N |
+| Testing | PASS/FAIL | N missing critical | N missing edge cases |
+| Code Quality | PASS/FAIL | N | N |
+
+**Verdict: GO / NO-GO**
+
+{Summary of key findings — bullet list of any Critical or High issues, or "No blocking issues" if GO}
+```
+
+### Step 7: Act on decision
+
+**If GO:** Proceed to `lifecycle:archive` below.
+**If NO-GO:** Present blockers to the user. List all Critical and High findings. Await user decision on how to proceed.
+
+---
+
+## Pre-Launch Checklist
+
+Run through the complete pre-launch checklist:
+
+1. **Code Quality** — Tests pass, build clean, lint clean, no TODOs, no console.logs
+2. **Security** — npm audit clean, no secrets in code, auth in place, headers configured
+3. **Performance** — Core Web Vitals good, no N+1 queries, images optimized, bundle sized
+4. **Accessibility** — Keyboard nav works, screen reader compatible, contrast adequate
+5. **Infrastructure** — Env vars set, migrations ready, monitoring configured
+6. **Documentation** — README current, ADRs written, changelog updated
+
+Report any failing checks and help resolve them before deployment.
+Define the rollback plan before proceeding.
+
+---
+
+⚠️ **MANDATORY** — If the decision is GO and an active plan exists, you MUST call `lifecycle:archive` to archive the plan:
+
+```
+lifecycle:archive status="completed" emit_spec=true promote_adrs=true
+```
+
+- `emit_spec=true` writes SPEC.md at the project root with the plan's findings and completed phases.
+- `promote_adrs=true` promotes trusted findings to ADR files in `docs/adr/`.
+
+On CANCEL decision, do NOT call `lifecycle:archive` — just report the cancellation reason.
+If the planning tool is not installed (no `plan` tool available), skip this step gracefully.
+
+## Exit Criteria (must ALL be true before deployment)
+- [ ] Pre-launch checklist complete (all sections green)
+- [ ] Parallel review complete (or sequential for trivial changes)
+- [ ] Ship decision appended to findings.md in the specified table format
+- [ ] Rollback plan documented
+- [ ] CHANGELOG updated
+- [ ] User has given final approval
+
+## Anti-Rationalization Table
+| Rationalization | Reality |
+|---|---|
+| "It works in staging, it'll work in production" | Production has different data, traffic, and edge cases. |
+| "We don't need monitoring" | You discover problems from user complaints instead of dashboards. |
+| "Rolling back is admitting failure" | Rolling back is responsible. Shipping broken features is the failure. |
+| "The changes are too small for parallel review" | Non-trivial changes deserve thorough review regardless of perceived risk. |
+| "Sequential review is faster" | 3 parallel reviews take wall-clock time of 1 review, with 3x coverage. |
+
+## Red Flags
+- No rollback plan
+- No monitoring in place
+- Deploying without user approval
+- "It's Friday afternoon, let's ship it"
+- Skipping parallel review for non-trivial changes
+- Scheduler failures ignored without fallback
+- findings.md overwritten instead of appended
+- wait_for_task called without timeout enforcement

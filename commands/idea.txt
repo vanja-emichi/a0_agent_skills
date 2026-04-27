@@ -1,0 +1,18 @@
+Load the skill `skills_tool:load idea-refine` and follow its instructions.
+
+Explore the idea space, identify constraints, evaluate feasibility, and produce a structured idea document.
+
+1. Capture the core concept in one sentence
+2. Identify assumptions and constraints
+3. Evaluate technical feasibility
+4. List risks and mitigations
+5. Define success criteria
+
+Save the idea to `docs/ideas/<slug>.md`.
+
+---
+
+⚠️ **Checkpoint** — Present the idea for review before proceeding to `/spec`.
+
+If the idea is approved, the next step is `/spec` to create a formal specification.
+{raw}

@@ -1,0 +1,32 @@
+Load the skill `skills_tool:load spec-driven-development` and follow its instructions.
+
+Begin by understanding what the user wants to build. Ask clarifying questions about:
+1. The objective and target users
+2. Core features and acceptance criteria
+3. Tech stack preferences and constraints
+4. Known boundaries (what to always do, ask first about, and never do)
+
+Then generate a structured spec covering all six core areas: objective, commands, project structure, code style, testing strategy, and boundaries.
+
+Save the spec as SPEC.md in the project root and confirm with the user before proceeding.
+
+{raw}
+
+
+## Exit Criteria (must ALL be true before proceeding to /plan)
+- [ ] SPEC.md exists at project root
+- [ ] Objective, acceptance criteria, and boundaries are defined
+- [ ] User has reviewed and approved the spec
+
+## Anti-Rationalization Table
+| Rationalization | Reality |
+|---|---|
+| "The spec is obvious from the idea" | What's obvious to you is ambiguous to the implementer. Write it down. |
+| "We'll refine it during implementation" | Implementation without a spec is exploration, not engineering. |
+| "The spec doesn't need user review" | Unreviewed specs encode assumptions that become bugs. |
+
+## Red Flags
+- Spec describes HOW to build, not WHAT to build
+- No acceptance criteria
+- No "Not Doing" list
+- User hasn't explicitly approved

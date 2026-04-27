@@ -1,0 +1,5 @@
+name: lifecycle-status
+description: Show current lifecycle status with the 5-Question Reboot Test.
+argument_hint: /lifecycle-status
+type: text
+template_path: lifecycle-status.txt

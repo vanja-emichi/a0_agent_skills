@@ -1,0 +1,3 @@
+title: Skill Comparator
+description: Performs blind A/B comparison of two skill test outputs to determine which is better.
+context: Use this agent for blind comparison of two outputs produced by different skill versions or configurations.

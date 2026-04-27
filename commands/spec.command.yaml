@@ -1,0 +1,5 @@
+name: spec
+description: Start spec-driven development — write a structured specification before writing code.
+argument_hint: /spec [topic or description]
+type: text
+template_path: spec.txt

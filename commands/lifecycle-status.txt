@@ -1,0 +1,5 @@
+Use the tool `lifecycle` with method `status` to check the current lifecycle state.
+
+Call `lifecycle:status` and return the output verbatim. Do not modify or summarize.
+
+{raw}

@@ -1,0 +1,12 @@
+# Default configuration for a0_agent_skills v0.3.1
+# Planning-with-files runtime layer settings
+
+planning:
+  mode: auto
+  gates:
+    no_plan: nudge
+    response: nudge
+    three_strike: block
+  paths:
+    active: .a0proj/run/current/
+  emit_spec_on_archive: false
