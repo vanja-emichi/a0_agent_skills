@@ -1,19 +1,16 @@
 # test_3_commands.py - Phase 3: Command file verification
 
 import os
-import sys
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-
-COMMANDS_DIR = os.path.join(os.path.dirname(__file__), "..", "commands")
+from .conftest import COMMANDS_DIR, STALE_PLAN_PATTERNS
 
 
 def _read(rel):
-    return open(os.path.join(COMMANDS_DIR, rel)).read()
+    return (COMMANDS_DIR / rel).read_text()
 
 
 def _exists(rel):
-    return os.path.exists(os.path.join(COMMANDS_DIR, rel))
+    return (COMMANDS_DIR / rel).is_file()
 
 
 def _parse_simple_yaml(text):
@@ -102,23 +99,12 @@ class TestIdeaCommand:
 class TestCommandProse:
     """All commands reference lifecycle:* not plan:*."""
 
-    STALE_PATTERNS = [
-        "plan:init",
-        "plan:status",
-        "plan:archive",
-        "plan:phase_start",
-        "plan:phase_complete",
-        "plan:log_finding",
-        "plan:log_progress",
-        "plan:log_error",
-    ]
-
     def test_no_stale_tool_calls(self):
         for f in sorted(os.listdir(COMMANDS_DIR)):
             if not f.endswith(".txt"):
                 continue
             content = _read(f)
-            for pattern in self.STALE_PATTERNS:
+            for pattern in STALE_PLAN_PATTERNS:
                 assert pattern not in content, f"Found '{pattern}' in {f}"
 
     def test_plan_txt_uses_lifecycle_init(self):
@@ -144,20 +130,23 @@ class TestLifecycleContextInDelegation:
     def test_review_txt_includes_lifecycle_context(self):
         """review.txt should include lifecycle context instruction."""
         content = _read("review.txt")
-        assert "Lifecycle Context" in content
-        assert "Current Phase" in content
+        assert "§§include(commands/_shared/lifecycle-context.md)" in content
 
     def test_test_txt_includes_lifecycle_context(self):
         """test.txt should include lifecycle context instruction."""
         content = _read("test.txt")
-        assert "Lifecycle Context" in content
-        assert "Current Phase" in content
+        assert "§§include(commands/_shared/lifecycle-context.md)" in content
 
     def test_security_txt_includes_lifecycle_context(self):
         """security.txt should include lifecycle context instruction."""
         content = _read("security.txt")
-        assert "Lifecycle Context" in content
-        assert "Current Phase" in content
+        assert "§§include(commands/_shared/lifecycle-context.md)" in content
+
+    def test_shared_lifecycle_context_file_exists(self):
+        """Shared lifecycle context snippet must exist with correct content."""
+        shared = (COMMANDS_DIR / "_shared" / "lifecycle-context.md").read_text()
+        assert "Lifecycle Context" in shared
+        assert "Current Phase" in shared
 
 
 class TestPlanTemplateSyntax:

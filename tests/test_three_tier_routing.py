@@ -8,23 +8,9 @@ Tests cover:
 """
 from __future__ import annotations
 
-import importlib.util
-import sys
-from pathlib import Path
-from unittest.mock import MagicMock
-
 import pytest
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-COMMANDS_DIR = REPO_ROOT / "commands"
-SKILLS_DIR = REPO_ROOT / "skills"
-EXT_PATH = (
-    REPO_ROOT
-    / "extensions"
-    / "python"
-    / "system_prompt"
-    / "_20_agent_skills_prompt.py"
-)
+from .conftest import COMMANDS_DIR, SKILLS_DIR
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -44,46 +30,6 @@ def _read_skill(name: str) -> str:
     assert path.is_file(), f"Missing skill: {path}"
     return path.read_text(encoding="utf-8")
 
-
-@pytest.fixture()
-def routing_module():
-    """Import the routing extension module with mocked A0 deps."""
-    saved = {}
-    for mod_name in ["helpers", "helpers.extension", "helpers.print_style", "agent"]:
-        saved[mod_name] = sys.modules.get(mod_name)
-
-    class FakeExtension:
-        def __init__(self):
-            self.agent = None
-
-    helpers_ext = MagicMock()
-    helpers_ext.Extension = FakeExtension
-    helpers_ps = MagicMock()
-    helpers_ps.PrintStyle = MagicMock()
-
-    sys.modules["helpers"] = MagicMock()
-    sys.modules["helpers.extension"] = helpers_ext
-    sys.modules["helpers.print_style"] = helpers_ps
-    sys.modules["agent"] = MagicMock()
-
-    spec = importlib.util.spec_from_file_location(
-        "agent_skills_prompt", EXT_PATH,
-    )
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    yield mod
-
-    for mod_name, orig in saved.items():
-        if orig is None:
-            sys.modules.pop(mod_name, None)
-        else:
-            sys.modules[mod_name] = orig
-
-
-@pytest.fixture()
-def delegation_table(routing_module):
-    """Get the compact delegation table."""
-    return routing_module.get_delegation_table()
 
 
 # ===================================================================
@@ -148,45 +94,29 @@ class TestSecurityCommand:
 
 
 class TestCodeSimplifyCommand:
-    """"/code-simplify final step must delegate to code-reviewer."""
+    """/code-simplify delegates fully to developer."""
 
-    def test_final_step_delegates_to_code_reviewer(self):
+    def test_delegates_to_developer(self):
         content = _read_command("code-simplify")
-        assert "call_subordinate profile=code-reviewer" in content, (
-            "/code-simplify must delegate to code-reviewer in final step"
+        assert "call_subordinate profile=developer" in content, (
+            "/code-simplify must delegate to developer"
         )
 
-    def test_loads_code_simplification_skill_first(self):
+    def test_loads_code_simplification_skill(self):
         content = _read_command("code-simplify")
         assert "skills_tool:load code-simplification" in content, (
-            "/code-simplify must load code-simplification skill"
-        )
-
-    def test_delegation_comes_after_simplification_steps(self):
-        content = _read_command("code-simplify")
-        lines = content.splitlines()
-        load_idx = None
-        delegate_idx = None
-        for i, line in enumerate(lines):
-            if "skills_tool:load code-simplification" in line:
-                load_idx = i
-            if "call_subordinate profile=code-reviewer" in line:
-                delegate_idx = i
-        assert load_idx is not None, "skills_tool:load not found"
-        assert delegate_idx is not None, "call_subordinate not found"
-        assert delegate_idx > load_idx, (
-            "Delegation to code-reviewer must come after loading code-simplification"
+            "/code-simplify must reference code-simplification skill"
         )
 
 
 class TestDirectLoadCommands:
-    """Commands that load skills directly must NOT contain call_subordinate."""
+    """Commands that delegate must contain call_subordinate AND skills_tool:load."""
 
     @pytest.mark.parametrize("cmd", ["spec", "plan", "build"])
-    def test_no_call_subordinate(self, cmd):
+    def test_contains_call_subordinate(self, cmd):
         content = _read_command(cmd)
-        assert "call_subordinate" not in content, (
-            f"/{cmd} should NOT contain call_subordinate (loads skill directly)"
+        assert "call_subordinate profile=" in content, (
+            f"/{cmd} must contain 'call_subordinate profile=' (delegates to specialist)"
         )
 
     @pytest.mark.parametrize("cmd", ["spec", "plan", "build"])
@@ -195,6 +125,7 @@ class TestDirectLoadCommands:
         assert "skills_tool:load" in content, (
             f"/{cmd} must contain skills_tool:load"
         )
+
 
 
 # ===================================================================

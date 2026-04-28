@@ -18,18 +18,18 @@ PLUGIN_NAME = "a0_agent_skills"
 
 DELEGATION_TABLE = """## Agent Skills — Task Delegation
 
-**Rule: Delegate specialist work to subagents. You orchestrate lifecycle phases.**
+**Rule: Delegate all specialist work to subagents. You orchestrate lifecycle phases.**
 
 | Intent | Delegate to |
 |--------|-------------|
-| Research, web search | `researcher` |
+| Ideas, research, planning | `researcher` |
+| Specs, implementation, simplification | `developer` |
 | Code review, quality | `code-reviewer` |
 | Tests, TDD | `test-engineer` |
 | Security audit, OWASP | `security-auditor` |
 | Skill create/benchmark | `skill-creator` |
-| Build code (/build only) | `developer` |
 
-**Lifecycle:** /idea → /spec → /plan → /build → /ship. You run phases, delegate only /build slices.
+**Lifecycle:** /idea → /spec → /plan → /build → /test → /review → /ship. You orchestrate phases, subagents execute. Security audits (`/security`) and code simplification (`/code-simplify`) can run at any phase.
 
 For simple questions, answer directly."""
 

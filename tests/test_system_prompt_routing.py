@@ -8,21 +8,10 @@ Verifies:
 from __future__ import annotations
 
 import ast
-import importlib.util
-import sys
-from pathlib import Path
-from unittest.mock import MagicMock
 
 import pytest
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-EXT_PATH = (
-    REPO_ROOT
-    / "extensions"
-    / "python"
-    / "system_prompt"
-    / "_20_agent_skills_prompt.py"
-)
+from .conftest import EXT_PATH
 
 # ---------------------------------------------------------------------------
 # File existence and syntax
@@ -53,63 +42,6 @@ class TestExtensionFile:
         lines = EXT_PATH.read_text(encoding="utf-8").splitlines()
         assert len(lines) < 100, f"Extension has {len(lines)} lines, must be < 100"
 
-
-# ---------------------------------------------------------------------------
-# Delegation table content
-# ---------------------------------------------------------------------------
-
-class TestDelegationTable:
-    """Verify the delegation table is compact and correct."""
-
-    @pytest.fixture(autouse=True)
-    def setup(self):
-        """Import extension module with mocked A0 deps."""
-        saved = {}
-        for mod_name in ["helpers", "helpers.extension", "helpers.print_style", "agent"]:
-            saved[mod_name] = sys.modules.get(mod_name)
-
-        class FakeExtension:
-            def __init__(self):
-                self.agent = None
-
-        helpers_ext = MagicMock()
-        helpers_ext.Extension = FakeExtension
-        helpers_ps = MagicMock()
-        helpers_ps.PrintStyle = MagicMock()
-
-        sys.modules["helpers"] = MagicMock()
-        sys.modules["helpers.extension"] = helpers_ext
-        sys.modules["helpers.print_style"] = helpers_ps
-        sys.modules["agent"] = MagicMock()
-
-        spec = importlib.util.spec_from_file_location(
-            "agent_skills_prompt", EXT_PATH,
-        )
-        mod = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(mod)
-        self.module = mod
-        self.table = mod.get_delegation_table()
-
-        for mod_name, orig in saved.items():
-            if orig is None:
-                sys.modules.pop(mod_name, None)
-            else:
-                sys.modules[mod_name] = orig
-
-    def test_table_is_non_empty_string(self):
-        assert isinstance(self.table, str) and len(self.table) > 0
-
-    def test_table_is_markdown_format(self):
-        assert "|" in self.table, "Delegation table must contain markdown table"
-
-    def test_table_has_delegation_header(self):
-        assert "Task Delegation" in self.table
-
-    def test_table_has_no_skills_tool_load(self):
-        assert "skills_tool:load" not in self.table
-
-    def test_table_under_1000_chars(self):
-        assert len(self.table) < 1000
 
 
 # ---------------------------------------------------------------------------

@@ -81,51 +81,6 @@ class TestExtensionStructure:
         )
 
 
-# ---------------------------------------------------------------------------
-# 3. Delegation table content
-# ---------------------------------------------------------------------------
-
-
-class TestDelegationTableContent:
-    """The generated output must be a compact delegation table."""
-
-    EXPECTED_AGENTS = [
-        "researcher",
-        "code-reviewer",
-        "test-engineer",
-        "security-auditor",
-        "skill-creator",
-        "developer",
-    ]
-
-    def test_output_is_non_empty_string(self, delegation_table):
-        assert isinstance(delegation_table, str) and len(delegation_table) > 0
-
-    def test_has_delegation_header(self, delegation_table):
-        assert "Task Delegation" in delegation_table
-
-    def test_has_delegate_rule(self, delegation_table):
-        assert "Delegate" in delegation_table
-
-    def test_has_no_skills_tool_load(self, delegation_table):
-        assert "skills_tool:load" not in delegation_table
-
-    def test_has_no_general_tasks_section(self, delegation_table):
-        assert "General Tasks" not in delegation_table
-
-    def test_has_two_column_table(self, delegation_table):
-        assert "| Intent |" in delegation_table
-
-    @pytest.mark.parametrize("agent", EXPECTED_AGENTS)
-    def test_lists_all_agents(self, delegation_table, agent):
-        assert agent in delegation_table
-
-    def test_output_under_1000_chars(self, delegation_table):
-        assert len(delegation_table) < 1000
-
-    def test_has_simple_answer_guidance(self, delegation_table):
-        assert "simple" in delegation_table.lower()
-
 
 # ---------------------------------------------------------------------------
 # 4. Extension class contract

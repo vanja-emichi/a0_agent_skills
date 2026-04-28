@@ -37,7 +37,23 @@ EXT_PATH = (
     / "_20_agent_skills_prompt.py"
 )
 SKILLS_DIR = REPO_ROOT / "skills"
+PROMPTS_DIR = REPO_ROOT / "prompts"
 ML_DIR = REPO_ROOT / "extensions" / "python" / "message_loop_start"
+COMMANDS_DIR = REPO_ROOT / "commands"
+
+# Stale plan:* tool call patterns (renamed to lifecycle:*)
+STALE_PLAN_PATTERNS = [
+    "plan:init",
+    "plan:status",
+    "plan:archive",
+    "plan:phase_start",
+    "plan:phase_complete",
+    "plan:log_finding",
+    "plan:log_progress",
+    "plan:log_error",
+    "plan:extend",
+    "plan:migrate",
+]
 
 
 @pytest.fixture()

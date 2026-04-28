@@ -1,9 +1,28 @@
 ---
 name: using-agent-skills
-description: Discovers and invokes agent skills. Use when starting a session or when you need to discover which skill applies to the current task. This is the meta-skill that governs how all other skills are discovered and invoked.
+description: Discovers and invokes agent skills, and enforces lifecycle discipline. Use when starting a session, discovering which skill applies, working with an active lifecycle, rebooting context, handling repeated errors, or managing trusted vs untrusted findings. This is the meta-skill that governs how all other skills are discovered, invoked, and tracked through lifecycle phases.
 ---
 
 # Using Agent Skills
+
+## Table of Contents
+
+- [Overview](#overview)
+- [When to Use](#when-to-use)
+- [Skill Discovery](#skill-discovery)
+- [Core Operating Behaviors](#core-operating-behaviors)
+- [Common Rationalizations](#common-rationalizations)
+- [Skill Rules](#skill-rules)
+- [Lifecycle Sequence](#lifecycle-sequence)
+- [Quick Reference](#quick-reference)
+- [Manus Principles](#manus-principles)
+- [The 5-Question Reboot Test](#the-5-question-reboot-test)
+- [Read vs Write Decision Matrix](#read-vs-write-decision-matrix)
+- [3-Strike Error Protocol](#3-strike-error-protocol)
+- [Behavioral Discipline](#behavioral-discipline)
+- [Red Flags](#red-flags)
+- [Verification](#verification)
+- [Planning Runtime Integration](#planning-runtime-integration)
 
 ## Overview
 
@@ -19,30 +38,17 @@ Agent Skills is a collection of engineering workflow skills organized by develop
 
 ## Skill Discovery
 
-When a task arrives, identify the development phase and apply the corresponding skill:
+When a task arrives, identify the development phase and delegate:
 
 ```
-Task arrives
-    │
-    ├── Vague idea/need refinement? ──→ idea-refine
-    ├── New project/feature/change? ──→ spec-driven-development
-    ├── Have a spec, need tasks? ──────→ planning-and-task-breakdown
-    ├── Implementing code? ────────────→ incremental-implementation
-    │   ├── UI work? ─────────────────→ frontend-ui-engineering
-    │   ├── API work? ────────────────→ api-and-interface-design
-    │   ├── Need better context? ─────→ context-engineering
-    │   └── Need doc-verified code? ───→ source-driven-development
-    ├── Writing/running tests? ────────→ DELEGATE to test-engineer
-    │   └── Browser-based? ───────────→ browser-testing-with-devtools
-    ├── Something broke? ──────────────→ debugging-and-error-recovery
-    ├── Reviewing code? ───────────────→ DELEGATE to code-reviewer
-    │   ├── Security concerns? ───────→ DELEGATE to security-auditor
-    │   └── Performance concerns? ────→ performance-optimization
-    ├── Committing/branching? ─────────→ git-workflow-and-versioning
-    ├── CI/CD pipeline work? ──────────→ ci-cd-and-automation
-    ├── Writing docs/ADRs? ───────────→ documentation-and-adrs
-    ├── Creating/testing/optimizing skills? → DELEGATE to skill-creator
-    └── Deploying/launching? ─────────→ shipping-and-launch
+Task arrives → determine profile → DELEGATE
+    ├── Ideas, research, planning → researcher
+    ├── Specs, implementation, simplification → developer
+    ├── Tests, TDD → test-engineer
+    ├── Code review, quality → code-reviewer
+    ├── Security audit → security-auditor
+    ├── Skill create/benchmark → skill-creator
+    └── Deploying/launching → orchestrator (load skill)
 ```
 
 ## Core Operating Behaviors
@@ -144,17 +150,17 @@ Every skill includes a verification step. A task is not complete until verificat
 For a complete feature, the typical skill sequence is:
 
 ```
-1. idea-refine                 → Refine vague ideas
-2. spec-driven-development     → Define what we're building
-3. planning-and-task-breakdown → Break into verifiable chunks
-4. context-engineering         → Load the right context
-5. source-driven-development   → Verify against official docs
-6. incremental-implementation  → Build slice by slice
+1. idea-refine                 → DELEGATE to researcher
+2. spec-driven-development     → DELEGATE to developer
+3. planning-and-task-breakdown → DELEGATE to researcher
+4. context-engineering         → DELEGATE to developer
+5. source-driven-development   → DELEGATE to developer
+6. incremental-implementation  → DELEGATE to developer
 7. test-driven-development     → DELEGATE to test-engineer
 8. code-review-and-quality     → DELEGATE to code-reviewer
-9. git-workflow-and-versioning → Clean commit history
-10. documentation-and-adrs     → Document decisions
-11. shipping-and-launch        → Deploy safely
+9. git-workflow-and-versioning → DELEGATE to developer
+10. documentation-and-adrs     → DELEGATE to developer
+11. shipping-and-launch        → Deploy safely (orchestrator)
 ```
 
 Not every task needs every skill. A bug fix might only need: `debugging-and-error-recovery` → `test-driven-development` → `code-review-and-quality`.
@@ -165,24 +171,113 @@ For creating, testing, grading, or optimizing skills, use `/test` with skill-cre
 
 | Phase | Skill | Method | One-Line Summary |
 |-------|-------|--------|-----------------|
-| Define | idea-refine | Load skill | Refine ideas through structured divergent and convergent thinking |
-| Define | spec-driven-development | Load skill | Requirements and acceptance criteria before code |
-| Plan | planning-and-task-breakdown | Load skill | Decompose into small, verifiable tasks |
-| Build | incremental-implementation | Load skill | Thin vertical slices, test each before expanding |
-| Build | source-driven-development | Load skill | Verify against official docs before implementing |
-| Build | context-engineering | Load skill | Right context at the right time |
-| Build | frontend-ui-engineering | Load skill | Production-quality UI with accessibility |
-| Build | api-and-interface-design | Load skill | Stable interfaces with clear contracts |
+| Define | idea-refine | Delegate → researcher | Refine ideas through structured divergent and convergent thinking |
+| Define | spec-driven-development | Delegate → developer | Requirements and acceptance criteria before code |
+| Plan | planning-and-task-breakdown | Delegate → researcher | Decompose into small, verifiable tasks |
+| Build | incremental-implementation | Delegate → developer | Thin vertical slices, test each before expanding |
+| Build | source-driven-development | Delegate → developer | Verify against official docs before implementing |
+| Build | context-engineering | Delegate → developer | Right context at the right time |
+| Build | frontend-ui-engineering | Delegate → developer | Production-quality UI with accessibility |
+| Build | api-and-interface-design | Delegate → developer | Stable interfaces with clear contracts |
 | Verify | test-driven-development | Delegate → test-engineer | Failing test first, then make it pass |
-| Verify | browser-testing-with-devtools | Load skill | playwright-cli for runtime browser verification |
-| Verify | debugging-and-error-recovery | Load skill | Reproduce → localize → fix → guard |
+| Verify | browser-testing-with-devtools | Delegate → test-engineer | playwright-cli for runtime browser verification |
+| Verify | debugging-and-error-recovery | Delegate → developer | Reproduce → localize → fix → guard |
 | Review | code-review-and-quality | Delegate → code-reviewer | Five-axis review with quality gates |
 | Review | security-and-hardening | Delegate → security-auditor | OWASP prevention, input validation, least privilege |
-| Review | performance-optimization | Load skill | Measure first, optimize only what matters |
-| Ship | git-workflow-and-versioning | Load skill | Atomic commits, clean history |
-| Ship | ci-cd-and-automation | Load skill | Automated quality gates on every change |
+| Review | performance-optimization | Delegate → developer | Measure first, optimize only what matters |
+| Ship | git-workflow-and-versioning | Delegate → developer | Atomic commits, clean history |
+| Ship | ci-cd-and-automation | Delegate → developer | Automated quality gates on every change |
 | Ship | shipping-and-launch | Load skill | Pre-launch checklist, monitoring, rollback plan |
+| Ship | documentation-and-adrs | Delegate → developer | Architecture Decision Records |
+| Ship | deprecation-and-migration | Delegate → developer | Safe migration patterns |
 | Meta | skill-creator | Delegate → skill-creator | Create, test, grade, benchmark, and optimize skills |
+
+---
+
+## Manus Principles
+
+The lifecycle discipline is grounded in three principles from Manus-style agent design:
+
+### 1. Memory Externalized (KV-Cache Stability)
+
+Plan state is persisted to disk, not held in conversation history. The EXTRAS block injected every turn has a **stable prefix** (goal + phase list with status icons) and a **dynamic suffix** (last-N progress and findings). The stable prefix enables KV-cache hits — the model sees the same bytes for unchanged state, reducing token cost and improving consistency.
+
+**Rule:** Never put timestamps or volatile data in the lifecycle prefix. Dynamic data goes in the suffix.
+
+### 2. Keep-Wrong-Stuff-In
+
+Findings are append-only. Never delete or edit a finding — even if it was later disproven. Instead, log a new finding that supersedes the old one. This creates an audit trail and prevents the model from repeating the same wrong path.
+
+**Rule:** `Append to findings.md with source tag (trusted/untrusted)` appends. There is no `plan:edit_finding` or `plan:delete_finding`.
+
+### 3. Attention via Recitation
+
+The 5-Question Reboot Test forces the model to *recite* the current state before acting. This is not busywork — it primes the attention mechanism with the exact context needed for the next decision. Every `lifecycle:status` call answers all five questions.
+
+**Rule:** After context compaction, conversation resume, or uncertainty — run `lifecycle:status` first.
+
+---
+
+## The 5-Question Reboot Test
+
+When resuming work, recovering from an error, or at the start of any uncertain turn, answer these five questions (via `lifecycle:status`):
+
+| # | Question | Answer Source |
+|---|----------|--------------|
+| 1 | **Where am I?** | Current phase title + status (⏸️ pending, 🔄 in_progress, ✅ completed) |
+| 2 | **Where am I going?** | Plan goal from metadata |
+| 3 | **What's the goal?** | Same as #2 — redundant by design (reinforcement) |
+| 4 | **What did I learn?** | Findings count + last few findings from findings.md |
+| 5 | **What's done?** | Completed phase count / total phases |
+
+**Usage:**
+```
+lifecycle:status
+```
+
+The response includes all five answers in a structured format. Read it. Act on it.
+
+---
+
+## Read vs Write Decision Matrix
+
+Plan state can be read freely but must be written through the lifecycle tool. This prevents corruption and maintains the audit trail.
+
+| Action | How | When |
+|--------|-----|------|
+| **Read** lifecycle state | `lifecycle:status` or EXTRAS block (automatic) | Anytime — no side effects |
+| **Read** findings/progress | Direct file read of `.a0proj/run/current/findings.md` | Anytime — these are append-only logs |
+| **Write** phase transitions | `Edit state.md frontmatter: change phase status from ⏸️ to 🔄`, `Edit state.md frontmatter: change phase status from 🔄 to ✅` | When starting or finishing a phase |
+| **Write** findings | `Append to findings.md with source tag (trusted/untrusted)` with `source` tag | When discovering information worth keeping |
+| **Write** progress | `Append to progress.md with timestamp` | When completing a meaningful step |
+| **Write** errors | `Errors are auto-tracked by StrikeTracker (3-strike protocol)` | When encountering a failure |
+| **Write** new phases | `Lifecycle has fixed 7 phases: IDEA→SPEC→PLAN→BUILD→VERIFY→REVIEW→SHIP` | When scope expands beyond the original plan |
+| **Write** archive | `lifecycle:archive` | When the lifecycle is done or abandoned |
+
+**Rule:** The lifecycle tool manages init, status, and archive. Day-to-day operations are direct file edits: edit state.md YAML frontmatter for phase transitions, append to findings.md/progress.md for findings and progress. Read freely via lifecycle:status or direct file reads.
+
+---
+
+## 3-Strike Error Protocol
+
+Repeated identical errors signal a systemic problem, not a transient glitch. The 3-strike protocol escalates automatically:
+
+| Strike | Behavior |
+|--------|----------|
+| 1st | Error logged. Agent continues. |
+| 2nd | Error logged. Agent continues. Warning displayed. |
+| 3rd | **Block.** Agent cannot proceed with the same approach. Must escalate to user or change strategy. |
+
+**Mechanism:** `Errors are auto-tracked by StrikeTracker (3-strike protocol)` computes a hash of the error content (or uses a provided signature). The `StrikeTracker` counts occurrences. On the 3rd strike, the response gate blocks further execution.
+
+**Recovery after 3rd strike:**
+1. Stop and report the repeated error to the user
+2. Propose an alternative approach
+3. If the user approves a different approach, log it as a finding and continue
+
+**Rule:** Three identical errors means you are in a loop. Break it.
+
+---
 
 ## Behavioral Discipline
 
@@ -215,7 +310,7 @@ After skill discovery:
 
 ## Planning Runtime Integration
 
-The `plan` tool is part of the skill lifecycle when an active lifecycle exists. Add these method calls to your workflow:
+The `lifecycle` tool is part of the skill lifecycle when an active lifecycle exists. Add these method calls to your workflow:
 
 | Lifecycle Phase | Plan Tool Method |
 |-----------------|-----------------|
