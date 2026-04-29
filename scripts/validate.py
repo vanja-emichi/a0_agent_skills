@@ -23,7 +23,7 @@ Checks performed:
     8. tools/lifecycle.py    — exists + has init, status, archive methods
     9. lib/ modules          — lifecycle_state.py
    10. lifecycle prompt      — agent.system.tool.lifecycle.md exists
-   11. lifecycle extensions  — 8 _lifecycle_*.py files exist
+   11. lifecycle extensions  — 7 _lifecycle_*.py files exist
    12. lifecycle-runtime skill — SKILL.md with expected sections
    13. plugin.yaml v0.3.0    — version + lifecycle settings
    14. lifecycle-status cmd  — command exists with valid yaml
