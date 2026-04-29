@@ -22,7 +22,6 @@ class TestSkillRename:
         content = _read(SKILLS_DIR / "using-agent-skills" / "SKILL.md")
         assert "Manus Principles" in content
         assert "5-Question Reboot Test" in content
-        assert "3-Strike Error Protocol" in content
 
 
 class TestPromptRename:

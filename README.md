@@ -87,7 +87,7 @@ Skills activate automatically based on context — no configuration needed.
 | Skill | Purpose |
 |-------|----------|
 | `using-agent-skills` | Discover which skill applies to your task |
-| `lifecycle-runtime` | Planning discipline with Manus principles, 5-Question Reboot, 3-Strike protocol |
+| `lifecycle-runtime` | Planning discipline with Manus principles, 5-Question Reboot |
 
 
 | `skill-creator` | Create, test, grade, benchmark, and optimize skills |
@@ -135,7 +135,7 @@ Skills pull these in automatically when needed:
 | `system_prompt` | `_22_lifecycle_rules.py` | Injects lifecycle-aware behavioral rules |
 | `tool_execute_before` | `_10_simplify_ignore_before.py` | Filters `simplify-ignore` blocks before agent reads |
 | `tool_execute_before` | `_30_no_lifecycle_gate.py` | Blocks tool calls outside current phase |
-| `tool_execute_before` | `_31_lifecycle_gate.py` | Enforces 3-strike error protocol |
+| `tool_execute_before` | `_31_lifecycle_gate.py` | Enforces phase-in-progress gate |
 | `tool_execute_after` | `_10_simplify_ignore_after.py` | Expands placeholders and re-filters after agent writes |
 | `tool_execute_after` | `_30_lifecycle_auto_progress.py` | Auto-progresses completed phases |
 | `monologue_start` | `_30_lifecycle_resume.py` | Resumes active lifecycle on conversation restart |
@@ -173,7 +173,7 @@ agent_skills/
 │       ├── monologue_end/
 │       ├── process_chain_end/
 │       └── startup_migration/
-├── lib/                  # Shared utilities (lifecycle_state, strike_tracker, simplify_ignore)
+├── lib/                  # Shared utilities (lifecycle_state, simplify_ignore)
 ├── references/           # 4 checklists
 ├── scripts/              # validate.py (88 checks)
 └── tests/                # 352 pytest tests
@@ -230,9 +230,9 @@ This is an Agent Zero plugin adaptation of [addyosmani/agent-skills](https://git
 
 - Added `plugin.yaml` for Agent Zero plugin discovery
 - 9 slash commands with native discovery via Commands plugin V4
-- 14 extension hooks: skill routing, simplify-ignore protection, lifecycle state injection, enforcement gates, strike tracking
-- `lib/` shared utilities: simplify_ignore, lifecycle_state, strike_tracker
-- Lifecycle runtime layer: 3-method API (init/status/archive), 7-phase lifecycle, disk-persisted state, EXTRAS injection, 3-strike error protocol
+- 13 extension hooks: skill routing, simplify-ignore protection, lifecycle state injection, enforcement gates
+- `lib/` shared utilities: simplify_ignore, lifecycle_state
+- Lifecycle runtime layer: 3-method API (init/status/archive), 7-phase lifecycle, disk-persisted state, EXTRAS injection
 - All paths derived dynamically from `__file__` — no hardcoded install paths
 - CI pipeline: `validate.py` (18 checks) + `pytest` (352 tests)
 

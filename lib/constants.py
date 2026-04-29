@@ -15,8 +15,6 @@ from __future__ import annotations
 # Context data keys
 CONTEXT_KEY_LIFECYCLE_STATE = "lifecycle_state"
 CONTEXT_KEY_LIFECYCLE_STATE_MTIME = "lifecycle_state_mtime"
-CONTEXT_KEY_LIFECYCLE_STRIKE_TRACKER = "lifecycle_strike_tracker"
-CONTEXT_KEY_STRIKE_BLOCKED = "plan_strike_blocked"
 CONTEXT_KEY_LIFECYCLE_GATE_WARNINGS = "lifecycle_gate_warnings"
 CONTEXT_KEY_LIFECYCLE_ACTIONS_SINCE_FINDING = "lifecycle_actions_since_finding"
 CONTEXT_KEY_LIFECYCLE_NUDGES = "lifecycle_nudges"

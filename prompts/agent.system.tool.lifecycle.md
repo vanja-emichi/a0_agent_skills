@@ -13,7 +13,7 @@ lifecycle:archive [promote_adrs=<bool>=true]
 | Method | Description |
 |---|---|
 | `lifecycle:init` | Create a new lifecycle with goal and slug. 7 phases hardcoded (IDEA→SHIP). Creates `.a0proj/run/current/` with state.md, findings.md, progress.md, errors.md. |
-| `lifecycle:status` | Show current lifecycle state: active phase, findings, strikes. Answers the 5-Question Reboot Test. |
+| `lifecycle:status` | Show current lifecycle state: active phase, findings. Answers the 5-Question Reboot Test. |
 | `lifecycle:archive` | Archive lifecycle as completed or abandoned. Promotes trusted findings to `docs/adr/NNNN-slug.md`. Cleans up runtime state. |
 
 ## Phase Model

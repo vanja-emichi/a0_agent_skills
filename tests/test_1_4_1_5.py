@@ -70,11 +70,6 @@ class TestImportUtils:
         import lib.import_utils as mod
         assert not hasattr(mod, "get_plan_state_module"), "get_plan_state_module should not exist"
 
-    def test_get_strike_tracker_module_preserved(self):
-        from lib.import_utils import get_strike_tracker_module
-        mod = get_strike_tracker_module()
-        assert hasattr(mod, "StrikeTracker")
-
     def test_module_name_uses_lifecycle(self):
         import lib.import_utils as mod
         import inspect
@@ -99,7 +94,6 @@ class TestPhase1Checkpoint:
             "lib/lifecycle_state.py",
             "lib/extension_base.py",
             "lib/import_utils.py",
-            "lib/strike_tracker.py",
             "tools/lifecycle.py",
         ]
         for f in files:

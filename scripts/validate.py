@@ -21,14 +21,13 @@ Checks performed:
     6. extensions/**/*.py    — valid Python syntax
     7. references/*.md       — non-empty
     8. tools/lifecycle.py    — exists + has init, status, archive methods
-    9. lib/ modules          — lifecycle_state.py + strike_tracker.py
+    9. lib/ modules          — lifecycle_state.py
    10. lifecycle prompt      — agent.system.tool.lifecycle.md exists
    11. lifecycle extensions  — 8 _lifecycle_*.py files exist
    12. lifecycle-runtime skill — SKILL.md with expected sections
    13. plugin.yaml v0.3.0    — version + lifecycle settings
    14. lifecycle-status cmd  — command exists with valid yaml
-   15. strike tracker        — at correct hook point
-   16. stale plan:* audit    — no stale v0.2.x references in source
+      16. stale plan:* audit    — no stale v0.2.x references in source
    17. v0.2.1 lib files      — import_utils.py, constants.py
 """
 from __future__ import annotations
@@ -348,7 +347,7 @@ def check_lifecycle_tool(root: Path) -> list[Result]:
 # Check 9 — lib/ modules (v0.3.0)
 # ---------------------------------------------------------------------------
 
-EXPECTED_LIB_FILES = ["lifecycle_state.py", "strike_tracker.py"]
+EXPECTED_LIB_FILES = ["lifecycle_state.py"]
 
 
 def check_lib(root: Path) -> list[Result]:
@@ -409,7 +408,6 @@ EXPECTED_LIFECYCLE_EXTENSIONS = [
     "extensions/python/monologue_start/_30_lifecycle_resume.py",
     "extensions/python/monologue_end/_30_lifecycle_verifier.py",
     "extensions/python/system_prompt/_22_lifecycle_rules.py",
-    "extensions/python/_functions/agent/Agent/handle_exception/end/_55_lifecycle_strike_tracker.py",
 ]
 
 
@@ -451,7 +449,7 @@ def check_lifecycle_skill(root: Path) -> list[Result]:
         )]
 
     content = skill_md.read_text(encoding="utf-8")
-    expected_sections = ["Manus Principles", "5-Question Reboot", "3-Strike", "Untrusted"]
+    expected_sections = ["Manus Principles", "5-Question Reboot", "Untrusted"]
     found = [s for s in expected_sections if s in content]
     if len(found) < len(expected_sections):
         missing_sections = [s for s in expected_sections if s not in content]
@@ -544,36 +542,6 @@ def check_lifecycle_status_command(root: Path) -> list[Result]:
         results.append(_pass(f"commands/lifecycle-status.command.yaml [{cmd_yaml}]"))
 
     return results
-
-
-# ---------------------------------------------------------------------------
-# Check 15 — strike tracker extension (v0.3.0)
-# ---------------------------------------------------------------------------
-
-def check_strike_tracker(root: Path) -> list[Result]:
-    """Verify strike tracker extension at correct hook point."""
-    strike_path = root / "extensions" / "python" / "_functions" / "agent" / "Agent" / "handle_exception" / "end" / "_55_lifecycle_strike_tracker.py"
-    if not strike_path.exists():
-        return [_fail("strike tracker not found at handle_exception/end/", str(strike_path))]
-
-    try:
-        source = strike_path.read_text(encoding="utf-8", errors="replace")
-        ast.parse(source, filename=str(strike_path))
-    except SyntaxError as exc:
-        return [_fail(f"strike tracker syntax error: {exc}", str(strike_path))]
-
-    # Check for key features
-    lower = source.lower()
-    features = {
-        "strike": "strike" in lower,
-        "block": "block" in lower,
-        "track": "track" in lower or "count" in lower,
-    }
-    missing = [k for k, v in features.items() if not v]
-    if missing:
-        return [_fail(f"strike tracker missing features: {', '.join(missing)}", str(strike_path))]
-
-    return [_pass(f"strike tracker at handle_exception/end/ [{strike_path}]")]
 
 
 # ---------------------------------------------------------------------------
@@ -675,7 +643,6 @@ CHECKS = [
     ("Check 12: lifecycle-runtime skill",               check_lifecycle_skill),
     ("Check 13: plugin.yaml v0.3.1 settings",           check_plugin_settings),
     ("Check 14: lifecycle-status command",              check_lifecycle_status_command),
-    ("Check 15: strike tracker",                        check_strike_tracker),
     ("Check 16: stale plan:* audit",                    check_stale_refs),
     ("Check 17: v0.2.1 lib files",                      check_v021_files),
     ("Check 18: ghost method references",                check_no_ghost_references),

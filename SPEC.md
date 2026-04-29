@@ -52,7 +52,6 @@ Fix the command delegation pattern so every slash command delegates to the right
 Merge `lifecycle-runtime` content into `using-agent-skills`:
 - Manus Principles (Memory Externalized, Keep-Wrong-Stuff-In, Attention via Recitation)
 - 5-Question Reboot Test
-- 3-Strike Error Protocol
 - Read vs Write Decision Matrix
 - Lifecycle tool usage table
 

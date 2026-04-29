@@ -60,7 +60,7 @@ class TestNoShadowing:
         base = os.path.join(os.path.dirname(__file__), "..", "extensions", "python")
         stale_patterns = [
             "_load_plan(", "_resolve_plan_dir",
-            "plan_strike_blocked", "plan_nudges", "plan_gate_warnings",
+            "plan_nudges", "plan_gate_warnings",
             "plan_actions_since_finding", "plan_resume_shown",
             "no-plan-gate", "plan-resume", "plan:phase_complete",
         ]
@@ -105,36 +105,3 @@ class TestNoShadowing:
             path = os.path.join(base, new)
             assert os.path.exists(path), f"New file missing: {new}"
 
-
-class TestStrikeTrackerExtension:
-    """Task 2.9: Strike tracker extension exists and compiles."""
-
-    STRIKE_TRACKER = "extensions/python/_functions/agent/Agent/handle_exception/end/_55_lifecycle_strike_tracker.py"
-
-    def test_strike_tracker_file_exists(self):
-        base = os.path.join(os.path.dirname(__file__), "..")
-        path = os.path.join(base, self.STRIKE_TRACKER)
-        assert os.path.exists(path), f"Strike tracker not found at {path}"
-
-    def test_strike_tracker_compiles(self):
-        base = os.path.join(os.path.dirname(__file__), "..")
-        py_compile.compile(os.path.join(base, self.STRIKE_TRACKER), doraise=True)
-
-    def test_strike_tracker_has_lifecycle_extension(self):
-        base = os.path.join(os.path.dirname(__file__), "..")
-        content = open(os.path.join(base, self.STRIKE_TRACKER)).read()
-        assert "LifecycleExtension" in content, "Strike tracker should use LifecycleExtension"
-        assert "LifecycleStrikeTracker" in content, "Should define LifecycleStrikeTracker class"
-
-    def test_strike_tracker_records_strikes(self):
-        base = os.path.join(os.path.dirname(__file__), "..")
-        content = open(os.path.join(base, self.STRIKE_TRACKER)).read()
-        assert "tracker.record" in content, "Should record strikes"
-        assert "tracker.persist" in content, "Should persist strikes"
-        assert "lifecycle_strike_blocked" in content, "Should set blocked flag"
-
-    def test_strike_tracker_uses_strike_tracker_lib(self):
-        base = os.path.join(os.path.dirname(__file__), "..")
-        content = open(os.path.join(base, self.STRIKE_TRACKER)).read()
-        assert ("from lib.strike_tracker import StrikeTracker" in content or "get_strike_tracker_module" in content), "Should import StrikeTracker directly or via import_utils"
-        assert "StrikeTracker" in content, "Should use StrikeTracker class"

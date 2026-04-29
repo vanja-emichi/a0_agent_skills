@@ -6,7 +6,6 @@ planning:
   gates:
     no_plan: nudge
     response: nudge
-    three_strike: block
   paths:
     active: .a0proj/run/current/
   emit_spec_on_archive: false

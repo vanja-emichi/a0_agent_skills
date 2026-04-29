@@ -7,7 +7,7 @@ description: |
   development lifecycle: Idea → Spec → Plan → Build → Verify → Review → Ship.
   Includes 7 specialist agent personas (skill-creator, skill-analyzer, skill-grader, skill-comparator, test-engineer, code-reviewer, security-auditor),
   4 reference checklists, and a lifecycle runtime layer with structured state tracking,
-  enforcement gates, and strike tracking.
+  enforcement gates.
 tags:
   - engineering
   - skills

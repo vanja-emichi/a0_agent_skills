@@ -6,7 +6,7 @@ import tempfile
 from pathlib import Path
 
 # Ensure plugin root is on path
-plugin_root = "/a0/usr/plugins/a0_agent_skills"
+plugin_root = os.path.join(os.path.dirname(__file__), '..')
 if plugin_root not in sys.path:
     sys.path.insert(0, plugin_root)
 

@@ -1,16 +1,10 @@
 # extensions/python/tool_execute_before/_31_lifecycle_gate.py — tool_execute_before hook
 #
 # Fires before the `response` tool executes.
-# Enforces two independent checks:
+# Enforces phase-in-progress check:
 #
-# 1. 3-strike enforcement (HIGHEST PRIORITY)
-#   - If context.data["lifecycle_strike_blocked"] is True, gate according to mode.
-#   - 3-strike block is ALWAYS hard — ignores force=true.
-#   - Config key: planning.gates.three_strike (default: block)
-#
-# 2. Phase-in-progress enforcement
 #   - If any phase has status `in_progress`, gate the response.
-#   - force=true overrides this check (passes with warning) but NOT 3-strike.
+#   - force=true overrides this check (passes with warning).
 #   - Config key: planning.gates.response (default: nudge)
 #
 # Modes per gate: off / nudge / block
@@ -40,7 +34,7 @@ PLUGIN_NAME = "a0_agent_skills"
 
 class ResponseGate(LifecycleExtension):
     """Gate that warns or blocks the `response` tool when phases are
-    in-progress or a 3-strike limit has been reached."""
+    in-progress."""
 
     # Override _resolve_lifecycle_dir to use module-level imports (test-mockable)
     def _resolve_lifecycle_dir(self) -> Path | None:
@@ -76,39 +70,15 @@ class ResponseGate(LifecycleExtension):
 
         tool_args = kwargs.get("tool_args", {}) or {}
 
-        # Read config modes
+        # Read config mode
         config = plugins.get_plugin_config(PLUGIN_NAME, agent=self.agent) or {}
         gates = config.get("planning", {}).get("gates", {})
-        three_strike_mode = gates.get("three_strike", "block")
         response_mode = gates.get("response", "nudge")
 
         force = str(tool_args.get("force", "")).lower() == "true"
 
         # ------------------------------------------------------------------
-        # Check 1: 3-strike enforcement (HIGHEST PRIORITY)
-        # ------------------------------------------------------------------
-        if self.agent and hasattr(self.agent, "context"):
-            strike_blocked = self.agent.context.data.get(
-                "lifecycle_strike_blocked", False
-            )
-            if strike_blocked:
-                if three_strike_mode == "block":
-                    raise RepairableException(
-                        "3-strike limit reached. Address the recurring error before continuing."
-                    )
-                elif three_strike_mode == "nudge":
-                    msg = (
-                        "[response-gate] 3-strike limit reached. "
-                        "Address the recurring error before continuing."
-                    )
-                    PrintStyle.warning(msg)
-                    self.agent.context.data.setdefault(
-                        "lifecycle_gate_warnings", []
-                    ).append(msg)
-                # off mode: continue silently
-
-        # ------------------------------------------------------------------
-        # Check 2: Phase-in-progress enforcement
+        # Phase-in-progress enforcement
         # ------------------------------------------------------------------
         state = self._load_lifecycle()
 
@@ -125,7 +95,6 @@ class ResponseGate(LifecycleExtension):
 
         # Phase is in progress — check force override
         if force:
-            # force=true overrides phase-in-progress (but NOT 3-strike)
             self.agent.context.data.setdefault(
                 "lifecycle_gate_warnings", []
             ).append(

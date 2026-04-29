@@ -18,7 +18,6 @@ description: Discovers and invokes agent skills, and enforces lifecycle discipli
 - [Manus Principles](#manus-principles)
 - [The 5-Question Reboot Test](#the-5-question-reboot-test)
 - [Read vs Write Decision Matrix](#read-vs-write-decision-matrix)
-- [3-Strike Error Protocol](#3-strike-error-protocol)
 - [Behavioral Discipline](#behavioral-discipline)
 - [Red Flags](#red-flags)
 - [Verification](#verification)
@@ -250,32 +249,11 @@ Plan state can be read freely but must be written through the lifecycle tool. Th
 | **Write** phase transitions | `Edit state.md frontmatter: change phase status from ⏸️ to 🔄`, `Edit state.md frontmatter: change phase status from 🔄 to ✅` | When starting or finishing a phase |
 | **Write** findings | `Append to findings.md with source tag (trusted/untrusted)` with `source` tag | When discovering information worth keeping |
 | **Write** progress | `Append to progress.md with timestamp` | When completing a meaningful step |
-| **Write** errors | `Errors are auto-tracked by StrikeTracker (3-strike protocol)` | When encountering a failure |
+| **Write** errors | `Append to errors.md with error hash` | When encountering a failure |
 | **Write** new phases | `Lifecycle has fixed 7 phases: IDEA→SPEC→PLAN→BUILD→VERIFY→REVIEW→SHIP` | When scope expands beyond the original plan |
 | **Write** archive | `lifecycle:archive` | When the lifecycle is done or abandoned |
 
 **Rule:** The lifecycle tool manages init, status, and archive. Day-to-day operations are direct file edits: edit state.md YAML frontmatter for phase transitions, append to findings.md/progress.md for findings and progress. Read freely via lifecycle:status or direct file reads.
-
----
-
-## 3-Strike Error Protocol
-
-Repeated identical errors signal a systemic problem, not a transient glitch. The 3-strike protocol escalates automatically:
-
-| Strike | Behavior |
-|--------|----------|
-| 1st | Error logged. Agent continues. |
-| 2nd | Error logged. Agent continues. Warning displayed. |
-| 3rd | **Block.** Agent cannot proceed with the same approach. Must escalate to user or change strategy. |
-
-**Mechanism:** `Errors are auto-tracked by StrikeTracker (3-strike protocol)` computes a hash of the error content (or uses a provided signature). The `StrikeTracker` counts occurrences. On the 3rd strike, the response gate blocks further execution.
-
-**Recovery after 3rd strike:**
-1. Stop and report the repeated error to the user
-2. Propose an alternative approach
-3. If the user approves a different approach, log it as a finding and continue
-
-**Rule:** Three identical errors means you are in a loop. Break it.
 
 ---
 
@@ -319,7 +297,7 @@ The `lifecycle` tool is part of the skill lifecycle when an active lifecycle exi
 | After completing a task | `Edit state.md frontmatter: change phase status from 🔄 to ✅` |
 | When discovering important information | `Append to findings.md with source tag (trusted/untrusted)` |
 | After completing a meaningful step | `Append to progress.md with timestamp` |
-| When hitting an error | `Errors are auto-tracked by StrikeTracker (3-strike protocol)` |
+| When hitting an error | `Append to errors.md with error hash` |
 | After `/ship` decision GO | `lifecycle:archive status="completed"` |
 | If work is abandoned | `lifecycle:archive status="abandoned"` |
 

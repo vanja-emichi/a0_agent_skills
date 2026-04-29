@@ -45,7 +45,7 @@
 - **Verify**: File contains conditional skill mentions
 
 ## Task 2: Merge lifecycle-runtime into using-agent-skills
-- [ ] Copy Manus Principles, 5-Question Reboot, 3-Strike Protocol, Read/Write Matrix from lifecycle-runtime
+- [ ] Copy Manus Principles, 5-Question Reboot, Read/Write Matrix from lifecycle-runtime
 - [ ] Insert into using-agent-skills SKILL.md (after Quick Reference section)
 - [ ] Update lifecycle tool usage table references
 - [ ] Remove lifecycle-runtime from routing table (replaced by merged content)

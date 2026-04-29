@@ -44,17 +44,6 @@ def get_lifecycle_state_module():
     )
 
 
-def get_strike_tracker_module():
-    """Load and cache the lib.strike_tracker module singleton.
-
-    Returns the module containing StrikeTracker.
-    """
-    return _load_cached(
-        "a0_agent_skills_strike_tracker",
-        _PLUGIN_ROOT / "lib" / "strike_tracker.py",
-    )
-
-
 def get_simplify_ignore_utils_module():
     """Load and cache the lib.simplify_ignore_utils module singleton.
 

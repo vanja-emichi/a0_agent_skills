@@ -11,11 +11,6 @@ def test_lifecycle_constants_exist():
     assert CONTEXT_KEY_LIFECYCLE_STATE_MTIME == 'lifecycle_state_mtime'
 
 
-def test_strike_blocked_preserved():
-    from lib.constants import CONTEXT_KEY_STRIKE_BLOCKED
-    assert CONTEXT_KEY_STRIKE_BLOCKED == 'plan_strike_blocked'
-
-
 def test_phase_icons_unchanged():
     from lib.constants import PHASE_ICONS, PHASE_ICON_DEFAULT
     assert PHASE_ICONS == {'pending': chr(0x23F8)+chr(0xFE0F), 'in_progress': chr(0x1F504), 'completed': chr(0x2705)}
@@ -39,7 +34,5 @@ def test_all_values_use_lifecycle_prefix():
         if not name.startswith('CONTEXT_KEY'):
             continue
         val = getattr(c, name)
-        if name == 'CONTEXT_KEY_STRIKE_BLOCKED':
-            continue
         if isinstance(val, str):
             assert not val.startswith('plan_'), f'{name}={val!r} still uses plan_ prefix'

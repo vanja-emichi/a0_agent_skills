@@ -31,8 +31,6 @@ if _plugin_root not in _sys.path:
 from lib.constants import (
     CONTEXT_KEY_LIFECYCLE_STATE,
     CONTEXT_KEY_LIFECYCLE_STATE_MTIME,
-    CONTEXT_KEY_LIFECYCLE_STRIKE_TRACKER,
-    CONTEXT_KEY_STRIKE_BLOCKED,
     CONTEXT_KEY_LIFECYCLE_GATE_WARNINGS,
     CONTEXT_KEY_LIFECYCLE_ACTIONS_SINCE_FINDING,
     CONTEXT_KEY_LIFECYCLE_NUDGES,
@@ -95,7 +93,7 @@ class ProgressEntry:
 
 @dataclass
 class ErrorEntry:
-    """An error log entry with hash for 3-strike tracking."""
+    """An error log entry with hash for deduplication."""
     content: str
     error_hash: str
     timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
