@@ -1,0 +1,22 @@
+You MUST delegate this code review to the code-reviewer specialist. Do NOT conduct the review yourself.
+
+Use `call_subordinate` with the code-reviewer profile:
+
+```
+call_subordinate(profile="code-reviewer", message="Review the current changes...")
+```
+
+Instruct the code-reviewer to review the current changes (staged, recent commits, or the files/scope described below) across all five axes:
+
+1. **Correctness** — Does it match the spec? Edge cases handled? Tests adequate?
+2. **Readability** — Clear names? Straightforward logic? Well-organized?
+3. **Architecture** — Follows existing patterns? Clean boundaries? Right abstraction level?
+4. **Security** — Input validated? Secrets safe? Auth checked? (Also reference `security-and-hardening` skill)
+5. **Performance** — No N+1 queries? No unbounded ops? (Also reference `performance-optimization` skill)
+
+The reviewer MUST categorize findings as Critical, Important, or Suggestion.
+The reviewer MUST produce a structured APPROVE/REQUEST CHANGES report with file:line references and fix recommendations.
+
+Do NOT let the reviewer spawn other personas — it reports back to you only.
+
+{raw}

@@ -1,0 +1,5 @@
+name: spec
+description: Load the spec-driven-development skill and write a SPEC.md for the current feature or project
+argument_hint: Optional feature name or description
+type: text
+template_path: spec.txt

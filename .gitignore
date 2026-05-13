@@ -1,0 +1,19 @@
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+*.pyc
+
+# Test artifacts
+MagicMock/
+.toggle-*
+
+# Secrets and credentials
+.env
+.env.*
+*.pem
+*.key
+*.p12
+secrets.yaml
+
+# OS files
+.DS_Store

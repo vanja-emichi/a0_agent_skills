@@ -1,0 +1,8 @@
+name: ship
+description: >-
+  Run a sequential three-perspective pre-ship review (code quality → security →
+  test coverage) then produce a GO/NO-GO decision with rollback plan.
+  Agent Zero executes the three specialist reviews sequentially, not concurrently.
+argument_hint: Optional scope or PR description
+type: script
+script_path: ship.py
