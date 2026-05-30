@@ -1,0 +1,26 @@
+__pycache__/
+*.pyc
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+venv/
+.a0proj/
+
+# Test artifacts
+MagicMock/
+.toggle-*
+
+# Secrets and credentials
+.env
+.env.*
+*.pem
+*.key
+*.p12
+secrets.yaml
+
+# Coverage
+.coverage
+htmlcov/
+
+# OS files
+.DS_Store

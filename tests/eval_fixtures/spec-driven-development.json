@@ -1,0 +1,24 @@
+{
+  "skill_name": "spec-driven-development",
+  "description": "Create specs before coding. Use when starting a new project, feature, or significant change and no spec exists yet.",
+  "should_trigger": [
+    "I need to build a new REST API for managing user accounts",
+    "Let's create a new feature for processing payments with Stripe",
+    "Implement a caching layer for the database queries",
+    "I want to add a new microservice for email notifications",
+    "Build a file upload system with progress tracking",
+    "Create a new module that handles user authentication with OAuth2",
+    "Design and implement a rate limiting system for our API",
+    "We need a new data pipeline for ETL processing from S3"
+  ],
+  "should_not_trigger": [
+    "Fix the typo in the README",
+    "List all Python files in the project",
+    "What does this function do?",
+    "Run the existing test suite and show me the results",
+    "Change the button color to blue",
+    "Print the current working directory",
+    "Show me the git log for the last 5 commits",
+    "Add a trailing newline to config.yaml"
+  ]
+}

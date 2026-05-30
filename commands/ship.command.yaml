@@ -1,0 +1,8 @@
+name: ship
+description: >-
+  Run a parallel three-perspective pre-ship review (code quality, security,
+  test coverage) via call_subordinate_parallel, then produce a GO/NO-GO
+  decision with rollback plan.
+argument_hint: Optional scope or PR description
+type: script
+script_path: ship.py

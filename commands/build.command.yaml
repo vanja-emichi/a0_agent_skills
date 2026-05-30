@@ -1,0 +1,5 @@
+name: build
+description: Implement the next task incrementally — load incremental-implementation and test-driven-development skills, then build, test, verify, and commit
+argument_hint: Optional task name or description to implement
+type: text
+template_path: build.txt
