@@ -78,6 +78,7 @@ _WRITE_ACTIONS = {"write", "patch"}
 
 # Phase ordering for forward-only advancement.
 _PHASE_ORDER = {"DEFINE": 0, "PLAN": 1, "BUILD": 2, "VERIFY": 3, "REVIEW": 4, "SHIP": 5}
+_ORDERED_PHASES = sorted(_PHASE_ORDER, key=_PHASE_ORDER.get)
 
 # Path patterns for artifact auto-inference.
 # (?:^|[\/]) matches either start-of-string or a path separator,
@@ -315,8 +316,10 @@ class PersistWorkflowState(Extension):
                 save_active_plan,
                 save_active_goal,
                 save_current_phase,
+                save_previous_lifecycle,
                 read_current_phase,
                 read_active_plan,
+                read_active_goal,
                 append_progress_event,
                 merge_workflow_artifact,
                 merge_workflow_artifacts_batch,
@@ -344,7 +347,6 @@ class PersistWorkflowState(Extension):
                 goal_text = slug.replace("-", " ") if slug else "active spec"
 
                 # Detect goal change → new lifecycle
-                from helpers.workflow_state import read_active_goal, read_active_plan
                 existing = read_active_goal(self.agent) or {}
                 old_slug = existing.get("slug", "")
                 is_new_lifecycle = old_slug and old_slug != slug
@@ -358,7 +360,6 @@ class PersistWorkflowState(Extension):
                     # New goal → reset lifecycle
                     _log.info("Goal changed: %s → %s, resetting lifecycle", old_slug, slug)
                     # Save previous lifecycle for context (old artifacts still on disk)
-                    from helpers.workflow_state import save_previous_lifecycle
                     save_previous_lifecycle(self.agent, {
                         "goal": old_slug,
                         "phase": current_phase_data.get("phase", "(unknown)"),
@@ -383,18 +384,9 @@ class PersistWorkflowState(Extension):
                     "source": "artifact_inference",
                 })
 
-                if is_new_lifecycle or (not old_slug and not existing_lifecycle):
-                    # New goal or truly first spec → set DEFINE
-                    from helpers.workflow_state import save_current_phase as _save_phase
-                    _save_phase(self.agent, {
-                        "phase": "DEFINE",
-                        "phases_completed": [],
-                        "lifecycle_goal": slug,
-                    })
-                elif not is_same_lifecycle:
-                    # No lifecycle tracked but goal exists → set DEFINE for safety
-                    from helpers.workflow_state import save_current_phase as _save_phase
-                    _save_phase(self.agent, {
+                if is_new_lifecycle or not is_same_lifecycle:
+                    # New lifecycle, first spec, or untracked lifecycle → set DEFINE
+                    save_current_phase(self.agent, {
                         "phase": "DEFINE",
                         "phases_completed": [],
                         "lifecycle_goal": slug,
@@ -490,12 +482,11 @@ class PersistWorkflowState(Extension):
             if target_rank > current_rank:
                 # Carry forward lifecycle_goal from current phase
                 lifecycle_goal = (current or {}).get("lifecycle_goal", "")
-                # Compute completed phases based on target position in phase order
-                ordered_phases = sorted(_PHASE_ORDER, key=_PHASE_ORDER.get)
-                target_idx = ordered_phases.index(target_phase) if target_phase in ordered_phases else 0
+                # Compute completed phases based on target position
+                target_idx = target_rank  # ranks are 0-indexed positions
                 new_phase_data = {
                     "phase": target_phase,
-                    "phases_completed": list(ordered_phases[:target_idx]),
+                    "phases_completed": list(_ORDERED_PHASES[:target_idx]),
                     "source": "artifact_inference",
                 }
                 if lifecycle_goal:

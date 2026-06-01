@@ -25,8 +25,11 @@ Configuration keys (default_config.yaml):
 
 from __future__ import annotations
 
+import importlib.util
 import logging
+import os
 import random
+import sys
 
 from helpers.extension import Extension
 
@@ -73,11 +76,6 @@ def _get_last_user_message(agent) -> str | None:
     return None
 
 
-import importlib.util
-import os
-import sys
-
-
 def _bootstrap_plugin_loader():
     if '_plugin_loader' not in sys.modules:
         this_dir = os.path.dirname(os.path.abspath(__file__))
@@ -112,8 +110,6 @@ def _import_helpers():
     global _cached_helpers
     if _cached_helpers is not None:
         return _cached_helpers
-
-    import os
 
     this_dir = os.path.dirname(os.path.abspath(__file__))
     # extensions/python/tool_execute_before/ → plugin root is 3 levels up

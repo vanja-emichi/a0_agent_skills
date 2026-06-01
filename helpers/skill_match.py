@@ -256,12 +256,8 @@ async def classify_skill(
             try:
                 parsed = json.loads(json_match)
             except (json.JSONDecodeError, TypeError):
-                return {
-                    "state": "classifier_unavailable",
-                    "candidate": None,
-                    "reason": f"malformed response: {raw[:80]}",
-                }
-        else:
+                json_match = None
+        if not json_match:
             return {
                 "state": "classifier_unavailable",
                 "candidate": None,

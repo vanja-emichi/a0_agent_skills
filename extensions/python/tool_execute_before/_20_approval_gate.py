@@ -50,6 +50,12 @@ _NEGATION_WORDS = frozenset([
 
 _NEGATION_WINDOW = 4  # number of preceding words to scan for negation
 
+# Stripped forms of contraction negations (e.g. "don't" → "dont").
+# Derived from _NEGATION_WORDS so there is a single source of truth.
+_STRIPPED_NEGATIONS = frozenset(
+    w.replace("'", "") for w in _NEGATION_WORDS if "'" in w
+)
+
 # Characters that separate clauses in natural language.
 _CLAUSE_SEPARATORS = re.compile(r'[,;.!]')
 
@@ -106,13 +112,10 @@ def _has_negation_in_window(prefix: str, window: int) -> bool:
     words = prefix.split()
     window_words = words[-window:] if len(words) >= window else words
     for word in window_words:
-        # Check exact match and common contractions
         if word in _NEGATION_WORDS:
             return True
-        # Handle contractions like "don't" with stripped apostrophes
-        if word.replace("'", "") in ("dont", "doesnt", "didnt", "wont",
-                                      "wouldnt", "couldnt", "shouldnt",
-                                      "isnt", "arent", "wasnt", "werent"):
+        # Handle contractions with stripped apostrophes (e.g. "don't" → "dont")
+        if word.replace("'", "") in _STRIPPED_NEGATIONS:
             return True
     return False
 
