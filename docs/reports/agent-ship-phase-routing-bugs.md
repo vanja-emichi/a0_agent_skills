@@ -172,6 +172,25 @@ Note: Reading AGENTS.md is NOT part of this bug — that file is the plugin's up
 4. Use `§§include()` for long existing text instead of rewriting
 5. When context is getting full, deliberately compact or summarize
 
+## Bug 7: Loaded documentation-and-adrs Skill But Didn't Write ADR Until Prompted
+
+**What happened:** The agent loaded the `documentation-and-adrs` skill during the correct SHIP retry. The skill's verification checklist explicitly states:
+
+- [ ] ADRs exist for all significant architectural decisions
+- [ ] ADR records: context, decision, alternatives considered, rationale, and consequences
+
+Despite loading the skill, the agent only created a `CHANGELOG.md` (one deliverable from the skill) but never wrote an ADR. The ADR-008 was only written after the user pointed out: "I don't see a new ADR."
+
+**Root cause:** The agent treated `CHANGELOG.md` as the only output from `documentation-and-adrs`. The skill has multiple deliverables (ADRs, README, inline docs, changelog) but the agent only executed the most obvious one.
+
+**Impact:** Architectural decisions (merge semantics, batch merge, backward-compat fallback, display key mapping, lifecycle reset fix, slug guard) were not documented as ADRs until prompted. These decisions would have been lost to chat history.
+
+**Correct behavior:** When loading `documentation-and-adrs`, follow the FULL verification checklist:
+1. ✅ Changelog updated
+2. ❌ ADRs written for architectural decisions (missed until prompted)
+3. ❌ Inline gotchas documented (not done)
+4. ❌ README updated (not checked)
+
 ## Lessons Learned
 
 1. When transitioning between lifecycle phases, re-verify skill assignments against the six-phase model
@@ -186,3 +205,4 @@ Note: Reading AGENTS.md is NOT part of this bug — that file is the plugin's up
 10. Re-reference `using-agent-skills` when transitioning between phases — its flowcharts catch routing errors
 11. **Apply context-engineering practices during long sessions** — summarize decisions, track tasks, use `§§include()`, manage context deliberately
 12. **Subordinate delegations must include project conventions, architectural decisions, and acceptance criteria** — not just the task name
+13. **When loading a skill, follow its ENTIRE verification checklist** — not just the most obvious deliverable
