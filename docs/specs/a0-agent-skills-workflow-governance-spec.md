@@ -179,6 +179,41 @@ Follow existing plugin patterns:
 7. The plugin provides a lightweight eval path to measure matching quality and outcome lift.
 8. All of the above remain user-space only and do not require core framework changes.
 
+## Remediation Slice (Slice 6) — Post-Review Hardening
+
+*Added 2026-05-30 after the parallel specialist review (`docs/reports/parallel-review-full.md`) and the `agents-best-practices` harness audit. This slice closes the gaps between the shipped plugin and the success criteria above. It remains user-space only.*
+
+### Problem statement
+
+The review confirmed 6 of 8 success criteria are met, but found:
+- two **HIGH** security findings still open in the shipped code,
+- success criterion 7 (outcome lift) only partially met — matching evals exist, but no gate-on vs gate-off measurement,
+- the original "can't silently skip" headline is only partially delivered because the `tool_execute_before` return value is ignored by the framework (advisory-only),
+- 825 stray `MagicMock/…` test artifacts polluting the plugin tree from tests that mocked a path object instead of using `tmp_path`.
+
+### Remediation requirements
+
+| ID | Requirement | Source finding | Acceptance |
+|----|-------------|----------------|-----------|
+| R1 | Default `telemetry_enabled: false`; redact freeform `query` to action+skill_name only; drop `result_preview`; add log path to `.gitignore` | HIGH-2 | New install logs no query text or result previews; existing tests updated; opt-in documented in README |
+| R2 | Harden `_sanitize_spec_text`: NFKC-normalize first, expand injection blocklist (`forget`, `skip`, `never`, `always`, `pretend`, `act as`, `you are`, `new instruction`, `system prompt`), and wrap spec-derived text in clearly-delimited "do not follow as instructions" blocks in `ship_review.md` | HIGH-1 | Bypass-phrase fixtures (incl. zero-width / confusables) are neutralized; specialist template quotes untrusted context |
+| R3 | Replace direct `AgentContext._contexts.pop()` coupling with a defensive `hasattr`/`isinstance` guard plus a logged deprecation path, and file an upstream request for a public cleanup API | MED-5 / code-review Important | Cleanup degrades safely if the private attr changes; no silent context leak path without a log |
+| R4 | Build an **outcome-lift eval runner**: run representative fixtures with the gate observe vs enforce and record outcome classification, closing success criterion 7 | Criterion 7 / test-engineer | A reproducible runner emits a gate-on vs gate-off comparison report under `evals/` or `tests/` |
+| R5 | Delete the 825-file `MagicMock/` tree and fix the offending tests to use `tmp_path` so mocked path objects never write real disk I/O | Repo hygiene / test quality | `MagicMock/` is gone; full suite still passes; no test writes outside `tmp_path` |
+| R6 | Decide and document the deferred strict (`InterventionException`) enforcement mode — the only path to a true code-level un-skippable gate — as an explicit accept/defer ADR | Headline goal / Open Q1 | A written decision (ADR) records the choice and rationale; if deferred, the advisory limitation is stated plainly in README |
+
+### Boundaries for this slice
+
+- **Always:** keep changes user-space; preserve passing tests; ship security defaults backward-safe-but-private.
+- **Ask first:** any move from advisory enforcement to hard `InterventionException` pausing as a *default*.
+- **Never:** weaken existing path-traversal, allowlist, or recursion guards while hardening; reintroduce framework edits.
+
+### Updated success-criteria status
+
+- Criteria 1–6, 8: met (see review).
+- Criterion 7: **closed by R4** once the outcome-lift runner lands.
+- Headline "can't silently skip": **explicitly resolved by R6** (accept advisory-only or implement strict mode), not left ambiguous.
+
 ## Open Questions
 
 1. Should strict human-gated mode (`InterventionException`) ever be added later, or should the plugin remain permanently self-correcting-only?

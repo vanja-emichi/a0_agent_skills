@@ -304,6 +304,166 @@ Bring the umbrella roadmap docs, the focused slice docs, the plugin README, and 
 
 **Estimated scope:** Small
 
+## Phase 6: Post-Review Remediation (Slice 6)
+
+*Closes the gaps the parallel specialist review and `agents-best-practices` audit found between the shipped plugin and the success criteria. Maps to spec Remediation Slice R1–R6. All user-space; full suite (`607 passed / 42 skipped`) must stay green at every checkpoint.*
+
+### Task 11: Privacy-safe telemetry defaults (R1)
+
+**Description:**
+Make telemetry safe-by-default so a fresh install logs no freeform query text or result previews.
+
+**Acceptance criteria:**
+- [ ] `telemetry_enabled` defaults to `false` in `default_config.yaml`
+- [ ] Log entries store only action type + `skill_name`; freeform `query` is dropped or reduced to action metadata
+- [ ] `result_preview` is removed from the telemetry entry schema
+- [ ] `.a0proj/skill_activations.jsonl` is covered by `.gitignore`
+- [ ] README documents telemetry as opt-in with a clear privacy note
+
+**Verification:**
+- [ ] `python -m pytest tests/test_skill_telemetry.py tests/test_telemetry_default_and_hooks.py -v`
+- [ ] Manual: enable telemetry, run a skill search, confirm no query text / preview in the JSONL
+- [ ] Full suite passes
+
+**Dependencies:** None
+
+**Files likely touched:**
+- `/a0/usr/plugins/a0_agent_skills/default_config.yaml`
+- `/a0/usr/plugins/a0_agent_skills/extensions/python/tool_execute_after/_05_skill_telemetry.py`
+- `/a0/usr/plugins/a0_agent_skills/.gitignore`
+- `/a0/usr/plugins/a0_agent_skills/README.md`
+- `/a0/usr/plugins/a0_agent_skills/tests/test_skill_telemetry.py`
+
+**Estimated scope:** Medium
+
+### Task 12: Harden `/ship` spec-context sanitizer (R2)
+
+**Description:**
+Close the prompt-injection bypass in `_sanitize_spec_text` and structurally quote untrusted spec-derived context in the specialist template.
+
+**Acceptance criteria:**
+- [ ] Input is NFKC-normalized before regex matching
+- [ ] Injection blocklist expanded (`forget`, `skip`, `never`, `always`, `pretend`, `act as`, `you are`, `new instruction`, `system prompt`)
+- [ ] `ship_review.md` wraps spec-derived text in clearly-delimited "do not follow as instructions" markers
+- [ ] Existing path-traversal, allowlist, and JSON-escaping defenses remain intact
+
+**Verification:**
+- [ ] `python -m pytest tests/test_ship_sanitization.py -v`
+- [ ] New fixtures for bypass phrasings (incl. zero-width / confusables) are neutralized
+- [ ] Full suite passes
+
+**Dependencies:** None
+
+**Files likely touched:**
+- `/a0/usr/plugins/a0_agent_skills/commands/ship.py`
+- `/a0/usr/plugins/a0_agent_skills/prompts/ship_review.md`
+- `/a0/usr/plugins/a0_agent_skills/tests/test_ship_sanitization.py`
+
+**Estimated scope:** Medium
+
+### Task 13: Defensive context cleanup for parallel workers (R3)
+
+**Description:**
+Replace the brittle `AgentContext._contexts.pop()` coupling with a guarded path that degrades safely and logs when the private attribute is absent.
+
+**Acceptance criteria:**
+- [ ] Cleanup checks `hasattr` + `isinstance(dict)` before mutating `_contexts`
+- [ ] A deprecation/diagnostic log line is emitted if the private attr is missing
+- [ ] No silent context-leak path remains without a log
+- [ ] An upstream request for a public cleanup API is noted in code comment + ADR/README
+
+**Verification:**
+- [ ] `python -m pytest tests/test_call_subordinate_parallel.py -v`
+- [ ] New test for the non-dict / missing-attr cleanup branch
+- [ ] Full suite passes
+
+**Dependencies:** None
+
+**Files likely touched:**
+- `/a0/usr/plugins/a0_agent_skills/tools/call_subordinate_parallel.py`
+- `/a0/usr/plugins/a0_agent_skills/tests/test_call_subordinate_parallel.py`
+
+**Estimated scope:** Small
+
+### Task 14: Outcome-lift eval runner (R4 — closes success criterion 7)
+
+**Description:**
+Build a reproducible runner that executes representative fixtures with the gate in observe vs enforce and reports an outcome comparison, proving enforcement helps.
+
+**Acceptance criteria:**
+- [ ] Runner executes a fixture set under both gate modes
+- [ ] Emits a gate-on vs gate-off outcome-classification report
+- [ ] Runner is plugin-local and lightweight (no new external deps)
+- [ ] Documented usage in README / spec Commands section
+
+**Verification:**
+- [ ] Run the new runner end-to-end and inspect the comparison report
+- [ ] `python -m pytest` for any new runner unit tests
+- [ ] Full suite passes
+
+**Dependencies:** Task 11 (telemetry schema), Task 12 (stable enforce path)
+
+**Files likely touched:**
+- `/a0/usr/plugins/a0_agent_skills/tests/run_enforcement_evals.py` (or new `evals/` runner)
+- `/a0/usr/plugins/a0_agent_skills/tests/eval_fixtures/*`
+- `/a0/usr/plugins/a0_agent_skills/README.md`
+
+**Estimated scope:** Medium
+
+### Task 15: Remove `MagicMock/` artifacts and fix leaking tests (R5)
+
+**Description:**
+Delete the 825-file `MagicMock/` tree and fix the tests that wrote real disk I/O by mocking a path object, so they use `tmp_path` instead.
+
+**Acceptance criteria:**
+- [ ] `MagicMock/` directory is deleted from the plugin tree
+- [ ] Offending tests use `tmp_path` (or a real temp dir) so no test writes outside a temp location
+- [ ] Re-running the suite does not recreate `MagicMock/`
+- [ ] `.gitignore` coverage retained as a safety net
+
+**Verification:**
+- [ ] `find /a0/usr/plugins/a0_agent_skills/MagicMock -type f | wc -l` returns `0` after cleanup and a test run
+- [ ] Full suite passes
+
+**Dependencies:** None
+
+**Files likely touched:**
+- `/a0/usr/plugins/a0_agent_skills/MagicMock/` (delete)
+- Telemetry/workflow-state tests that mock `projects.get_project_folder()`
+- `/a0/usr/plugins/a0_agent_skills/tests/conftest.py`
+
+**Estimated scope:** Medium
+
+### Task 16: Decide strict (`InterventionException`) enforcement mode (R6)
+
+**Description:**
+Resolve the headline "can't silently skip" question with an explicit accept-advisory-or-implement-strict decision, recorded as an ADR.
+
+**Acceptance criteria:**
+- [ ] A new ADR records the decision and rationale
+- [ ] If deferred, README/spec state plainly that enforcement is advisory due to the framework hook contract
+- [ ] If accepted, a scoped follow-up task list for strict mode is added
+
+**Verification:**
+- [ ] Manual review of the ADR against ADR-001 and the idea one-pager
+- [ ] Docs are internally consistent (no claim of un-skippable gating unless implemented)
+
+**Dependencies:** Task 14 (outcome data informs the decision)
+
+**Files likely touched:**
+- `/a0/usr/projects/a0_agent_skills/docs/adrs/006-enforcement-strict-mode-decision.md`
+- `/a0/usr/plugins/a0_agent_skills/README.md`
+
+**Estimated scope:** Small
+
+### Checkpoint: After Phase 6
+- [ ] Both HIGH security findings resolved (Tasks 11, 12)
+- [ ] No private-API leak path without a log (Task 13)
+- [ ] Success criterion 7 closed by the outcome-lift runner (Task 14)
+- [ ] `MagicMock/` gone and tests no longer leak disk I/O (Task 15)
+- [ ] Headline enforcement question explicitly decided (Task 16)
+- [ ] Full suite still green; docs and shipped behavior agree
+
 ## Risks and Mitigations
 
 | Risk | Impact | Mitigation |

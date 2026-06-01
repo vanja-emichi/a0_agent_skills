@@ -65,12 +65,15 @@ All state files live under `.a0proj/state/` relative to the project folder. Each
 
 ### `active_plan.json`
 
+> **Note (two-store model):** `plan_path` is owned by `workflow_artifacts.json`, not this file.
+> See ADR-007 (`docs/adrs/007-artifact-path-resolution.md`) for the rationale.
+
 ```json
 {
   "version": 1,
   "updated_at": 1234567890.0,
   "plan_name": "durable-workflow-state",
-  "plan_path": "docs/plans/durable-workflow-state-plan.md",
+  "slug": "durable-workflow-state",
   "current_task": "Task 2: Add workflow-state helper",
   "tasks_total": 3,
   "tasks_completed": 0
