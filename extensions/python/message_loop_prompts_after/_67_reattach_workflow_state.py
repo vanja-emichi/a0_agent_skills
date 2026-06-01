@@ -74,10 +74,11 @@ def _format_state_block(state: dict) -> str:
         if completed:
             lines.append(f"**Phases Completed:** {', '.join(completed)}")
 
+    artifacts = state.get("workflow_artifacts") or {}
     plan = state.get("active_plan")
     if plan:
         lines.append(f"**Active Plan:** {plan.get('plan_name', '(unknown)')}")
-        lines.append(f"**Plan Path:** {plan.get('plan_path', '(unknown)')}")
+        lines.append(f"**Plan Path:** {artifacts.get('plan_path') or plan.get('plan_path', '(unknown)')}")
         lines.append(f"**Current Task:** {plan.get('current_task', '(unknown)')}")
         total = plan.get("tasks_total", 0)
         done = plan.get("tasks_completed", 0)
@@ -99,6 +100,26 @@ def _format_state_block(state: dict) -> str:
             lines.append(
                 f"**Last Checkpoint:** {last.get('id', '?')} \u2014 {last.get('label', '?')}"
             )
+
+    # Note: "intent" is populated via manual state manipulation (e.g. saving
+    # to workflow_artifacts.json directly), not by the resolver or discover_feature_slug.
+    if artifacts and isinstance(artifacts, dict):
+        artifact_items = []
+        approved = artifacts.get("approved") or {}
+        # Map stored keys (with _path suffix) to display names
+        artifact_key_map = {
+            "idea": "idea", "intent": "intent",
+            "spec_path": "spec", "plan_path": "plan", "todo_path": "todo",
+        }
+        for key, display_name in artifact_key_map.items():
+            path_val = artifacts.get(key)
+            if path_val:
+                tag = " (approved)" if approved.get(key) else ""
+                artifact_items.append(f"- {display_name}: {path_val}{tag}")
+        if artifact_items:
+            lines.append("")
+            lines.append("**Active Artifacts:**")
+            lines.extend(artifact_items)
 
     lines.append("")
     return "\n".join(lines)
@@ -205,7 +226,15 @@ class ReattachWorkflowState(Extension):
                     try:
                         if not isinstance(self.agent.data, dict):
                             self.agent.data = {}
-                        self.agent.data["loaded_skills"] = skill_names
+                        # Write rehydrated names to a PLUGIN-PRIVATE key, NOT the
+                        # core-rendered 'loaded_skills' key. Writing to
+                        # 'loaded_skills' makes the core skills renderer re-inject
+                        # full SKILL.md bodies for every prior-session skill on
+                        # every message loop (unbounded context flood). The
+                        # enforcement gate reads this private key via
+                        # skill_match.get_loaded_skills(); the lightweight names
+                        # summary already lives in the rehydrated state block.
+                        self.agent.data["_a0skills_rehydrated_loaded"] = skill_names
                     except Exception:
                         pass
 

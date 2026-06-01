@@ -15,6 +15,7 @@ All functions are fail-safe — missing/corrupt files return safe defaults.
 
 from __future__ import annotations
 
+import glob
 import importlib.util
 import json
 import logging
@@ -26,6 +27,9 @@ import threading
 from typing import Any
 
 _log = logging.getLogger(__name__)
+# NOTE: _write_lock is process-level only — it will NOT protect against
+# concurrent writes from multiple Agent Zero instances sharing the same
+# state directory. For multi-instance safety, use file-level locking (fcntl).
 _write_lock = threading.Lock()
 
 
@@ -53,6 +57,7 @@ _VALID_EVENT_TYPES = frozenset({
     "phase_change", "skill_loaded", "skill_unloaded",
     "task_started", "task_completed", "checkpoint",
     "goal_set", "plan_set", "gate_correction", "custom",
+    "artifact_created", "artifact_updated", "approval",
 })
 
 STATE_DIR_NAME = ".a0proj/state"
@@ -73,7 +78,13 @@ def resolve_state_dir(agent) -> str | None:
             if proj_name:
                 proj_folder = _projects.get_project_folder(proj_name)
                 if proj_folder:
-                    state_dir = os.path.join(proj_folder, STATE_DIR_NAME.replace("/", os.sep))
+                    # Read state path from config, fall back to default
+                    cfg = _get_plugin_config(agent)
+                    state_rel = (
+                        cfg.get("workflow_state_path", STATE_DIR_NAME)
+                        if isinstance(cfg, dict) else STATE_DIR_NAME
+                    )
+                    state_dir = os.path.join(proj_folder, state_rel.replace("/", os.sep))
                     base = pathlib.Path(proj_folder).resolve()
                     candidate = pathlib.Path(state_dir).resolve()
                     try:
@@ -83,8 +94,190 @@ def resolve_state_dir(agent) -> str | None:
                     return str(candidate)
     except Exception:
         _log.warning("resolve_state_dir failed — possible path issue", exc_info=True)
+
+    # No-project fallback: use plugin-local state under workdir
+    return os.path.join("/a0/usr/workdir", ".a0_agent_skills", "state")
+
+
+def resolve_visible_root(agent) -> str:
+    """Return the project root if a project is selected, else /a0/usr/workdir."""
+    try:
+        from helpers import projects as _projects
+        if agent and hasattr(agent, "context") and agent.context:
+            proj_name = _projects.get_context_project_name(agent.context)
+            if proj_name:
+                proj_folder = _projects.get_project_folder(proj_name)
+                if proj_folder:
+                    return str(proj_folder)
+    except Exception:
         pass
+    return "/a0/usr/workdir"
+
+
+# --- Artifact Path Resolution ---
+
+
+def _sanitize_slug(slug: str | None) -> str | None:
+    """Sanitize a feature slug to prevent path traversal.
+
+    Strips path separators and leading dots. Returns None if the
+    result is empty.
+    """
+    if not slug:
+        return None
+    slug = slug.replace(os.sep, "_").replace("/", "_").replace("\\", "_")
+    slug = slug.strip(".")
+    return slug if slug else None
+
+
+def resolve_artifact_paths(agent, slug: str | None = None) -> dict:
+    """Return canonical artifact paths for the current project or workdir.
+
+    When *slug* is provided the paths follow the feature-scoped layout
+    (docs/specs/<slug>-spec.md, docs/plans/<slug>-plan.md, …).
+    When *slug* is ``None`` the function falls back to legacy paths
+    (SPEC.md, tasks/plan.md, tasks/todo.md).
+    """
+    root = resolve_visible_root(agent)
+    slug = _sanitize_slug(slug)
+
+    if slug:
+        return {
+            "spec": os.path.join(root, "docs", "specs", f"{slug}-spec.md"),
+            "plan": os.path.join(root, "docs", "plans", f"{slug}-plan.md"),
+            "todo": os.path.join(root, "tasks", f"{slug}-todo.md"),
+            "idea": os.path.join(root, "docs", "ideas", f"{slug}.md"),
+            "adr": os.path.join(root, "docs", "adrs"),
+            "report": os.path.join(root, "docs", "reports", slug),
+        }
+
+    # Legacy fallback (no slug)
+    return {
+        "spec": os.path.join(root, "SPEC.md"),
+        "plan": os.path.join(root, "tasks", "plan.md"),
+        "todo": os.path.join(root, "tasks", "todo.md"),
+        "idea": os.path.join(root, "docs", "ideas"),
+        "adr": os.path.join(root, "docs", "adrs"),
+        "report": os.path.join(root, "docs", "reports"),
+    }
+
+
+def save_workflow_artifacts(agent, data: dict) -> str | None:
+    """Persist workflow artifact tracking data to workflow_artifacts.json."""
+    return _save_artifact(agent, "workflow_artifacts.json", data)
+
+
+def read_workflow_artifacts(agent) -> dict | None:
+    """Read workflow artifact tracking data from workflow_artifacts.json."""
+    return _read_artifact(agent, "workflow_artifacts.json")
+
+
+def merge_workflow_artifact(agent, key: str, value) -> str | None:
+    """Merge a single key-value pair into workflow_artifacts.json.
+
+    Reads the existing artifact dict, sets ``dict[key] = value``, and writes
+    it back.  Preserves all other keys.  Returns the file path on success or
+    ``None`` on failure.  Never raises.
+    """
+    try:
+        existing = read_workflow_artifacts(agent)
+        if existing is None:
+            existing = {}
+        existing[key] = value
+        return save_workflow_artifacts(agent, existing)
+    except Exception:
+        _log.warning("merge_workflow_artifact failed for key=%s", key, exc_info=True)
+        return None
+
+
+def merge_workflow_artifacts_batch(agent, updates: dict) -> str | None:
+    """Merge multiple key-value pairs into workflow_artifacts.json in one write.
+
+    Like merge_workflow_artifact but for multiple keys at once.
+    Returns the file path on success or None on failure. Never raises.
+    """
+    try:
+        existing = read_workflow_artifacts(agent)
+        if existing is None:
+            existing = {}
+        existing.update(updates)
+        return save_workflow_artifacts(agent, existing)
+    except Exception:
+        _log.warning("merge_workflow_artifacts_batch failed", exc_info=True)
+        return None
+
+
+def discover_feature_slug(agent) -> str | None:
+    """Discover the active feature slug.
+
+    Priority:
+    1. Read from ``workflow_artifacts.json`` state.
+    2. Scan ``docs/specs/*-spec.md`` on the visible root filesystem.
+    3. Return ``None`` if nothing found.
+    """
+    # 1. Check state
+    stored = read_workflow_artifacts(agent)
+    if stored and isinstance(stored, dict):
+        slug = _sanitize_slug(stored.get("feature_slug"))
+        if slug:
+            return slug
+
+    # 2. Scan filesystem
+    root = resolve_visible_root(agent)
+    specs_dir = os.path.join(root, "docs", "specs")
+    if os.path.isdir(specs_dir):
+        candidates = sorted(glob.glob(os.path.join(specs_dir, "*-spec.md")))
+        if candidates:
+            if len(candidates) > 1:
+                _log.debug(
+                    "Multiple spec candidates found; selecting last alphabetically: %s",
+                    candidates[-1],
+                )
+            filename = os.path.basename(candidates[-1])
+            slug = filename[: -len("-spec.md")]
+            return _sanitize_slug(slug)
+
     return None
+
+
+_VALID_ARTIFACT_TYPES = frozenset({"spec", "plan", "todo", "idea", "intent", "review", "report"})
+
+
+def mark_artifact_approved(agent, artifact_type: str) -> str | None:
+    """Mark an artifact as approved in workflow_artifacts.json.
+
+    Records approval with timestamp and emits an 'approval' progress event.
+    Returns the path to workflow_artifacts.json on success, None on failure.
+    """
+    if artifact_type not in _VALID_ARTIFACT_TYPES:
+        _log.warning(
+            "Unknown artifact type in mark_artifact_approved: %s (expected one of %s)",
+            artifact_type, sorted(_VALID_ARTIFACT_TYPES),
+        )
+    try:
+        existing = read_workflow_artifacts(agent)
+        if existing is None:
+            existing = {}
+
+        for key in ("approved", "approved_at"):
+            if key not in existing or not isinstance(existing[key], dict):
+                existing[key] = {}
+
+        existing["approved"][artifact_type] = True
+        existing["approved_at"][artifact_type] = time.time()
+
+        result = save_workflow_artifacts(agent, existing)
+
+        append_progress_event(agent, {
+            "event": "approval",
+            "artifact_type": artifact_type,
+            "approved": True,
+        })
+
+        return result
+    except Exception as exc:
+        _log.warning("Failed to mark artifact approved: %s", exc)
+        return None
 
 
 def _ensure_dir(path: str) -> None:
@@ -215,6 +408,32 @@ def read_current_phase(agent) -> dict | None:
 
 
 # ---------------------------------------------------------------------------
+# Previous lifecycle (archived goal history)
+# ---------------------------------------------------------------------------
+
+
+def save_previous_lifecycle(agent, lifecycle_data: dict) -> str | None:
+    if "archived_at" not in lifecycle_data:
+        lifecycle_data["archived_at"] = time.time()
+    # Append to a list of previous lifecycles
+    existing = read_previous_lifecycle(agent)
+    if isinstance(existing, list):
+        existing.append(lifecycle_data)
+    else:
+        existing = [lifecycle_data]
+    # Keep only last 5 lifecycles to prevent unbounded growth
+    existing = existing[-5:]
+    return _save_artifact(agent, "previous_lifecycle.json", existing)
+
+
+def read_previous_lifecycle(agent) -> list | None:
+    data = _read_artifact(agent, "previous_lifecycle.json")
+    if data is None:
+        return []
+    return data if isinstance(data, list) else [data]
+
+
+# ---------------------------------------------------------------------------
 # Loaded skills
 # ---------------------------------------------------------------------------
 
@@ -251,6 +470,9 @@ def append_progress_event(agent, event_data: dict) -> str | None:
         _ensure_dir(state_dir)
         if "ts" not in event_data:
             event_data["ts"] = time.time()
+        event_type = event_data.get("event")
+        if event_type and event_type not in _VALID_EVENT_TYPES:
+            _log.warning("Unknown event type: %s", event_type)
         line = json.dumps(event_data, separators=(",", ":")) + "\n"
 
         max_entries = DEFAULT_MAX_PROGRESS_ENTRIES
@@ -263,17 +485,14 @@ def append_progress_event(agent, event_data: dict) -> str | None:
         with _write_lock:
             if max_entries > 0 and os.path.exists(path):
                 try:
-                    line_count = 0
+                    import tempfile
+                    # Single-pass: read all lines and count simultaneously
+                    existing = []
                     with open(path, "r", encoding="utf-8") as fh:
-                        for _ in fh:
-                            line_count += 1
-                            if line_count > max_entries + 1:
-                                break
-                    if line_count >= max_entries:
-                        with open(path, "r", encoding="utf-8") as fh:
-                            existing = fh.readlines()
+                        for raw_line in fh:
+                            existing.append(raw_line)
+                    if len(existing) >= max_entries:
                         keep = existing[max_entries // 2:]
-                        import tempfile
                         tmp_fd, tmp_path = tempfile.mkstemp(dir=state_dir)
                         try:
                             with os.fdopen(tmp_fd, "w", encoding="utf-8") as tf:
@@ -348,19 +567,55 @@ def write_handoff(agent) -> str | None:
             "%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time())
         )
 
+        # Build artifact section from workflow_artifacts.json
+        artifacts = read_workflow_artifacts(agent) or {}
+        artifact_lines = []
+        if artifacts:
+            # Map stored keys (with _path suffix) to display names
+            artifact_key_map = {
+                "idea": "idea", "intent": "intent",
+                "spec_path": "spec", "plan_path": "plan", "todo_path": "todo",
+            }
+            for key, display_name in artifact_key_map.items():
+                path_val = artifacts.get(key)
+                if path_val:
+                    approval = ""
+                    approved_dict = artifacts.get("approved") or {}
+                    if approved_dict.get(key):
+                        approval = " (approved)"
+                    artifact_lines.append(f"- {display_name}: {path_val}{approval}")
+
         md = (
             "# Workflow Handoff\n\n"
             f"**Project:** {proj_name}\n"
             f"**Phase:** {phase.get('phase', '(unknown)')}\n"
             f"**Goal:** {goal.get('goal', '(unknown)')}\n"
-            f"**Plan:** {plan.get('plan_path', '(unknown)')}\n"
+            f"**Plan:** {artifacts.get('plan_path') or plan.get('plan_path', '(unknown)')}\n"
             f"**Current Task:** {plan.get('current_task', '(unknown)')}\n"
             f"**Loaded Skills:** {skill_names}\n"
             f"**Last Checkpoint:** {last_cp}\n"
             f"**Updated:** {updated}\n"
         )
 
+        if artifact_lines:
+            md += "\n## Active Artifacts\n\n" + "\n".join(artifact_lines) + "\n"
+
+        # Previous lifecycle section
+        prev = state.get("previous_lifecycle") or []
+        if prev:
+            md += "\n## Previous Lifecycles\n\n"
+            for p in prev[-3:]:  # Show last 3
+                goal = p.get("goal", "?")
+                phase = p.get("phase", "?")
+                md += f"- **{goal}** (completed at {phase})\n"
+            md += "\n"
+
         _ensure_dir(state_dir)
+        # Check for symlink on the raw (unresolved) path before _state_path resolves it
+        raw_handoff = os.path.join(state_dir, "handoff.md")
+        if os.path.exists(raw_handoff) and os.path.islink(raw_handoff):
+            _log.warning("Refusing to write to symlink: %s", raw_handoff)
+            return None
         with _write_lock:
             with open(path, "w", encoding="utf-8") as f:
                 f.write(md)
@@ -458,6 +713,9 @@ def read_all_state(agent) -> dict:
 
         progress = _read_progress_log_from_dir(state_dir)
 
+        # Read workflow artifact tracking
+        artifacts = read_workflow_artifacts(agent)
+
         result = {}
         if plan is not None:
             result["active_plan"] = plan
@@ -469,8 +727,13 @@ def read_all_state(agent) -> dict:
             result["loaded_skills"] = skills
         if checkpoints is not None:
             result["checkpoints"] = checkpoints
+        prev_lifecycle = _safe_read_json(_state_path(state_dir, "previous_lifecycle.json"))
+        if prev_lifecycle is not None:
+            result["previous_lifecycle"] = prev_lifecycle
         if progress:
             result["progress_log"] = progress
+        if artifacts is not None:
+            result["workflow_artifacts"] = artifacts
         return result
     except Exception:
         return {}

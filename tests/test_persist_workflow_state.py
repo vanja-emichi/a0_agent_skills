@@ -13,6 +13,7 @@ import sys
 import time
 from pathlib import Path
 from unittest.mock import MagicMock
+from unittest.mock import patch
 
 import pytest
 
@@ -217,6 +218,53 @@ class TestStateUpdates:
         plan = ws.read_active_plan(mock_agent)
         assert plan is not None
         assert plan["plan_name"] == "test-plan"
+        # plan_path must NOT be in active_plan.json (routed to workflow_artifacts.json)
+        assert "plan_path" not in plan
+
+        # plan_path should be in workflow_artifacts.json
+        artifacts = ws.read_workflow_artifacts(mock_agent)
+        assert artifacts is not None
+        assert artifacts["plan_path"] == "docs/plan.md"
+
+    @pytest.mark.asyncio
+    async def test_current_task_preserves_plan_name(self, mock_agent, tmp_project):
+        """Path B: setting current_task should preserve pre-existing plan_name."""
+        ws = _load_workflow_state()
+
+        # Pre-set plan_name
+        ws.save_active_plan(mock_agent, {"plan_name": "my-cool-plan", "slug": "my-cool-plan"})
+
+        ext = _make_ext(mock_agent)
+        mock_agent.loop_data.current_tool.method = "execute"
+        mock_agent.loop_data.current_tool.args = {"current_task": "Task 1"}
+
+        await ext.execute(tool_name="code_execution_tool",
+                         tool_args={"current_task": "Task 1"})
+
+        plan = ws.read_active_plan(mock_agent)
+        assert plan is not None
+        assert plan["plan_name"] == "my-cool-plan"  # preserved
+        assert plan["current_task"] == "Task 1"
+
+    @pytest.mark.asyncio
+    async def test_plan_path_routed_to_workflow_artifacts(self, mock_agent, tmp_project):
+        """Path B: plan_path goes to workflow_artifacts.json, not active_plan.json."""
+        ext = _make_ext(mock_agent)
+        mock_agent.loop_data.current_tool.method = "execute"
+        mock_agent.loop_data.current_tool.args = {"plan_name": "test-plan"}
+
+        await ext.execute(tool_name="code_execution_tool",
+                         tool_args={"plan_name": "test-plan", "plan_path": "/some/path/plan.md"})
+
+        ws = _load_workflow_state()
+        plan = ws.read_active_plan(mock_agent)
+        assert plan is not None
+        assert plan["plan_name"] == "test-plan"
+        assert "plan_path" not in plan  # NOT in active_plan.json
+
+        artifacts = ws.read_workflow_artifacts(mock_agent)
+        assert artifacts is not None
+        assert artifacts["plan_path"] == "/some/path/plan.md"
 
     @pytest.mark.asyncio
     async def test_saves_goal_when_goal_in_args(self, mock_agent, tmp_project):
@@ -372,3 +420,310 @@ class TestConfigDisabled:
         state_dir = ws.resolve_state_dir(agent)
         if state_dir:
             assert not os.path.exists(state_dir)
+
+
+# ---------------------------------------------------------------------------
+# Early-exit performance optimization
+# ---------------------------------------------------------------------------
+
+_IRRELEVANT_TOOL_CASES = [
+    ("browser", {"action": "open", "url": "http://example.com"}),
+    ("search_engine", {"query": "test"}),
+    ("response", {"text": "hello"}),
+    ("memory_save", {"text": "test"}),
+    ("scheduler", {"action": "list_tasks"}),
+    ("code_execution_tool", {"runtime": "terminal", "code": "ls"}),
+    ("text_editor", {"action": "read", "path": "/tmp/test.py"}),
+    ("call_subordinate", {"message": "test"}),
+    ("wait", {"seconds": 5}),
+    ("notify_user", {"message": "test"}),
+]
+
+
+class TestEarlyExit:
+    """Verify irrelevant tool calls skip expensive operations via early exit."""
+
+    @pytest.mark.parametrize("tool_name,tool_args", _IRRELEVANT_TOOL_CASES)
+    @pytest.mark.asyncio
+    async def test_skips_get_plugin_config_for_irrelevant_tools(
+            self, mock_agent, tmp_project, tool_name, tool_args):
+        """Irrelevant tools must NOT trigger the expensive _get_plugin_config call."""
+        ext_mod = _load_extension()
+        ext = _make_ext(mock_agent)
+
+        with patch.object(ext_mod, '_get_plugin_config',
+                          return_value={"workflow_state_enabled": True}) as mock_cfg:
+            await ext.execute(tool_name=tool_name, tool_args=tool_args)
+            mock_cfg.assert_not_called()
+
+    @pytest.mark.parametrize("tool_name,tool_args", _IRRELEVANT_TOOL_CASES)
+    @pytest.mark.asyncio
+    async def test_reconstructs_but_skips_config_for_irrelevant_tools(
+            self, mock_agent, tmp_project, tool_name, tool_args):
+        """Irrelevant tools call _reconstruct_tool_info (needed for relevance check)
+        but must NOT trigger the expensive _get_plugin_config call."""
+        ext_mod = _load_extension()
+        ext = _make_ext(mock_agent)
+
+        with patch.object(ext_mod, '_reconstruct_tool_info',
+                          return_value=(tool_name, tool_args or {})) as mock_recon, \
+             patch.object(ext_mod, '_get_plugin_config',
+                          return_value={"workflow_state_enabled": True}) as mock_cfg:
+            await ext.execute(tool_name=tool_name, tool_args=tool_args)
+            # Reconstruction IS called now (needed to determine relevance)
+            mock_recon.assert_called_once()
+            # But config loading should still be skipped for irrelevant tools
+            mock_cfg.assert_not_called()
+
+    @pytest.mark.asyncio
+    async def test_proceeds_for_skills_tool(self, mock_agent, tmp_project):
+        """skills_tool should still trigger _get_plugin_config (relevant tool)."""
+        ext_mod = _load_extension()
+        ext = _make_ext(mock_agent)
+
+        with patch.object(ext_mod, '_get_plugin_config',
+                          return_value={"workflow_state_enabled": True}) as mock_cfg:
+            await ext.execute(tool_name="skills_tool",
+                             tool_args={"action": "load", "skill_name": "test"})
+            mock_cfg.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_proceeds_for_skills_tool_prefix(self, mock_agent, tmp_project):
+        """skills_tool:load variant should still trigger _get_plugin_config."""
+        ext_mod = _load_extension()
+        ext = _make_ext(mock_agent)
+
+        with patch.object(ext_mod, '_get_plugin_config',
+                          return_value={"workflow_state_enabled": True}) as mock_cfg:
+            await ext.execute(tool_name="skills_tool:load",
+                             tool_args={"skill_name": "test"})
+            mock_cfg.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_proceeds_for_state_action_in_args(self, mock_agent, tmp_project):
+        """Tools with action=plan_set should still trigger _get_plugin_config."""
+        ext_mod = _load_extension()
+        ext = _make_ext(mock_agent)
+        mock_agent.loop_data.current_tool.method = "execute"
+        mock_agent.loop_data.current_tool.args = {"action": "plan_set"}
+
+        with patch.object(ext_mod, '_get_plugin_config',
+                          return_value={"workflow_state_enabled": True}) as mock_cfg:
+            await ext.execute(tool_name="code_execution_tool",
+                             tool_args={"action": "plan_set", "plan_name": "my-plan"})
+            mock_cfg.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_proceeds_for_plan_name_key_in_args(self, mock_agent, tmp_project):
+        """Tools with plan_name in args should still trigger _get_plugin_config."""
+        ext_mod = _load_extension()
+        ext = _make_ext(mock_agent)
+        mock_agent.loop_data.current_tool.method = "execute"
+        mock_agent.loop_data.current_tool.args = {"plan_name": "test-plan"}
+
+        with patch.object(ext_mod, '_get_plugin_config',
+                          return_value={"workflow_state_enabled": True}) as mock_cfg:
+            await ext.execute(tool_name="code_execution_tool",
+                             tool_args={"plan_name": "test-plan"})
+            mock_cfg.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_proceeds_for_artifact_type_in_args(self, mock_agent, tmp_project):
+        """Tools with artifact_type in args should still trigger _get_plugin_config."""
+        ext_mod = _load_extension()
+        ext = _make_ext(mock_agent)
+
+        with patch.object(ext_mod, '_get_plugin_config',
+                          return_value={"workflow_state_enabled": True}) as mock_cfg:
+            await ext.execute(tool_name="some_tool",
+                             tool_args={"artifact_type": "spec",
+                                        "artifact_event": "artifact_created"})
+            mock_cfg.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_early_exit_for_none_tool_name(self, mock_agent, tmp_project):
+        """None tool_name must early-exit without calling _get_plugin_config."""
+        ext_mod = _load_extension()
+        ext = _make_ext(mock_agent)
+
+        with patch.object(ext_mod, '_get_plugin_config',
+                          return_value={"workflow_state_enabled": True}) as mock_cfg:
+            await ext.execute(tool_name=None)
+            mock_cfg.assert_not_called()
+
+
+# ---------------------------------------------------------------------------
+# Lifecycle reset clears active_plan (regression: None -> {})
+# ---------------------------------------------------------------------------
+
+class TestLifecycleResetClearsPlan:
+    """Regression tests for the bug where save_active_plan(agent, None) raised
+    TypeError inside _save_artifact (data["version"] = VERSION on None),
+    caught silently by the outer except, preventing plan clearing during
+    lifecycle reset.
+    """
+
+    @pytest.mark.asyncio
+    async def test_lifecycle_reset_clears_active_plan(self, mock_agent, tmp_project):
+        """When goal changes (spec slug differs), active_plan must be cleared."""
+        ws = _load_workflow_state()
+
+        # Pre-set an active plan with real data
+        ws.save_active_plan(mock_agent, {
+            "plan_name": "old-feature",
+            "slug": "old-feature",
+            "current_task": "Task 3 of 5",
+        })
+        # Pre-set an active goal with a different slug (simulates prior lifecycle)
+        ws.save_active_goal(mock_agent, {
+            "goal": "old feature",
+            "slug": "old-feature",
+            "source": "test",
+        })
+
+        # Confirm plan exists before the reset
+        plan_before = ws.read_active_plan(mock_agent)
+        assert plan_before is not None
+        assert plan_before["plan_name"] == "old-feature"
+
+        # Trigger lifecycle reset via text_editor write to a spec path with NEW slug
+        spec_path = str(tmp_project / "docs" / "specs" / "new-feature-spec.md")
+        os.makedirs(os.path.dirname(spec_path), exist_ok=True)
+        Path(spec_path).write_text("# New Feature Spec\n")
+
+        ext = _make_ext(mock_agent)
+        # _make_ext bypasses __init__, so _artifact_mtimes is missing.
+        # Without it, _persist_artifact_state raises AttributeError (caught silently).
+        ext._artifact_mtimes = {}
+        mock_agent.loop_data.current_tool.method = "execute"
+        mock_agent.loop_data.current_tool.args = {
+            "action": "write",
+            "path": spec_path,
+            "content": "# New Feature Spec\n",
+        }
+
+        await ext.execute(
+            tool_name="text_editor",
+            tool_args={
+                "action": "write",
+                "path": spec_path,
+                "content": "# New Feature Spec\n",
+            },
+        )
+
+        # After lifecycle reset, active_plan should be cleared
+        plan_after = ws.read_active_plan(mock_agent)
+        # The plan should be empty dict (only version/timestamp metadata) or None
+        if plan_after is not None:
+            assert "plan_name" not in plan_after, (
+                f"plan_name should be cleared after lifecycle reset, "
+                f"got: {plan_after}"
+            )
+            assert "current_task" not in plan_after, (
+                f"current_task should be cleared after lifecycle reset, "
+                f"got: {plan_after}"
+            )
+
+    @pytest.mark.asyncio
+    async def test_save_active_plan_with_empty_dict_does_not_raise(self, mock_agent, tmp_project):
+        """save_active_plan(agent, {}) must succeed without TypeError."""
+        ws = _load_workflow_state()
+
+        # This is the exact call that was failing with None
+        result = ws.save_active_plan(mock_agent, {})
+
+        # Should return a path (success), not None (failure)
+        assert result is not None, "save_active_plan(agent, {}) returned None — write failed"
+
+        # Verify the file is valid JSON with version stamp
+        plan = ws.read_active_plan(mock_agent)
+        assert plan is not None
+        assert "version" in plan
+
+    @pytest.mark.asyncio
+    async def test_save_active_plan_with_none_returns_none(self, mock_agent, tmp_project):
+        """save_active_plan(agent, None) must fail gracefully (returns None).
+
+        This is the OLD buggy behavior — it should not raise, but it should
+        return None because _save_artifact cannot index-assign on None.
+        """
+        ws = _load_workflow_state()
+
+        # Should not raise — _save_artifact has its own try/except
+        result = ws.save_active_plan(mock_agent, None)  # type: ignore[arg-type]
+
+        # Returns None because data["version"] = VERSION fails on None
+        assert result is None
+
+
+# ---------------------------------------------------------------------------
+# merge_workflow_artifacts_batch
+# ---------------------------------------------------------------------------
+
+class TestMergeWorkflowArtifactsBatch:
+    """Tests for the batch merge function that writes multiple keys at once."""
+
+    def test_batch_writes_two_keys_at_once(self, mock_agent, tmp_project):
+        """Writing two keys in one batch call must persist both."""
+        ws = _load_workflow_state()
+
+        result = ws.merge_workflow_artifacts_batch(mock_agent, {
+            "spec_path": "/docs/specs/auth-spec.md",
+            "feature_slug": "auth",
+        })
+        assert result is not None
+
+        artifacts = ws.read_workflow_artifacts(mock_agent)
+        assert artifacts is not None
+        assert artifacts["spec_path"] == "/docs/specs/auth-spec.md"
+        assert artifacts["feature_slug"] == "auth"
+
+    def test_batch_preserves_existing_keys(self, mock_agent, tmp_project):
+        """Batch write must preserve keys that already exist."""
+        ws = _load_workflow_state()
+
+        # Pre-set some keys
+        ws.merge_workflow_artifacts_batch(mock_agent, {
+            "spec_path": "/docs/specs/old-spec.md",
+            "existing_key": "preserved_value",
+        })
+
+        # Batch write new keys
+        ws.merge_workflow_artifacts_batch(mock_agent, {
+            "feature_slug": "new-feature",
+            "plan_path": "/docs/plans/new-feature-plan.md",
+        })
+
+        artifacts = ws.read_workflow_artifacts(mock_agent)
+        assert artifacts is not None
+        # Old keys preserved
+        assert artifacts["existing_key"] == "preserved_value"
+        assert artifacts["spec_path"] == "/docs/specs/old-spec.md"
+        # New keys present
+        assert artifacts["feature_slug"] == "new-feature"
+        assert artifacts["plan_path"] == "/docs/plans/new-feature-plan.md"
+
+    def test_batch_overwrites_existing_key_with_new_value(self, mock_agent, tmp_project):
+        """Batch write should overwrite a key if it already exists."""
+        ws = _load_workflow_state()
+
+        ws.merge_workflow_artifacts_batch(mock_agent, {"spec_path": "/old.md"})
+        ws.merge_workflow_artifacts_batch(mock_agent, {"spec_path": "/new.md"})
+
+        artifacts = ws.read_workflow_artifacts(mock_agent)
+        assert artifacts is not None
+        assert artifacts["spec_path"] == "/new.md"
+
+    def test_batch_never_raises_on_failure(self):
+        """merge_workflow_artifacts_batch must never raise, even with broken agent."""
+        ws = _load_workflow_state()
+
+        broken_agent = MagicMock()
+        broken_agent.context = None
+        # Make resolve_state_dir fail by patching it to return None
+        with patch.object(ws, "resolve_state_dir", return_value=None):
+            # Must NOT raise
+            result = ws.merge_workflow_artifacts_batch(broken_agent, {
+                "key": "value",
+            })
+            assert result is None  # Returns None on failure, doesn't raise

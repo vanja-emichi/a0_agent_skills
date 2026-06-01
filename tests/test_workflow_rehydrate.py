@@ -162,7 +162,8 @@ class TestStateBlockAppended:
     async def test_appends_state_block_when_state_exists(self, mock_agent, tmp_project):
         ws = _load_workflow_state()
         ws.save_active_plan(mock_agent, {"plan_name": "test-plan", "plan_path": "docs/plan.md",
-                                          "current_task": "Task 1", "tasks_total": 3, "tasks_completed": 1})
+                                           "current_task": "Task 1", "tasks_total": 3, "tasks_completed": 1})
+        ws.save_workflow_artifacts(mock_agent, {"plan_path": "docs/plan.md"})
         ws.save_active_goal(mock_agent, {"goal": "Build it"})
         ws.save_current_phase(mock_agent, {"phase": "BUILD", "phases_completed": ["DEFINE", "PLAN"]})
 
@@ -175,6 +176,7 @@ class TestStateBlockAppended:
         assert "**Active Goal:** Build it" in state_block
         assert "**Current Phase:** BUILD" in state_block
         assert "**Active Plan:** test-plan" in state_block
+        assert "**Plan Path:** docs/plan.md" in state_block
         assert "**Current Task:** Task 1" in state_block
         assert "**Task Progress:** 1/3 completed" in state_block
         assert "**Phases Completed:** DEFINE, PLAN" in state_block
@@ -270,7 +272,8 @@ class TestErrorHandling:
         ext = _make_ext(agent)
         loop_data = _LoopData()
         await ext.execute(loop_data=loop_data)
-        assert "workflow_state" not in loop_data.extras_persistent
+        # With no-project fallback, rehydration now succeeds using workdir state
+        assert "workflow_state" in loop_data.extras_persistent
 
     def test_source_has_top_level_try_except(self):
         """Verify the extension source contains a top-level try/except in execute."""
@@ -307,11 +310,18 @@ class TestLoadedSkillsInjection:
         loop_data = _LoopData()
         await ext.execute(loop_data=loop_data)
 
-        # Check that agent.data['loaded_skills'] was updated
-        assert mock_agent.data["loaded_skills"] == [
+        # Rehydration writes to the PLUGIN-PRIVATE key, not the core-rendered
+        # 'loaded_skills' key (which would re-inject full SKILL.md bodies every
+        # loop). The core key must stay empty; the gate still sees the names.
+        assert mock_agent.data.get("_a0skills_rehydrated_loaded") == [
             "incremental-implementation",
             "test-driven-development",
         ]
+        assert not mock_agent.data.get("loaded_skills")
+        from helpers.skill_match import get_loaded_skills
+        gate_loaded = get_loaded_skills(mock_agent)
+        assert "incremental-implementation" in gate_loaded
+        assert "test-driven-development" in gate_loaded
 
     @pytest.mark.asyncio
     async def test_does_not_inject_when_no_skills_in_state(self, mock_agent, tmp_project):
@@ -345,6 +355,7 @@ class TestRoundTrip:
             "tasks_total": 6,
             "tasks_completed": 2,
         })
+        ws.save_workflow_artifacts(mock_agent, {"plan_path": "docs/plans/plan.md"})
         ws.save_active_goal(mock_agent, {
             "goal": "Persist workflow state durably",
             "source": "user message",
@@ -365,6 +376,7 @@ class TestRoundTrip:
 
         state_block = loop_data.extras_persistent["workflow_state"]
         assert "durable-workflow-state" in state_block
+        assert "**Plan Path:** docs/plans/plan.md" in state_block
         assert "Persist workflow state durably" in state_block
         assert "BUILD" in state_block
         assert "incremental-implementation" in state_block
@@ -388,9 +400,14 @@ class TestSkillMatchCompat:
         loop_data = _LoopData()
         await ext.execute(loop_data=loop_data)
 
-        # After rehydration, agent.data['loaded_skills'] should be a list of strings
-        loaded = mock_agent.data["loaded_skills"]
-        assert isinstance(loaded, list)
+        # After rehydration, the enforcement gate (skill_match.get_loaded_skills)
+        # must see the rehydrated skill via the plugin-private key, while the
+        # core-rendered 'loaded_skills' key stays empty to avoid full-body
+        # re-injection of SKILL.md content every message loop.
+        assert not mock_agent.data.get("loaded_skills")
+        from helpers.skill_match import get_loaded_skills
+        loaded = get_loaded_skills(mock_agent)
+        assert isinstance(loaded, set)
         assert all(isinstance(s, str) for s in loaded)
         assert "test-driven-development" in loaded
 
@@ -501,3 +518,131 @@ class TestNextSkillHints:
 
         state_block = loop_data.extras_persistent.get("workflow_state", "")
         assert "Next Skill Hints" not in state_block
+
+
+# ---------------------------------------------------------------------------
+# Regression: rehydration must NOT repopulate the core-rendered
+# agent.data['loaded_skills'] key. Doing so makes the core skills renderer
+# re-inject full SKILL.md bodies for every prior-session skill on every
+# message loop (unbounded context flood). Names belong in a plugin-private
+# key that the enforcement gate reads; the lightweight summary lives in the
+# rehydrated state block.
+# ---------------------------------------------------------------------------
+
+
+class TestNoCoreLoadedSkillsFlood:
+    @pytest.mark.asyncio
+    async def test_rehydration_does_not_repopulate_core_loaded_skills(self, mock_agent, tmp_project):
+        ws = _load_workflow_state()
+        ws.save_loaded_skills(mock_agent, {"skills": [
+            {"name": "spec-driven-development", "loaded_at": 1.0},
+            {"name": "test-driven-development", "loaded_at": 2.0},
+        ]})
+
+        ext = _make_ext(mock_agent)
+        loop_data = _LoopData()
+        await ext.execute(loop_data=loop_data)
+
+        # Core-rendered key MUST stay empty so the skills renderer does not
+        # re-inject full SKILL.md bodies for prior-session skills.
+        assert not mock_agent.data.get("loaded_skills")
+
+        # Plugin-private key MUST carry the rehydrated names.
+        private = mock_agent.data.get("_a0skills_rehydrated_loaded", [])
+        assert "spec-driven-development" in private
+        assert "test-driven-development" in private
+
+        # The enforcement gate must still treat them as already-loaded.
+        from helpers.skill_match import get_loaded_skills
+        loaded = get_loaded_skills(mock_agent)
+        assert "spec-driven-development" in loaded
+        assert "test-driven-development" in loaded
+
+        # The lightweight names summary must still appear in the state block.
+        state_block = loop_data.extras_persistent.get("workflow_state", "")
+        assert "spec-driven-development" in state_block
+
+
+# ---------------------------------------------------------------------------
+# Task 4 (artifact-path-wiring-fix): plan_path reads from workflow_artifacts.json
+# with backward-compat fallback to active_plan.json
+# ---------------------------------------------------------------------------
+
+
+class TestPlanPathFromArtifacts:
+    """Plan path reads from workflow_artifacts.json with fallback."""
+
+    @pytest.mark.asyncio
+    async def test_plan_path_from_workflow_artifacts(self, mock_agent, tmp_project):
+        """plan_path in workflow_artifacts.json is used for display."""
+        ws = _load_workflow_state()
+        ws.save_active_plan(mock_agent, {
+            "plan_name": "my-plan",
+            "plan_path": "old/path.md",
+            "current_task": "Task 1",
+        })
+        ws.save_workflow_artifacts(mock_agent, {"plan_path": "docs/plans/my-plan-plan.md"})
+
+        ext = _make_ext(mock_agent)
+        loop_data = _LoopData()
+        await ext.execute(loop_data=loop_data)
+
+        state_block = loop_data.extras_persistent["workflow_state"]
+        # Artifacts value takes priority
+        assert "**Plan Path:** docs/plans/my-plan-plan.md" in state_block
+
+    @pytest.mark.asyncio
+    async def test_plan_path_backward_compat_fallback(self, mock_agent, tmp_project):
+        """When plan_path only in active_plan.json, rehydration still displays it."""
+        ws = _load_workflow_state()
+        ws.save_active_plan(mock_agent, {
+            "plan_name": "legacy-plan",
+            "plan_path": "docs/plans/legacy-plan.md",
+            "current_task": "Task 2",
+        })
+        # Intentionally do NOT save workflow_artifacts — simulates old state
+
+        ext = _make_ext(mock_agent)
+        loop_data = _LoopData()
+        await ext.execute(loop_data=loop_data)
+
+        state_block = loop_data.extras_persistent["workflow_state"]
+        # Falls back to active_plan.json value
+        assert "**Plan Path:** docs/plans/legacy-plan.md" in state_block
+
+    @pytest.mark.asyncio
+    async def test_plan_name_still_from_active_plan(self, mock_agent, tmp_project):
+        """plan_name always reads from active_plan.json, not workflow_artifacts."""
+        ws = _load_workflow_state()
+        ws.save_active_plan(mock_agent, {
+            "plan_name": "plan-from-active",
+            "plan_path": "docs/plan.md",
+            "current_task": "Task 1",
+        })
+        ws.save_workflow_artifacts(mock_agent, {"plan_path": "docs/plans/plan-from-active-plan.md"})
+
+        ext = _make_ext(mock_agent)
+        loop_data = _LoopData()
+        await ext.execute(loop_data=loop_data)
+
+        state_block = loop_data.extras_persistent["workflow_state"]
+        # plan_name comes from active_plan.json, not artifacts
+        assert "**Active Plan:** plan-from-active" in state_block
+
+    @pytest.mark.asyncio
+    async def test_current_task_still_from_active_plan(self, mock_agent, tmp_project):
+        """current_task always reads from active_plan.json, not workflow_artifacts."""
+        ws = _load_workflow_state()
+        ws.save_active_plan(mock_agent, {
+            "plan_name": "task-test",
+            "plan_path": "docs/plan.md",
+            "current_task": "Task 5 of 10",
+        })
+        ws.save_workflow_artifacts(mock_agent, {"plan_path": "docs/plans/task-test-plan.md"})
+
+        ext = _make_ext(mock_agent)
+        loop_data = _LoopData()
+        await ext.execute(loop_data=loop_data)
+
+        state_block = loop_data.extras_persistent["workflow_state"]
+        assert "**Current Task:** Task 5 of 10" in state_block
