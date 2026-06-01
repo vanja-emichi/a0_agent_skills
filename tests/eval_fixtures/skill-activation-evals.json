@@ -1,0 +1,667 @@
+[
+  {
+    "id": "eval-001",
+    "intent": "fix this bug in the login flow",
+    "expected_skill": "debugging-and-error-recovery",
+    "category": "positive",
+    "phase": "VERIFY"
+  },
+  {
+    "id": "eval-002",
+    "intent": "write a spec for the new auth system",
+    "expected_skill": "spec-driven-development",
+    "category": "positive",
+    "phase": "DEFINE"
+  },
+  {
+    "id": "eval-003",
+    "intent": "break this feature into tasks",
+    "expected_skill": "planning-and-task-breakdown",
+    "category": "positive",
+    "phase": "PLAN"
+  },
+  {
+    "id": "eval-004",
+    "intent": "implement the POST /tasks endpoint",
+    "expected_skill": "incremental-implementation",
+    "category": "positive",
+    "phase": "BUILD"
+  },
+  {
+    "id": "eval-005",
+    "intent": "write tests for the task creation",
+    "expected_skill": "test-driven-development",
+    "category": "positive",
+    "phase": "BUILD"
+  },
+  {
+    "id": "eval-006",
+    "intent": "review the PR before merge",
+    "expected_skill": "code-review-and-quality",
+    "category": "positive",
+    "phase": "REVIEW"
+  },
+  {
+    "id": "eval-007",
+    "intent": "simplify this function",
+    "expected_skill": "code-simplification",
+    "category": "positive",
+    "phase": "REVIEW"
+  },
+  {
+    "id": "eval-008",
+    "intent": "check for security vulnerabilities",
+    "expected_skill": "security-and-hardening",
+    "category": "positive",
+    "phase": "REVIEW"
+  },
+  {
+    "id": "eval-009",
+    "intent": "optimize the slow query",
+    "expected_skill": "performance-optimization",
+    "category": "positive",
+    "phase": "REVIEW"
+  },
+  {
+    "id": "eval-010",
+    "intent": "deploy to production",
+    "expected_skill": "shipping-and-launch",
+    "category": "positive",
+    "phase": "SHIP"
+  },
+  {
+    "id": "eval-011",
+    "intent": "set up CI/CD pipeline",
+    "expected_skill": "ci-cd-and-automation",
+    "category": "positive",
+    "phase": "SHIP"
+  },
+  {
+    "id": "eval-012",
+    "intent": "create a branch and commit",
+    "expected_skill": "git-workflow-and-versioning",
+    "category": "positive",
+    "phase": "SHIP"
+  },
+  {
+    "id": "eval-013",
+    "intent": "write ADR for database choice",
+    "expected_skill": "documentation-and-adrs",
+    "category": "positive",
+    "phase": "SHIP"
+  },
+  {
+    "id": "eval-014",
+    "intent": "migrate from REST to GraphQL",
+    "expected_skill": "deprecation-and-migration",
+    "category": "positive",
+    "phase": "SHIP"
+  },
+  {
+    "id": "eval-015",
+    "intent": "check the React docs for the latest API",
+    "expected_skill": "source-driven-development",
+    "category": "positive",
+    "phase": "BUILD"
+  },
+  {
+    "id": "eval-016",
+    "intent": "stress-test this plan before committing",
+    "expected_skill": "doubt-driven-development",
+    "category": "positive",
+    "phase": "BUILD"
+  },
+  {
+    "id": "eval-017",
+    "intent": "build the login form component",
+    "expected_skill": "frontend-ui-engineering",
+    "category": "positive",
+    "phase": "BUILD"
+  },
+  {
+    "id": "eval-018",
+    "intent": "design the REST API for tasks",
+    "expected_skill": "api-and-interface-design",
+    "category": "positive",
+    "phase": "BUILD"
+  },
+  {
+    "id": "eval-019",
+    "intent": "test in the browser",
+    "expected_skill": "browser-testing-with-devtools",
+    "category": "positive",
+    "phase": "VERIFY"
+  },
+  {
+    "id": "eval-020",
+    "intent": "manage context for this large codebase",
+    "expected_skill": "context-engineering",
+    "category": "positive",
+    "phase": "PLAN"
+  },
+  {
+    "id": "eval-021",
+    "intent": "interview me about what I want",
+    "expected_skill": "interview-me",
+    "category": "positive",
+    "phase": "DEFINE"
+  },
+  {
+    "id": "eval-022",
+    "intent": "refine this vague idea",
+    "expected_skill": "idea-refine",
+    "category": "positive",
+    "phase": "DEFINE"
+  },
+  {
+    "id": "eval-023",
+    "intent": "which skill should I use",
+    "expected_skill": "using-agent-skills",
+    "category": "positive",
+    "phase": "META"
+  },
+  {
+    "id": "eval-024",
+    "intent": "refactor this code to be cleaner",
+    "expected_skill": "code-simplification",
+    "confused_with": "code-review-and-quality",
+    "category": "near-miss",
+    "phase": "REVIEW"
+  },
+  {
+    "id": "eval-025",
+    "intent": "audit security flaws",
+    "expected_skill": "security-and-hardening",
+    "confused_with": "code-review-and-quality",
+    "category": "near-miss",
+    "phase": "REVIEW"
+  },
+  {
+    "id": "eval-026",
+    "intent": "plan the next sprint",
+    "expected_skill": "planning-and-task-breakdown",
+    "confused_with": "spec-driven-development",
+    "category": "near-miss",
+    "phase": "PLAN"
+  },
+  {
+    "id": "eval-027",
+    "intent": "make this page load faster",
+    "expected_skill": "performance-optimization",
+    "confused_with": "frontend-ui-engineering",
+    "category": "near-miss",
+    "phase": "REVIEW"
+  },
+  {
+    "id": "eval-028",
+    "intent": "verify the app works end to end",
+    "expected_skill": "browser-testing-with-devtools",
+    "confused_with": "test-driven-development",
+    "category": "near-miss",
+    "phase": "VERIFY"
+  },
+  {
+    "id": "eval-029",
+    "intent": "document this API",
+    "expected_skill": "documentation-and-adrs",
+    "confused_with": "spec-driven-development",
+    "category": "near-miss",
+    "phase": "SHIP"
+  },
+  {
+    "id": "eval-030",
+    "intent": "figure out what the user actually wants",
+    "expected_skill": "interview-me",
+    "confused_with": "idea-refine",
+    "category": "near-miss",
+    "phase": "DEFINE"
+  },
+  {
+    "id": "eval-031",
+    "intent": "Review the changes in src/api/tasks.py for correctness and security",
+    "expected_skill": "code-review-and-quality",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-032",
+    "intent": "Check this pull request for potential issues before merging",
+    "expected_skill": "code-review-and-quality",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-033",
+    "intent": "Audit the authentication module for security vulnerabilities",
+    "expected_skill": "code-review-and-quality",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-034",
+    "intent": "Review the refactoring of the database layer",
+    "expected_skill": "code-review-and-quality",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-035",
+    "intent": "Look at the recent commits and check for code quality",
+    "expected_skill": "code-review-and-quality",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-036",
+    "intent": "I just finished implementing the feature, please review my code",
+    "expected_skill": "code-review-and-quality",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-037",
+    "intent": "Check if the new module follows our coding standards",
+    "expected_skill": "code-review-and-quality",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-038",
+    "intent": "Review the error handling in the payment service",
+    "expected_skill": "code-review-and-quality",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-039",
+    "intent": "List all TODO comments in the codebase",
+    "expected_skill": "code-review-and-quality",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-040",
+    "intent": "Count the number of lines of code in the project",
+    "expected_skill": "code-review-and-quality",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-041",
+    "intent": "What does the config.yaml file contain?",
+    "expected_skill": "code-review-and-quality",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-042",
+    "intent": "Show me the project dependencies",
+    "expected_skill": "code-review-and-quality",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-043",
+    "intent": "Run the linter on the codebase",
+    "expected_skill": "code-review-and-quality",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-044",
+    "intent": "Generate a code coverage report",
+    "expected_skill": "code-review-and-quality",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-045",
+    "intent": "Find all uses of deprecated functions",
+    "expected_skill": "code-review-and-quality",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-046",
+    "intent": "Display the git branch list",
+    "expected_skill": "code-review-and-quality",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-047",
+    "intent": "The tests are failing with a KeyError on line 42",
+    "expected_skill": "debugging-and-error-recovery",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-048",
+    "intent": "I'm getting a segfault when running the parser",
+    "expected_skill": "debugging-and-error-recovery",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-049",
+    "intent": "The API returns 500 errors intermittently",
+    "expected_skill": "debugging-and-error-recovery",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-050",
+    "intent": "Something is wrong with the authentication flow, users get logged out randomly",
+    "expected_skill": "debugging-and-error-recovery",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-051",
+    "intent": "The application crashes when processing large files",
+    "expected_skill": "debugging-and-error-recovery",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-052",
+    "intent": "Getting an ImportError for a module that definitely exists",
+    "expected_skill": "debugging-and-error-recovery",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-053",
+    "intent": "Fix the timeout errors in the database layer after the migration",
+    "expected_skill": "debugging-and-error-recovery",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-054",
+    "intent": "The websocket connection drops every few minutes",
+    "expected_skill": "debugging-and-error-recovery",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-055",
+    "intent": "Create a new Django project",
+    "expected_skill": "debugging-and-error-recovery",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-056",
+    "intent": "Write a function to calculate fibonacci numbers",
+    "expected_skill": "debugging-and-error-recovery",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-057",
+    "intent": "Set up the CI/CD pipeline",
+    "expected_skill": "debugging-and-error-recovery",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-058",
+    "intent": "Add a new endpoint to the API",
+    "expected_skill": "debugging-and-error-recovery",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-059",
+    "intent": "Design the database schema for user management",
+    "expected_skill": "debugging-and-error-recovery",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-060",
+    "intent": "Install the required npm packages",
+    "expected_skill": "debugging-and-error-recovery",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-061",
+    "intent": "Configure the logging framework",
+    "expected_skill": "debugging-and-error-recovery",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-062",
+    "intent": "Write documentation for the REST API",
+    "expected_skill": "debugging-and-error-recovery",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-063",
+    "intent": "I need to build a new REST API for managing user accounts",
+    "expected_skill": "spec-driven-development",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-064",
+    "intent": "Let's create a new feature for processing payments with Stripe",
+    "expected_skill": "spec-driven-development",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-065",
+    "intent": "Implement a caching layer for the database queries",
+    "expected_skill": "spec-driven-development",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-066",
+    "intent": "I want to add a new microservice for email notifications",
+    "expected_skill": "spec-driven-development",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-067",
+    "intent": "Build a file upload system with progress tracking",
+    "expected_skill": "spec-driven-development",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-068",
+    "intent": "Create a new module that handles user authentication with OAuth2",
+    "expected_skill": "spec-driven-development",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-069",
+    "intent": "Design and implement a rate limiting system for our API",
+    "expected_skill": "spec-driven-development",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-070",
+    "intent": "We need a new data pipeline for ETL processing from S3",
+    "expected_skill": "spec-driven-development",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-071",
+    "intent": "Fix the typo in the README",
+    "expected_skill": "spec-driven-development",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-072",
+    "intent": "List all Python files in the project",
+    "expected_skill": "spec-driven-development",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-073",
+    "intent": "What does this function do?",
+    "expected_skill": "spec-driven-development",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-074",
+    "intent": "Run the existing test suite and show me the results",
+    "expected_skill": "spec-driven-development",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-075",
+    "intent": "Change the button color to blue",
+    "expected_skill": "spec-driven-development",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-076",
+    "intent": "Print the current working directory",
+    "expected_skill": "spec-driven-development",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-077",
+    "intent": "Show me the git log for the last 5 commits",
+    "expected_skill": "spec-driven-development",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-078",
+    "intent": "Add a trailing newline to config.yaml",
+    "expected_skill": "spec-driven-development",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-079",
+    "intent": "Implement a function that validates email addresses",
+    "expected_skill": "test-driven-development",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-080",
+    "intent": "Write a sorting algorithm for custom objects",
+    "expected_skill": "test-driven-development",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-081",
+    "intent": "Fix the bug where users can't log in with special characters",
+    "expected_skill": "test-driven-development",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-082",
+    "intent": "Refactor the database pool module to handle timeouts",
+    "expected_skill": "test-driven-development",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-083",
+    "intent": "Add input validation to the payment processing endpoint",
+    "expected_skill": "test-driven-development",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-084",
+    "intent": "Implement a parser module for the custom configuration format",
+    "expected_skill": "test-driven-development",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-085",
+    "intent": "Build a rate limiter endpoint with sliding window algorithm",
+    "expected_skill": "test-driven-development",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-086",
+    "intent": "Implement the merge step of the merge sort algorithm",
+    "expected_skill": "test-driven-development",
+    "category": "positive",
+    "description": "Per-skill test: should trigger"
+  },
+  {
+    "id": "eval-087",
+    "intent": "Show me the project directory structure",
+    "expected_skill": "test-driven-development",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-088",
+    "intent": "What version of Python are we using?",
+    "expected_skill": "test-driven-development",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-089",
+    "intent": "List the installed pip packages",
+    "expected_skill": "test-driven-development",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-090",
+    "intent": "Display the contents of README.md",
+    "expected_skill": "test-driven-development",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-091",
+    "intent": "Check the disk space on this server",
+    "expected_skill": "test-driven-development",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-092",
+    "intent": "Tell me what time it is",
+    "expected_skill": "test-driven-development",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-093",
+    "intent": "Show recent git commits",
+    "expected_skill": "test-driven-development",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  },
+  {
+    "id": "eval-094",
+    "intent": "Print the environment variables",
+    "expected_skill": "test-driven-development",
+    "category": "near-miss",
+    "description": "Per-skill test: should not trigger"
+  }
+]

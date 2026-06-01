@@ -90,33 +90,32 @@ class TestSkillCount:
 
 
 class TestTelemetryDefault:
-    """Telemetry default must be consistent across README and config."""
+    """Telemetry default must be privacy-safe (disabled) across README and config."""
 
-    def test_readme_says_enabled_by_default(self):
-        """README must state telemetry is enabled by default."""
+    def test_readme_says_disabled_by_default(self):
+        """README must state telemetry is disabled by default."""
         readme = _read_readme()
-        # Find the telemetry section
-        assert "enabled by default" in readme.lower() or "on by default" in readme.lower(), (
-            "README must state telemetry is 'enabled by default' or 'on by default'"
+        assert "disabled by default" in readme.lower() or "off by default" in readme.lower(), (
+            "README must state telemetry is 'disabled by default' or 'off by default'"
         )
 
-    def test_readme_does_not_say_off_by_default(self):
-        """README must NOT state telemetry is off by default."""
+    def test_readme_does_not_say_enabled_by_default(self):
+        """README must NOT state telemetry is enabled by default."""
         readme = _read_readme()
-        assert "off by default" not in readme.lower(), (
-            "README must not claim telemetry is 'off by default'"
+        assert "enabled by default" not in readme.lower(), (
+            "README must not claim telemetry is 'enabled by default'"
         )
 
-    def test_default_config_telemetry_enabled(self):
-        """default_config.yaml must have telemetry_enabled: true."""
+    def test_default_config_telemetry_disabled(self):
+        """default_config.yaml must have telemetry_enabled: false."""
         config_path = os.path.join(PLUGIN_ROOT, "default_config.yaml")
         if not os.path.exists(config_path):
             pytest.skip("default_config.yaml not found")
         with open(config_path) as f:
             data = yaml.safe_load(f)
         telemetry = data.get("telemetry_enabled")
-        assert telemetry is True, (
-            f"default_config.yaml must have telemetry_enabled: true, got {telemetry}"
+        assert telemetry is False, (
+            f"default_config.yaml must have telemetry_enabled: false, got {telemetry}"
         )
 
 

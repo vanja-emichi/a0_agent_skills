@@ -863,6 +863,17 @@ class TestNewEventTypes:
 # ---------------------------------------------------------------------------
 
 class TestMarkArtifactApproved:
+    def test_unknown_artifact_type_rejected(self, mock_agent):
+        """M-3: Unknown artifact type returns None and does not record approval."""
+        ws = _load_workflow_state()
+        result = ws.mark_artifact_approved(mock_agent, "invalid_type_xyz")
+        assert result is None
+
+        # Verify nothing was written to workflow_artifacts.json
+        artifacts = ws.read_workflow_artifacts(mock_agent)
+        if artifacts:
+            assert "approved" not in artifacts or "invalid_type_xyz" not in artifacts.get("approved", {})
+
     def test_approve_spec_records_approval(self, mock_agent):
         ws = _load_workflow_state()
         # Create workflow_artifacts.json with a spec path
@@ -930,6 +941,205 @@ class TestMarkArtifactApproved:
         assert artifacts["feature_slug"] == "my-feature"
         assert artifacts["approved"]["idea"] is True
         assert artifacts["approved"]["spec"] is True
+
+
+# ---------------------------------------------------------------------------
+# Mtime invalidation (Task 3 — Mtime Invalidation)
+# ---------------------------------------------------------------------------
+
+
+class TestMtimeInvalidation:
+    """Tests for mtime-based approval invalidation.
+
+    Verifies that:
+    - mark_artifact_approved stores the artifact file's mtime
+    - is_artifact_approved returns False if the file was modified after approval
+    - is_artifact_approved returns True if the file is unchanged
+    - Legacy approvals (no mtime stored) are treated as valid
+    - Missing artifact file makes approval invalid
+    - mtime errors are handled gracefully (fail-safe)
+    """
+
+    def _setup_agent_with_artifact(self, tmp_project, artifact_type="spec", content="# Spec\n"):
+        """Create a mock agent with a real artifact file on disk."""
+        import time as _time
+        agent = _make_agent(tmp_project)
+        ws = _load_workflow_state()
+
+        # Create the artifact file on disk so mtime can be read
+        slug = "test-feature"
+        if artifact_type == "spec":
+            artifact_dir = tmp_project / "docs" / "specs"
+            artifact_dir.mkdir(parents=True, exist_ok=True)
+            artifact_path = artifact_dir / f"{slug}-spec.md"
+        elif artifact_type == "plan":
+            artifact_dir = tmp_project / "docs" / "plans"
+            artifact_dir.mkdir(parents=True, exist_ok=True)
+            artifact_path = artifact_dir / f"{slug}-plan.md"
+        elif artifact_type == "todo":
+            artifact_dir = tmp_project / "tasks"
+            artifact_dir.mkdir(parents=True, exist_ok=True)
+            artifact_path = artifact_dir / f"{slug}-todo.md"
+        else:
+            # Generic: use docs/reports/<slug>/
+            artifact_dir = tmp_project / "docs" / "reports" / slug
+            artifact_dir.mkdir(parents=True, exist_ok=True)
+            artifact_path = artifact_dir / f"{artifact_type}.md"
+
+        artifact_path.write_text(content)
+
+        # Set up workflow_artifacts.json with the feature slug
+        ws.save_workflow_artifacts(agent, {
+            "feature_slug": slug,
+        })
+
+        return agent, str(artifact_path)
+
+    def test_mark_stores_mtime(self, mock_agent, tmp_project):
+        """mark_artifact_approved stores approved_mtime in workflow_artifacts.json."""
+        ws = _load_workflow_state()
+        agent, artifact_path = self._setup_agent_with_artifact(tmp_project, "spec")
+
+        result = ws.mark_artifact_approved(agent, "spec")
+        assert result is not None
+
+        artifacts = ws.read_workflow_artifacts(agent)
+        assert "approved_mtime" in artifacts
+        assert "spec" in artifacts["approved_mtime"]
+        stored_mtime = artifacts["approved_mtime"]["spec"]
+        assert isinstance(stored_mtime, float)
+
+        # Verify it matches the actual file mtime
+        import os
+        actual_mtime = os.path.getmtime(artifact_path)
+        assert stored_mtime == actual_mtime
+
+    def test_approval_valid_when_unchanged(self, mock_agent, tmp_project):
+        """is_artifact_approved returns True when artifact unchanged after approval."""
+        ws = _load_workflow_state()
+        agent, artifact_path = self._setup_agent_with_artifact(tmp_project, "spec")
+
+        ws.mark_artifact_approved(agent, "spec")
+
+        # No modification — should still be approved
+        assert ws.is_artifact_approved(agent, "spec") is True
+
+    def test_approval_invalid_after_modification(self, mock_agent, tmp_project):
+        """is_artifact_approved returns False after artifact is modified."""
+        import time as _time
+        ws = _load_workflow_state()
+        agent, artifact_path = self._setup_agent_with_artifact(tmp_project, "spec")
+
+        ws.mark_artifact_approved(agent, "spec")
+        assert ws.is_artifact_approved(agent, "spec") is True
+
+        # Modify the file — ensure mtime changes
+        from pathlib import Path
+        Path(artifact_path).write_text("# Modified Spec\nChanged content")
+        # Force a different mtime (some filesystems have 1s resolution)
+        import os
+        os.utime(artifact_path, (os.path.getmtime(artifact_path) + 2,) * 2)
+
+        # Approval should now be invalidated
+        assert ws.is_artifact_approved(agent, "spec") is False
+
+    def test_legacy_approval_without_mtime_still_valid(self, mock_agent, tmp_project):
+        """Approval records without mtime (legacy) are treated as valid."""
+        ws = _load_workflow_state()
+        agent, artifact_path = self._setup_agent_with_artifact(tmp_project, "spec")
+
+        # Manually write approval without mtime (simulating legacy data)
+        ws.save_workflow_artifacts(agent, {
+            "feature_slug": "test-feature",
+            "approved": {"spec": True},
+            "approved_at": {"spec": 1234567890.0},
+            # No approved_mtime key
+        })
+
+        # Should still be valid (backward compatible)
+        assert ws.is_artifact_approved(agent, "spec") is True
+
+    def test_approval_invalid_when_file_deleted(self, mock_agent, tmp_project):
+        """is_artifact_approved returns False when artifact file is deleted."""
+        ws = _load_workflow_state()
+        agent, artifact_path = self._setup_agent_with_artifact(tmp_project, "spec")
+
+        ws.mark_artifact_approved(agent, "spec")
+        assert ws.is_artifact_approved(agent, "spec") is True
+
+        # Delete the artifact file
+        import os
+        os.remove(artifact_path)
+
+        # Approval should be invalidated (file gone)
+        assert ws.is_artifact_approved(agent, "spec") is False
+
+    def test_mtime_read_error_fail_safe(self, mock_agent, tmp_project):
+        """mtime check errors don't crash — returns safe default."""
+        ws = _load_workflow_state()
+        agent, artifact_path = self._setup_agent_with_artifact(tmp_project, "spec")
+
+        ws.mark_artifact_approved(agent, "spec")
+
+        # Corrupt the mtime value to something non-numeric
+        artifacts = ws.read_workflow_artifacts(agent)
+        artifacts["approved_mtime"]["spec"] = "not_a_number"
+        ws.save_workflow_artifacts(agent, artifacts)
+
+        # Should not crash — fail-safe returns a valid bool
+        result = ws.is_artifact_approved(agent, "spec")
+        assert isinstance(result, bool)
+
+    def test_mtime_works_for_plan_artifact(self, mock_agent, tmp_project):
+        """mtime invalidation works for plan artifacts too."""
+        import os
+        ws = _load_workflow_state()
+        agent, artifact_path = self._setup_agent_with_artifact(tmp_project, "plan")
+
+        ws.mark_artifact_approved(agent, "plan")
+        assert ws.is_artifact_approved(agent, "plan") is True
+
+        # Modify the plan file
+        os.utime(artifact_path, (os.path.getmtime(artifact_path) + 2,) * 2)
+        assert ws.is_artifact_approved(agent, "plan") is False
+
+    def test_mark_preserves_existing_data(self, mock_agent, tmp_project):
+        """mark_artifact_approved preserves all existing workflow_artifacts data."""
+        ws = _load_workflow_state()
+        agent, artifact_path = self._setup_agent_with_artifact(tmp_project, "spec")
+
+        # Pre-populate with existing approval data
+        artifacts = ws.read_workflow_artifacts(agent)
+        artifacts["approved"] = {"idea": True}
+        artifacts["approved_at"] = {"idea": 12345.0}
+        ws.save_workflow_artifacts(agent, artifacts)
+
+        ws.mark_artifact_approved(agent, "spec")
+
+        # Both approvals should be present
+        artifacts = ws.read_workflow_artifacts(agent)
+        assert artifacts["approved"]["idea"] is True
+        assert artifacts["approved"]["spec"] is True
+        assert "spec" in artifacts["approved_mtime"]
+
+    def test_approval_invalid_after_file_replaced(self, mock_agent, tmp_project):
+        """Approval invalidated when artifact file is deleted and recreated."""
+        import os
+        import time as _time
+        ws = _load_workflow_state()
+        agent, artifact_path = self._setup_agent_with_artifact(tmp_project, "spec")
+
+        ws.mark_artifact_approved(agent, "spec")
+        assert ws.is_artifact_approved(agent, "spec") is True
+
+        # Delete and recreate with different content/mtime
+        os.remove(artifact_path)
+        _time.sleep(0.05)  # ensure different timestamp
+        from pathlib import Path
+        Path(artifact_path).write_text("# Brand new spec")
+
+        # New file has a different mtime → approval invalid
+        assert ws.is_artifact_approved(agent, "spec") is False
 
 
 # ---------------------------------------------------------------------------

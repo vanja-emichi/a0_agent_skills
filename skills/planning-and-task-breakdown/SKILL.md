@@ -12,6 +12,8 @@ tags:
   - decomposition
   - estimation
   - workflow
+depends_on:
+  - markdown-documents
 trigger_patterns:
   - planning-and-task-breakdown
   - break this into tasks
@@ -41,6 +43,8 @@ contract:
     - incremental-implementation
     - test-driven-development
   conflicts: []
+depends_on:
+  - spec-driven-development
 ---
 
 # Planning and Task Breakdown

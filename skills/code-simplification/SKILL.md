@@ -24,6 +24,8 @@ trigger_patterns:
   - make this simpler
   - code is confusing
   - unnecessary complexity
+depends_on:
+  - code-review-and-quality
 ---
 
 # Code Simplification

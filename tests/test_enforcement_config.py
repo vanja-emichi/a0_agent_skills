@@ -39,11 +39,11 @@ class TestEnforcementConfigSurface:
             "default_config.yaml must contain enforcement_mode key"
         )
 
-    def test_enforcement_mode_defaults_to_observe(self):
-        """enforcement_mode MUST default to 'observe' (not 'enforce')."""
+    def test_enforcement_mode_is_enforce(self):
+        """enforcement_mode MUST be 'enforce' (Task 6 — enforce mode enabled)."""
         cfg = _load_config()
-        assert cfg.get("enforcement_mode") == "observe", (
-            f"enforcement_mode must be 'observe', got {cfg.get('enforcement_mode')!r}"
+        assert cfg.get("enforcement_mode") == "enforce", (
+            f"enforcement_mode must be 'enforce', got {cfg.get('enforcement_mode')!r}"
         )
 
     def test_enforcement_classifier_model_exists(self):
@@ -67,11 +67,11 @@ class TestEnforcementConfigSurface:
             "default_config.yaml must contain enforcement_shadow_sample_rate key"
         )
 
-    def test_enforcement_shadow_sample_rate_defaults_to_zero(self):
-        """enforcement_shadow_sample_rate MUST default to 0.0 (disabled)."""
+    def test_enforcement_shadow_sample_rate_defaults_to_0_1(self):
+        """enforcement_shadow_sample_rate MUST be 0.1 (10% shadow sampling enabled for Task 4)."""
         cfg = _load_config()
-        assert cfg.get("enforcement_shadow_sample_rate") == 0.0, (
-            f"enforcement_shadow_sample_rate must be 0.0, got {cfg.get('enforcement_shadow_sample_rate')!r}"
+        assert cfg.get("enforcement_shadow_sample_rate") == 0.1, (
+            f"enforcement_shadow_sample_rate must be 0.1, got {cfg.get('enforcement_shadow_sample_rate')!r}"
         )
 
 
@@ -83,11 +83,11 @@ class TestEnforcementConfigSurface:
 class TestTelemetryDefaultsPreserved:
     """Existing telemetry defaults MUST remain unchanged after enforcement config addition."""
 
-    def test_telemetry_enabled_still_true(self):
-        """telemetry_enabled MUST still be true."""
+    def test_telemetry_enabled_still_false(self):
+        """telemetry_enabled MUST still be false (privacy-safe default)."""
         cfg = _load_config()
-        assert cfg.get("telemetry_enabled") is True, (
-            f"telemetry_enabled must remain true, got {cfg.get('telemetry_enabled')!r}"
+        assert cfg.get("telemetry_enabled") is False, (
+            f"telemetry_enabled must remain false, got {cfg.get('telemetry_enabled')!r}"
         )
 
     def test_telemetry_log_path_unchanged(self):

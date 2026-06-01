@@ -10,6 +10,8 @@ tags:
   - specification
   - planning
   - requirements
+depends_on:
+  - markdown-documents
   - architecture
   - design
 trigger_patterns:

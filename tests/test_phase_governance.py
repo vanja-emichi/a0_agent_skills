@@ -89,6 +89,7 @@ class TestPhaseSkillMap:
         assert pg.PHASE_SKILL_MAP["DEFINE"] == [
             "interview-me",
             "spec-driven-development",
+            "idea-refine",
         ]
 
     def test_plan_skills(self):

@@ -8,6 +8,17 @@ Follow the skill's complete TDD process for the request below.
 
 {raw}
 
+If an active spec exists, resolve its path and read it for test criteria and acceptance boundaries:
+
+```python
+from helpers.workflow_state import resolve_artifact_paths, discover_feature_slug
+slug = discover_feature_slug(agent)
+paths = resolve_artifact_paths(agent, slug=slug)
+spec_path = paths["spec"]
+```
+
+When `spec_path` exists, use the spec's success criteria and boundaries to guide test coverage.
+
 ## For new features (RED → GREEN → REFACTOR):
 
 1. **RED** — Write tests that describe the expected behavior. They MUST FAIL.

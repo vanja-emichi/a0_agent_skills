@@ -24,7 +24,9 @@ from __future__ import annotations
 import importlib.util
 import logging
 import os
+import re
 import sys
+import time as _time
 from typing import TYPE_CHECKING
 
 from agent import LoopData
@@ -168,6 +170,114 @@ def _format_next_skill_hints(skill_names: list[str], cfg: dict) -> str | None:
         return None
 
 
+# TTL-based cache for _scan_active_specs — avoids glob + file reads on
+# every message loop iteration.  Mirrors the pattern in build_skill_graph().
+_specs_cache: list | None = None
+_specs_cache_ts: float = 0.0
+_SPECS_CACHE_TTL: float = 30.0  # seconds
+
+
+def _reset_specs_cache() -> None:
+    """Clear the specs cache (for test teardown)."""
+    global _specs_cache, _specs_cache_ts
+    _specs_cache = None
+    _specs_cache_ts = 0.0
+
+
+def _scan_active_specs(agent) -> list[dict]:
+    """Scan docs/specs/ for spec files and return non-shipped ones.
+
+    Results are cached for _SPECS_CACHE_TTL seconds to avoid redundant
+    filesystem I/O on every message loop iteration.
+
+    Returns list of dicts with 'name', 'path', 'status' keys.
+    Specs with Status: SHIPPED or Status: Approved are excluded.
+    Fail-safe: returns empty list on any error.
+    """
+    global _specs_cache, _specs_cache_ts
+
+    # Return cached result if still fresh
+    if _specs_cache is not None and (_time.time() - _specs_cache_ts < _SPECS_CACHE_TTL):
+        return _specs_cache
+
+    try:
+        import glob as _glob
+
+        # Resolve project directory from agent context
+        project_dir = None
+        try:
+            helpers_mod = sys.modules.get("helpers")
+            if helpers_mod and hasattr(helpers_mod, "projects"):
+                proj_name = helpers_mod.projects.get_context_project_name(agent)
+                if proj_name:
+                    project_dir = helpers_mod.projects.get_project_folder(proj_name)
+        except Exception:
+            pass
+
+        if not project_dir:
+            return []
+
+        specs_dir = os.path.join(project_dir, "docs", "specs")
+        if not os.path.isdir(specs_dir):
+            return []
+
+        # Patterns for Status field in markdown header
+        _STATUS_RE = re.compile(r"^\*\*Status:\*\*\s*(.+)$", re.MULTILINE)
+        _COMPLETED_STATUSES = frozenset({
+            "shipped", "approved", "complete", "completed", "done",
+        })
+
+        active_specs = []
+        for spec_file in sorted(_glob.glob(os.path.join(specs_dir, "*-spec.md"))):
+            try:
+                with open(spec_file, "r", encoding="utf-8") as f:
+                    # Read only first 2KB for performance
+                    header = f.read(2048)
+
+                match = _STATUS_RE.search(header)
+                status = match.group(1).strip() if match else "Draft"
+
+                # Filter out completed specs
+                if status.lower() in _COMPLETED_STATUSES:
+                    continue
+
+                name = os.path.basename(spec_file)
+                # Show relative path from project root
+                rel_path = os.path.relpath(spec_file, project_dir)
+                active_specs.append({
+                    "name": name,
+                    "path": rel_path,
+                    "status": status,
+                })
+            except Exception:
+                continue
+
+        # Cache the result
+        _specs_cache = active_specs
+        _specs_cache_ts = _time.time()
+        return active_specs
+
+    except Exception:
+        return []
+
+
+def _format_active_specs_block(specs: list[dict]) -> str | None:
+    """Format active (non-shipped) specs into a state block section."""
+    try:
+        if not specs:
+            return None
+
+        lines = ["", "## Active Specs (Not Yet Shipped)", ""]
+        for spec in specs:
+            status_tag = f" ({spec['status']})" if spec.get('status') else ""
+            lines.append(f"- {spec['path']}{status_tag}")
+        lines.append("")
+        return "\n".join(lines)
+
+    except Exception:
+        return None
+
+
 def _extract_skill_names(state: dict) -> list[str]:
     skills = state.get("loaded_skills")
     if not skills:
@@ -244,6 +354,13 @@ class ReattachWorkflowState(Extension):
                 hints_block = _format_next_skill_hints(skill_names, cfg)
                 if hints_block:
                     state_block += hints_block
+
+            # Scan for active (non-shipped) specs to help agent avoid
+            # proposing already-completed work.
+            active_specs = _scan_active_specs(self.agent)
+            specs_block = _format_active_specs_block(active_specs)
+            if specs_block:
+                state_block += specs_block
 
             if state_block:
                 loop_data.extras_persistent["workflow_state"] = state_block

@@ -32,6 +32,8 @@ trigger_patterns:
   - reduce latency
   - response time this api
   - improve the response time
+depends_on:
+  - code-review-and-quality
 ---
 
 # Performance Optimization

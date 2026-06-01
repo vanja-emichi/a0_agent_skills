@@ -64,6 +64,10 @@ def _make_agent(
     agent.loop_data = MagicMock()
     agent.loop_data.current_tool = current_tool
 
+    # Prevent MagicMock file leaks: set context to None so that
+    # resolve_state_dir() and _resolve_log_file() bail out early.
+    agent.context = None
+
     return agent
 
 
@@ -73,6 +77,8 @@ def _make_config(*, enforcement_mode: str = "observe"):
         "enforcement_mode": enforcement_mode,
         "telemetry_enabled": True,
         "telemetry_log_path": ".a0proj/skill_activations.jsonl",
+        "phase_governance_enabled": False,
+        "skill_contracts_enabled": False,
     }
 
 

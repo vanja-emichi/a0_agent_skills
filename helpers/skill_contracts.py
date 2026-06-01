@@ -72,6 +72,7 @@ _EMPTY_GRAPH_ENTRY: dict[str, Any] = {
     "artifacts": [],
     "verification": [],
     "contract": {},
+    "depends_on": [],
 }
 
 
@@ -296,6 +297,12 @@ def build_skill_graph(
                 else:
                     contract = {}
 
+                # depends_on is a top-level frontmatter field
+                raw_deps = frontmatter.get("depends_on", []) if frontmatter else []
+                if not isinstance(raw_deps, list):
+                    raw_deps = []
+                deps = _validate_name_list(raw_deps, known_skills, "depends_on")
+
                 graph[skill_name] = {
                     "phase": contract.get("phase"),
                     "next_skills": contract.get("next_skills", []),
@@ -304,6 +311,7 @@ def build_skill_graph(
                     "artifacts": contract.get("artifacts", []),
                     "verification": contract.get("verification", []),
                     "contract": contract,
+                    "depends_on": deps,
                 }
             except Exception:
                 _log.debug("Failed to process skill: %s", skill_name, exc_info=True)
@@ -363,6 +371,71 @@ def get_skill_conflicts(skill_name: str) -> list[str]:
             return []
         return list(entry.get("conflicts", []))
     except Exception:
+        return []
+
+
+def get_skill_dependencies(skill_name: str) -> list[str]:
+    """Return direct dependencies for a skill from the graph."""
+    try:
+        graph = build_skill_graph()
+        entry = graph.get(skill_name)
+        if entry is None:
+            return []
+        return list(entry.get("depends_on", []))
+    except Exception:
+        return []
+
+
+def resolve_dependencies(
+    skill_name: str,
+    already_loaded: set[str] | None = None,
+    graph: dict | None = None,
+) -> list[str]:
+    """Return ordered list of prerequisite skill names that need loading.
+
+    Uses topological sort on the skill dependency graph (depends_on edges).
+    Skills already in ``already_loaded`` are skipped.
+    Cycles are detected and broken (cycle members excluded from result).
+
+    Returns:
+        List of skill names in load order (prerequisites first).
+        Empty list if no dependencies or skill not found.
+    """
+    try:
+        if already_loaded is None:
+            already_loaded = set()
+        if graph is None:
+            graph = build_skill_graph()
+
+        if skill_name not in graph:
+            return []
+
+        result: list[str] = []
+        visited: set[str] = set()
+        in_stack: set[str] = set()
+
+        def _dfs(name: str) -> None:
+            if name in visited:
+                return
+            if name in in_stack:
+                # Cycle detected — skip this node
+                _log.warning("Dependency cycle detected involving '%s'", name)
+                return
+            in_stack.add(name)
+            deps = graph.get(name, {}).get("depends_on", [])
+            for dep in deps:
+                if dep not in already_loaded:
+                    _dfs(dep)
+            in_stack.discard(name)
+            visited.add(name)
+            if name != skill_name and name not in already_loaded:
+                result.append(name)
+
+        _dfs(skill_name)
+        return result
+
+    except Exception:
+        _log.debug("Failed to resolve dependencies for '%s'", skill_name, exc_info=True)
         return []
 
 

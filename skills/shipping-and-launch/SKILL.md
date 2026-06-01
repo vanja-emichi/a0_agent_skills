@@ -37,6 +37,8 @@ contract:
     - Rollback plan exists
   next_skills: []
   conflicts: []
+depends_on:
+  - code-review-and-quality
 ---
 
 # Shipping and Launch

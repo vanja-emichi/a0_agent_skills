@@ -1,0 +1,17 @@
+{
+    "telemetry_enabled": true,
+    "telemetry_log_path": ".a0proj/skill_activations.jsonl",
+    "telemetry_max_lines": 0,
+    "enforcement_mode": "enforce",
+    "enforcement_classifier_model": null,
+    "enforcement_shadow_sample_rate": 0.1,
+    "workflow_state_enabled": true,
+    "workflow_state_path": ".a0proj/state",
+    "max_progress_entries": 10000,
+    "artifact_inference_enabled": true,
+    "phase_governance_enabled": true,
+    "enforcement_correction_cooldown_seconds": 300,
+    "skill_contracts_enabled": true,
+    "skill_graph_validate_on_build": true,
+    "skill_next_skill_hints": true
+}

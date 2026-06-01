@@ -32,10 +32,9 @@ import importlib.util
 import os
 import sys as _sys
 
+# sys.path injection is handled by __init__.py (canonical location).
+# _PLUGIN_ROOT retained for _bootstrap_plugin_loader() path resolution.
 _PLUGIN_ROOT = os.path.dirname(os.path.abspath(__file__))
-_PLUGIN_HELPERS = os.path.join(_PLUGIN_ROOT, "helpers")
-if _PLUGIN_HELPERS not in _sys.path:
-    _sys.path.insert(0, _PLUGIN_HELPERS)
 
 
 def _bootstrap_plugin_loader():

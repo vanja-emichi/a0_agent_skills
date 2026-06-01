@@ -374,3 +374,24 @@ class TestClassifySkillEdgeCases:
         assert result["state"] in ("should_correct", "should_not_correct")
         if result["state"] == "should_correct":
             assert result["candidate"] == "source-driven-development"
+
+    @patch("helpers.skill_match.search_skills", return_value=[])
+    def test_wrapped_json_in_markdown_fences(self, _mock):
+        """Bug #1: classifier returns JSON wrapped in markdown code fences.
+
+        _extract_json_object should find the JSON and the result should be
+        should_correct, NOT classifier_unavailable.
+        """
+        from helpers.skill_match import classify_skill
+        skill = _make_skill("spec-driven-development")
+        agent = _make_agent(
+            loaded_skills=[],
+            utility_response='```json\n{"should_load": true, "reason": "need spec"}\n```'
+        )
+
+        result = asyncio.run(
+            classify_skill(agent, "code_execution_tool", {}, [skill], "write spec")
+        )
+        assert result["state"] == "should_correct"
+        assert result["candidate"] == "spec-driven-development"
+        assert "spec" in result["reason"]

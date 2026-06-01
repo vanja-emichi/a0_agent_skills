@@ -38,6 +38,8 @@ contract:
   next_skills:
     - shipping-and-launch
   conflicts: []
+depends_on:
+  - spec-driven-development
 ---
 
 # Code Review and Quality

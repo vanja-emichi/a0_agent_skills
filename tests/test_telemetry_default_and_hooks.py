@@ -19,7 +19,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from conftest import _make_extension, PLUGIN_ROOT
+from conftest import _make_extension, PLUGIN_ROOT, _doc_path
 
 
 def _run(coro):
@@ -28,34 +28,30 @@ def _run(coro):
 
 
 # ===========================================================================
-# BUG FIX 1: Telemetry defaults to ON
+# BUG FIX 1: Telemetry defaults to OFF (privacy-safe)
 # ===========================================================================
 
-def test_telemetry_default_config_says_enabled():
-    """default_config.yaml MUST have telemetry_enabled: true."""
+def test_telemetry_default_config_says_disabled():
+    """default_config.yaml MUST have telemetry_enabled: false."""
     config_path = PLUGIN_ROOT / "default_config.yaml"
     assert config_path.exists(), "default_config.yaml must exist"
     cfg = yaml.safe_load(config_path.read_text())
-    assert cfg.get("telemetry_enabled") is True, (
-        f"telemetry_enabled must default to true, got {cfg.get('telemetry_enabled')}"
+    assert cfg.get("telemetry_enabled") is False, (
+        f"telemetry_enabled must default to false, got {cfg.get('telemetry_enabled')}"
     )
 
 
-def test_telemetry_code_default_is_true():
-    """When no config exists, telemetry MUST still fire (default True)."""
+def test_telemetry_code_default_is_false():
+    """When no config exists, telemetry MUST NOT fire (default False)."""
     ext, plugins_mock, agent = _make_extension(config={})
 
     with patch("helpers.plugins", plugins_mock), \
          patch(
              "extensions.python.tool_execute_after._05_skill_telemetry._write_log_line"
-         ) as mock_write, \
-         patch(
-             "extensions.python.tool_execute_after._05_skill_telemetry._resolve_log_file",
-             return_value="/tmp/test.jsonl",
-         ):
+         ) as mock_write:
         _run(ext.execute(tool_name="skills_tool"))
-        # With default True and no config, telemetry SHOULD attempt to write
-        mock_write.assert_called_once()
+        # With default False and no config, telemetry SHOULD NOT write
+        mock_write.assert_not_called()
 
 
 def test_telemetry_explicit_disable_respected():
@@ -98,16 +94,13 @@ def test_telemetry_string_true_enables():
         mock_write.assert_called_once()
 
 
-def test_telemetry_docstring_says_enabled():
-    """The telemetry source docstring MUST reflect default enabled."""
+def test_telemetry_docstring_says_disabled():
+    """The telemetry source docstring MUST reflect default disabled (privacy-safe)."""
     import importlib
     mod_path = PLUGIN_ROOT / "extensions" / "python" / "tool_execute_after" / "_05_skill_telemetry.py"
     content = mod_path.read_text()
-    assert "telemetry_enabled: true" in content, (
-        "Docstring must say telemetry_enabled: true"
-    )
-    assert "telemetry_enabled: false" not in content, (
-        "Default should be true, not false"
+    assert "telemetry_enabled: false" in content, (
+        "Docstring must say telemetry_enabled: false"
     )
 
 
@@ -268,13 +261,13 @@ def test_telemetry_integer_zero_disables():
 
 def test_hook_alignment_doc_exists():
     """docs/hook-alignment.md MUST exist after Task 12."""
-    doc_path = PLUGIN_ROOT / "docs" / "hook-alignment.md"
+    doc_path = _doc_path("hook-alignment.md")
     assert doc_path.exists(), "docs/hook-alignment.md must exist"
 
 
 def test_hook_alignment_doc_has_all_nine_upstream_assets():
     """The hook alignment doc MUST classify all 9 upstream hook assets."""
-    doc_path = PLUGIN_ROOT / "docs" / "hook-alignment.md"
+    doc_path = _doc_path("hook-alignment.md")
     content = doc_path.read_text()
 
     upstream_assets = [
@@ -294,7 +287,7 @@ def test_hook_alignment_doc_has_all_nine_upstream_assets():
 
 def test_hook_alignment_doc_has_three_classifications():
     """The hook alignment doc MUST use PORT, DEFER, and OMIT classifications."""
-    doc_path = PLUGIN_ROOT / "docs" / "hook-alignment.md"
+    doc_path = _doc_path("hook-alignment.md")
     content = doc_path.read_text()
 
     assert "PORT" in content, "hook-alignment.md must define PORT classification"
@@ -304,7 +297,7 @@ def test_hook_alignment_doc_has_three_classifications():
 
 def test_hook_alignment_doc_summary_matches_hooks_py():
     """The summary in hook-alignment.md MUST match the summary in hooks.py."""
-    doc_path = PLUGIN_ROOT / "docs" / "hook-alignment.md"
+    doc_path = _doc_path("hook-alignment.md")
     hooks_path = PLUGIN_ROOT / "hooks.py"
 
     doc_content = doc_path.read_text()
@@ -323,7 +316,7 @@ def test_hook_alignment_doc_summary_matches_hooks_py():
 
 def test_hook_alignment_doc_has_hook_families():
     """The hook alignment doc MUST define policies for session-start, simplify-ignore, and sdd-cache families."""
-    doc_path = PLUGIN_ROOT / "docs" / "hook-alignment.md"
+    doc_path = _doc_path("hook-alignment.md")
     content = doc_path.read_text()
 
     assert "session-start family" in content.lower() or "session-start" in content
@@ -333,7 +326,7 @@ def test_hook_alignment_doc_has_hook_families():
 
 def test_surface_mapping_hooks_section_references_alignment_doc():
     """The surface mapping doc MUST reference hook-alignment.md."""
-    mapping_path = PLUGIN_ROOT / "docs" / "managed-fork-surface-mapping.md"
+    mapping_path = _doc_path("managed-fork-surface-mapping.md")
     if not mapping_path.exists():
         pytest.skip("surface mapping doc not yet created")
     content = mapping_path.read_text()

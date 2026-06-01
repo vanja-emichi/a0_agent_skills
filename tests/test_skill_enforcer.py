@@ -30,6 +30,8 @@ import pytest
 
 from conftest import _make_extension, PLUGIN_ROOT
 
+import random as _random
+
 
 def _run(coro):
     """Run a coroutine in a fresh event loop."""
@@ -48,8 +50,9 @@ def _make_enforcer_agent(
     agent.data = {"loaded_skills": list(loaded_skills or [])}
 
     # last_user_message attribute (agent.last_user_message)
+    # Framework Message class stores text in .content, not .message
     msg = MagicMock()
-    msg.message = last_user_message
+    msg.content = last_user_message
     agent.last_user_message = msg
 
     # loop_data for tool info
@@ -58,6 +61,10 @@ def _make_enforcer_agent(
     current_tool.args = {"code": "print('hello')"}
     agent.loop_data = MagicMock()
     agent.loop_data.current_tool = current_tool
+
+    # Prevent MagicMock file leaks: set context to None so that
+    # resolve_state_dir() and _resolve_log_file() bail out early.
+    agent.context = None
 
     return agent
 
@@ -72,6 +79,8 @@ def _make_config(
         "enforcement_mode": enforcement_mode,
         "telemetry_enabled": telemetry_enabled,
         "telemetry_log_path": ".a0proj/skill_activations.jsonl",
+        "phase_governance_enabled": False,
+        "skill_contracts_enabled": False,
     }
 
 
@@ -1506,9 +1515,12 @@ class TestContractAwareEnforcer:
             "reason": "skill not loaded",
         }
 
+        cfg = _make_config(enforcement_mode="enforce")
+        cfg["skill_contracts_enabled"] = True
+
         with patch(
             "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
-            return_value=_make_config(enforcement_mode="enforce"),
+            return_value=cfg,
         ), patch(
             "helpers.skill_match.prefilter_match",
             return_value=[skill],
@@ -1638,9 +1650,12 @@ class TestContractAwareEnforcer:
         skill = MagicMock()
         skill.name = "test-driven-development"
 
+        cfg = _make_config(enforcement_mode="observe")
+        cfg["skill_contracts_enabled"] = True
+
         with patch(
             "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
-            return_value=_make_config(enforcement_mode="observe"),
+            return_value=cfg,
         ), patch(
             "helpers.skill_match.prefilter_match",
             return_value=[skill],
@@ -1706,3 +1721,796 @@ class TestContractAwareEnforcer:
         src = inspect.getsource(SkillEnforcer.execute)
         assert "try:" in src
         assert "except Exception" in src
+
+
+# ===========================================================================
+# Graph validation on build config (skill_graph_validate_on_build)
+# ===========================================================================
+
+
+class TestGraphValidateOnBuild:
+    """Verify skill_graph_validate_on_build config is wired correctly."""
+
+    def test_validate_graph_called_when_enabled(self):
+        """validate_graph() is called when skill_graph_validate_on_build is true."""
+        from extensions.python.tool_execute_before._10_skill_enforcer import (
+            SkillEnforcer,
+        )
+        ext = SkillEnforcer.__new__(SkillEnforcer)
+        ext.agent = _make_enforcer_agent()
+
+        cfg = _make_config(enforcement_mode="observe")
+        cfg["skill_graph_validate_on_build"] = True
+
+        with patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
+            return_value=cfg,
+        ), patch(
+            "helpers.skill_match.prefilter_match",
+            return_value=[],
+        ), patch(
+            "extensions.python.tool_execute_after._05_skill_telemetry.log_gate_decision",
+            new_callable=AsyncMock,
+        ), patch(
+            "helpers.skill_contracts.validate_graph",
+            return_value=[],
+        ) as mock_validate:
+            _run(ext.execute(tool_name="code_execution_tool", tool_args={"code": "x = 1"}))
+            mock_validate.assert_called_once()
+
+    def test_validate_graph_not_called_when_disabled(self):
+        """validate_graph() is NOT called when skill_graph_validate_on_build is false."""
+        from extensions.python.tool_execute_before._10_skill_enforcer import (
+            SkillEnforcer,
+        )
+        ext = SkillEnforcer.__new__(SkillEnforcer)
+        ext.agent = _make_enforcer_agent()
+
+        cfg = _make_config(enforcement_mode="observe")
+        cfg["skill_graph_validate_on_build"] = False
+
+        with patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
+            return_value=cfg,
+        ), patch(
+            "helpers.skill_match.prefilter_match",
+            return_value=[],
+        ), patch(
+            "extensions.python.tool_execute_after._05_skill_telemetry.log_gate_decision",
+            new_callable=AsyncMock,
+        ), patch(
+            "helpers.skill_contracts.validate_graph",
+            return_value=[],
+        ) as mock_validate:
+            _run(ext.execute(tool_name="code_execution_tool", tool_args={"code": "x = 1"}))
+            mock_validate.assert_not_called()
+
+    def test_validate_graph_warnings_logged_on_findings(self):
+        """Findings from validate_graph() are logged as warnings."""
+        from extensions.python.tool_execute_before._10_skill_enforcer import (
+            SkillEnforcer,
+        )
+        ext = SkillEnforcer.__new__(SkillEnforcer)
+        ext.agent = _make_enforcer_agent()
+
+        cfg = _make_config(enforcement_mode="observe")
+        cfg["skill_graph_validate_on_build"] = True
+
+        fake_findings = [
+            {"type": "broken_ref", "details": "skill-a references non-existent next_skill: skill-z"},
+        ]
+
+        with patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
+            return_value=cfg,
+        ), patch(
+            "helpers.skill_match.prefilter_match",
+            return_value=[],
+        ), patch(
+            "extensions.python.tool_execute_after._05_skill_telemetry.log_gate_decision",
+            new_callable=AsyncMock,
+        ), patch(
+            "helpers.skill_contracts.validate_graph",
+            return_value=fake_findings,
+        ), patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer._log",
+        ) as mock_log:
+            _run(ext.execute(tool_name="code_execution_tool", tool_args={"code": "x = 1"}))
+            mock_log.warning.assert_called()
+            call_args = mock_log.warning.call_args_list
+            assert any("broken_ref" in str(c) or "non-existent" in str(c) for c in call_args)
+
+    def test_validate_graph_exception_does_not_propagate(self):
+        """validate_graph() exception is swallowed by top-level try/except."""
+        from extensions.python.tool_execute_before._10_skill_enforcer import (
+            SkillEnforcer,
+        )
+        ext = SkillEnforcer.__new__(SkillEnforcer)
+        ext.agent = _make_enforcer_agent()
+
+        cfg = _make_config(enforcement_mode="observe")
+        cfg["skill_graph_validate_on_build"] = True
+
+        with patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
+            return_value=cfg,
+        ), patch(
+            "helpers.skill_contracts.validate_graph",
+            side_effect=RuntimeError("graph explosion"),
+        ), patch(
+            "helpers.skill_match.prefilter_match",
+            return_value=[],
+        ), patch(
+            "extensions.python.tool_execute_after._05_skill_telemetry.log_gate_decision",
+            new_callable=AsyncMock,
+        ):
+            # Must not raise
+            _run(ext.execute(tool_name="code_execution_tool", tool_args={"code": "x = 1"}))
+
+    def test_validate_graph_called_at_most_once_per_session(self):
+        """validate_graph() is called once, then skipped on subsequent execute() calls."""
+        from extensions.python.tool_execute_before._10_skill_enforcer import (
+            SkillEnforcer,
+            _reset_helpers_cache,
+        )
+
+        # Reset to ensure clean state
+        _reset_helpers_cache()
+
+        try:
+            ext = SkillEnforcer.__new__(SkillEnforcer)
+            ext.agent = _make_enforcer_agent()
+
+            cfg = _make_config(enforcement_mode="observe")
+            cfg["skill_graph_validate_on_build"] = True
+
+            with patch(
+                "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
+                return_value=cfg,
+            ), patch(
+                "helpers.skill_match.prefilter_match",
+                return_value=[],
+            ), patch(
+                "extensions.python.tool_execute_after._05_skill_telemetry.log_gate_decision",
+                new_callable=AsyncMock,
+            ), patch(
+                "helpers.skill_contracts.validate_graph",
+                return_value=[],
+            ) as mock_validate:
+                # First call — should invoke validate_graph
+                _run(ext.execute(tool_name="code_execution_tool", tool_args={"code": "x = 1"}))
+                assert mock_validate.call_count == 1
+
+                # Second call — should NOT invoke validate_graph again
+                _run(ext.execute(tool_name="code_execution_tool", tool_args={"code": "y = 2"}))
+                assert mock_validate.call_count == 1  # still 1, not 2
+
+                # Third call — still skipped
+                _run(ext.execute(tool_name="text_editor", tool_args={"action": "read", "path": "/tmp/f.py"}))
+                assert mock_validate.call_count == 1  # still 1
+        finally:
+            _reset_helpers_cache()
+
+
+# ===========================================================================
+# Shadow sampling (Task 4)
+# ===========================================================================
+
+
+def _make_shadow_config(
+    *,
+    enforcement_mode: str = "observe",
+    shadow_sample_rate: float = 0.0,
+    telemetry_enabled: bool = True,
+):
+    """Create a plugin config dict with shadow sampling support."""
+    return {
+        "enforcement_mode": enforcement_mode,
+        "telemetry_enabled": telemetry_enabled,
+        "telemetry_log_path": ".a0proj/skill_activations.jsonl",
+        "phase_governance_enabled": False,
+        "skill_contracts_enabled": False,
+        "enforcement_shadow_sample_rate": shadow_sample_rate,
+    }
+
+
+class TestShadowSampling:
+    """Verify shadow sampling logic in observe mode.
+
+    Shadow sampling means: on N% of tool calls, run the classifier in
+    observe mode to collect accuracy data WITHOUT affecting behavior.
+    """
+
+    def _setup_enforcer(self, *, loaded_skills=None, last_user_message="implement feature"):
+        """Create a fresh enforcer extension with mock agent."""
+        from extensions.python.tool_execute_before._10_skill_enforcer import (
+            SkillEnforcer,
+            _reset_helpers_cache,
+        )
+        ext = SkillEnforcer.__new__(SkillEnforcer)
+        ext.agent = _make_enforcer_agent(
+            loaded_skills=loaded_skills or [],
+            last_user_message=last_user_message,
+        )
+        return ext
+
+    def _make_skill(self, name="test-driven-development"):
+        skill = MagicMock()
+        skill.name = name
+        return skill
+
+    def test_shadow_rate_zero_does_not_call_classifier(self):
+        """With shadow_sample_rate=0.0, classifier is NOT called."""
+        ext = self._setup_enforcer(loaded_skills=[])
+        skill = self._make_skill()
+
+        with patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
+            return_value=_make_shadow_config(shadow_sample_rate=0.0),
+        ), patch(
+            "helpers.skill_match.prefilter_match",
+            return_value=[skill],
+        ), patch(
+            "extensions.python.tool_execute_after._05_skill_telemetry.log_gate_decision",
+            new_callable=AsyncMock,
+        ), patch(
+            "helpers.skill_match.classify_skill",
+            new_callable=AsyncMock,
+        ) as mock_classify:
+            _run(ext.execute(
+                tool_name="code_execution_tool",
+                tool_args={"code": "x = 1"},
+            ))
+            mock_classify.assert_not_called()
+
+    def test_shadow_rate_one_always_calls_classifier(self):
+        """With shadow_sample_rate=1.0 and random() < 1.0, classifier IS called."""
+        ext = self._setup_enforcer(loaded_skills=[])
+        skill = self._make_skill()
+
+        classify_result = {
+            "state": "should_not_correct",
+            "candidate": None,
+            "reason": "trivial task",
+        }
+
+        with patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
+            return_value=_make_shadow_config(shadow_sample_rate=1.0),
+        ), patch(
+            "helpers.skill_match.prefilter_match",
+            return_value=[skill],
+        ), patch(
+            "extensions.python.tool_execute_after._05_skill_telemetry.log_gate_decision",
+            new_callable=AsyncMock,
+        ), patch(
+            "helpers.skill_match.classify_skill",
+            new_callable=AsyncMock,
+            return_value=classify_result,
+        ) as mock_classify, patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer.random.random",
+            return_value=0.5,
+        ):
+            _run(ext.execute(
+                tool_name="code_execution_tool",
+                tool_args={"code": "x = 1"},
+            ))
+            mock_classify.assert_called_once()
+
+    def test_shadow_sample_skipped_when_random_above_rate(self):
+        """With shadow_sample_rate=0.1 and random()=0.5 (>0.1), classifier NOT called."""
+        ext = self._setup_enforcer(loaded_skills=[])
+        skill = self._make_skill()
+
+        with patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
+            return_value=_make_shadow_config(shadow_sample_rate=0.1),
+        ), patch(
+            "helpers.skill_match.prefilter_match",
+            return_value=[skill],
+        ), patch(
+            "extensions.python.tool_execute_after._05_skill_telemetry.log_gate_decision",
+            new_callable=AsyncMock,
+        ), patch(
+            "helpers.skill_match.classify_skill",
+            new_callable=AsyncMock,
+        ) as mock_classify, patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer.random.random",
+            return_value=0.5,
+        ):
+            _run(ext.execute(
+                tool_name="code_execution_tool",
+                tool_args={"code": "x = 1"},
+            ))
+            mock_classify.assert_not_called()
+
+    def test_shadow_sample_triggered_when_random_below_rate(self):
+        """With shadow_sample_rate=0.1 and random()=0.05 (<0.1), classifier IS called."""
+        ext = self._setup_enforcer(loaded_skills=[])
+        skill = self._make_skill()
+
+        classify_result = {
+            "state": "should_correct",
+            "candidate": "test-driven-development",
+            "reason": "writing tests is expected",
+        }
+
+        with patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
+            return_value=_make_shadow_config(shadow_sample_rate=0.1),
+        ), patch(
+            "helpers.skill_match.prefilter_match",
+            return_value=[skill],
+        ), patch(
+            "extensions.python.tool_execute_after._05_skill_telemetry.log_gate_decision",
+            new_callable=AsyncMock,
+        ) as mock_log, patch(
+            "helpers.skill_match.classify_skill",
+            new_callable=AsyncMock,
+            return_value=classify_result,
+        ) as mock_classify, patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer.random.random",
+            return_value=0.05,
+        ):
+            _run(ext.execute(
+                tool_name="code_execution_tool",
+                tool_args={"code": "x = 1"},
+            ))
+            mock_classify.assert_called_once()
+            # Shadow result logged with mode='observe_shadow'
+            assert mock_log.call_count == 2  # would-fire + shadow
+            shadow_call = mock_log.call_args_list[1]
+            assert shadow_call[1]["mode"] == "observe_shadow"
+            assert shadow_call[1]["state"] == "should_correct"
+
+    def test_shadow_no_corrections_injected(self):
+        """Shadow sample says should_correct but NO corrective warning appended."""
+        ext = self._setup_enforcer(loaded_skills=[])
+        ext.agent.hist_add_message = MagicMock()
+        skill = self._make_skill()
+
+        classify_result = {
+            "state": "should_correct",
+            "candidate": "test-driven-development",
+            "reason": "writing tests is expected",
+        }
+
+        with patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
+            return_value=_make_shadow_config(shadow_sample_rate=1.0),
+        ), patch(
+            "helpers.skill_match.prefilter_match",
+            return_value=[skill],
+        ), patch(
+            "extensions.python.tool_execute_after._05_skill_telemetry.log_gate_decision",
+            new_callable=AsyncMock,
+        ), patch(
+            "helpers.skill_match.classify_skill",
+            new_callable=AsyncMock,
+            return_value=classify_result,
+        ), patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer.random.random",
+            return_value=0.5,
+        ):
+            _run(ext.execute(
+                tool_name="code_execution_tool",
+                tool_args={"code": "x = 1"},
+            ))
+            # hist_add_message must NOT be called — shadow is data collection only
+            ext.agent.hist_add_message.assert_not_called()
+
+    def test_shadow_does_not_mutate_tool_args(self):
+        """Shadow sampling MUST NOT mutate tool_args."""
+        ext = self._setup_enforcer(loaded_skills=[])
+        skill = self._make_skill()
+        tool_args = {"code": "x = 1"}
+        original = json.dumps(tool_args, sort_keys=True)
+
+        classify_result = {
+            "state": "should_correct",
+            "candidate": "test-driven-development",
+            "reason": "test",
+        }
+
+        with patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
+            return_value=_make_shadow_config(shadow_sample_rate=1.0),
+        ), patch(
+            "helpers.skill_match.prefilter_match",
+            return_value=[skill],
+        ), patch(
+            "extensions.python.tool_execute_after._05_skill_telemetry.log_gate_decision",
+            new_callable=AsyncMock,
+        ), patch(
+            "helpers.skill_match.classify_skill",
+            new_callable=AsyncMock,
+            return_value=classify_result,
+        ), patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer.random.random",
+            return_value=0.5,
+        ):
+            _run(ext.execute(
+                tool_name="code_execution_tool",
+                tool_args=tool_args,
+            ))
+
+        assert json.dumps(tool_args, sort_keys=True) == original
+
+    def test_shadow_classifier_failure_does_not_propagate(self):
+        """If shadow classifier throws, it must not break the agent loop."""
+        ext = self._setup_enforcer(loaded_skills=[])
+        skill = self._make_skill()
+
+        with patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
+            return_value=_make_shadow_config(shadow_sample_rate=1.0),
+        ), patch(
+            "helpers.skill_match.prefilter_match",
+            return_value=[skill],
+        ), patch(
+            "extensions.python.tool_execute_after._05_skill_telemetry.log_gate_decision",
+            new_callable=AsyncMock,
+        ), patch(
+            "helpers.skill_match.classify_skill",
+            new_callable=AsyncMock,
+            side_effect=RuntimeError("classifier boom"),
+        ), patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer.random.random",
+            return_value=0.5,
+        ):
+            # Must NOT raise
+            _run(ext.execute(
+                tool_name="code_execution_tool",
+                tool_args={"code": "x = 1"},
+            ))
+
+    def test_shadow_not_triggered_in_enforce_mode(self):
+        """Shadow sampling only applies in observe mode; enforce mode uses classifier directly."""
+        ext = self._setup_enforcer(loaded_skills=[])
+        skill = self._make_skill()
+
+        classify_result = {
+            "state": "should_not_correct",
+            "candidate": None,
+            "reason": "trivial",
+        }
+
+        with patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
+            return_value=_make_shadow_config(
+                enforcement_mode="enforce",
+                shadow_sample_rate=1.0,
+            ),
+        ), patch(
+            "helpers.skill_match.prefilter_match",
+            return_value=[skill],
+        ), patch(
+            "extensions.python.tool_execute_after._05_skill_telemetry.log_gate_decision",
+            new_callable=AsyncMock,
+        ) as mock_log, patch(
+            "helpers.skill_match.classify_skill",
+            new_callable=AsyncMock,
+            return_value=classify_result,
+        ) as mock_classify, patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer.random.random",
+            return_value=0.5,
+        ):
+            _run(ext.execute(
+                tool_name="code_execution_tool",
+                tool_args={"code": "x = 1"},
+            ))
+            # In enforce mode, classifier is called ONCE directly (not via shadow)
+            mock_classify.assert_called_once()
+            # The direct call should use mode='enforce', not 'observe_shadow'
+            calls = mock_log.call_args_list
+            shadow_calls = [c for c in calls if c[1].get("mode") == "observe_shadow"]
+            assert len(shadow_calls) == 0
+
+
+# ===========================================================================
+# Task 6: Enforce Mode Enabled — config-driven integration tests
+# ===========================================================================
+
+
+def _make_enforce_config(
+    *,
+    phase_governance_enabled: bool = True,
+    contracts_enabled: bool = False,
+    cooldown_seconds: float = 300.0,
+    telemetry_enabled: bool = True,
+):
+    """Config dict reflecting enforce mode (Task 6 default)."""
+    return {
+        "enforcement_mode": "enforce",
+        "telemetry_enabled": telemetry_enabled,
+        "telemetry_log_path": ".a0proj/skill_activations.jsonl",
+        "phase_governance_enabled": phase_governance_enabled,
+        "enforcement_correction_cooldown_seconds": cooldown_seconds,
+        "skill_contracts_enabled": contracts_enabled,
+    }
+
+
+class TestEnforceModeEnabled:
+    """Task 6 acceptance: enforce mode injects corrections, no false positives,
+    dedup prevents loops, fail-safe still works.
+
+    These tests verify the enforce-mode code paths work correctly with the
+    enforcement_mode set to 'enforce' (as it is in production after Task 6).
+    """
+
+    def _make_classify_return(self, state, candidate=None, reason=None):
+        return {"state": state, "candidate": candidate, "reason": reason}
+
+    # --- Correction injection ---
+
+    def test_enforce_mode_injects_correction_via_hist_add_message(self):
+        """Classifier says should_correct → hist_add_message called with skill name."""
+        from extensions.python.tool_execute_before._10_skill_enforcer import (
+            SkillEnforcer,
+        )
+
+        skill = MagicMock()
+        skill.name = "test-driven-development"
+
+        ext = SkillEnforcer.__new__(SkillEnforcer)
+        ext.agent = _make_enforcer_agent(
+            loaded_skills=[],
+            last_user_message="implement feature with tests",
+        )
+        ext.agent.hist_add_message = MagicMock()
+
+        classify_result = self._make_classify_return(
+            "should_correct",
+            candidate="test-driven-development",
+            reason="TDD required for feature implementation",
+        )
+
+        with patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
+            return_value=_make_enforce_config(phase_governance_enabled=False),
+        ), patch(
+            "helpers.skill_match.prefilter_match",
+            return_value=[skill],
+        ), patch(
+            "helpers.skill_match.classify_skill",
+            new_callable=AsyncMock,
+            return_value=classify_result,
+        ), patch(
+            "extensions.python.tool_execute_after._05_skill_telemetry.log_gate_decision",
+            new_callable=AsyncMock,
+        ):
+            _run(ext.execute(
+                tool_name="code_execution_tool",
+                tool_args={"code": "x = 1"},
+            ))
+
+            # Correction was injected
+            ext.agent.hist_add_message.assert_called_once()
+            kwargs = ext.agent.hist_add_message.call_args[1]
+            assert kwargs["ai"] is False
+            assert "test-driven-development" in kwargs["content"]
+            assert "skills_tool" in kwargs["content"]
+
+    def test_enforce_mode_does_not_inject_when_should_not_correct(self):
+        """Classifier says should_not_correct → NO hist_add_message call."""
+        from extensions.python.tool_execute_before._10_skill_enforcer import (
+            SkillEnforcer,
+        )
+
+        skill = MagicMock()
+        skill.name = "test-driven-development"
+
+        ext = SkillEnforcer.__new__(SkillEnforcer)
+        ext.agent = _make_enforcer_agent(
+            loaded_skills=[],
+            last_user_message="list files",
+        )
+        ext.agent.hist_add_message = MagicMock()
+
+        classify_result = self._make_classify_return(
+            "should_not_correct", reason="trivial task",
+        )
+
+        with patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
+            return_value=_make_enforce_config(),
+        ), patch(
+            "helpers.skill_match.prefilter_match",
+            return_value=[skill],
+        ), patch(
+            "helpers.skill_match.classify_skill",
+            new_callable=AsyncMock,
+            return_value=classify_result,
+        ), patch(
+            "extensions.python.tool_execute_after._05_skill_telemetry.log_gate_decision",
+            new_callable=AsyncMock,
+        ):
+            _run(ext.execute(
+                tool_name="code_execution_tool",
+                tool_args={"code": "ls"},
+            ))
+
+            # NO correction injected
+            ext.agent.hist_add_message.assert_not_called()
+
+    # --- No false positives when skill already loaded ---
+
+    def test_enforce_mode_no_correction_when_skill_already_loaded(self):
+        """Legitimate skill-loaded call → no correction, no false positive."""
+        from extensions.python.tool_execute_before._10_skill_enforcer import (
+            SkillEnforcer,
+        )
+
+        skill = MagicMock()
+        skill.name = "test-driven-development"
+
+        ext = SkillEnforcer.__new__(SkillEnforcer)
+        ext.agent = _make_enforcer_agent(
+            loaded_skills=["test-driven-development"],  # already loaded
+            last_user_message="implement feature with tests",
+        )
+        ext.agent.hist_add_message = MagicMock()
+
+        with patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
+            return_value=_make_enforce_config(),
+        ), patch(
+            "helpers.skill_match.prefilter_match",
+            return_value=[skill],
+        ), patch(
+            "extensions.python.tool_execute_after._05_skill_telemetry.log_gate_decision",
+            new_callable=AsyncMock,
+        ) as mock_log:
+            _run(ext.execute(
+                tool_name="code_execution_tool",
+                tool_args={"code": "x = 1"},
+            ))
+
+            # NO correction — skill is already loaded
+            ext.agent.hist_add_message.assert_not_called()
+            # Telemetry shows already_loaded
+            mock_log.assert_called_once()
+            assert mock_log.call_args[1]["state"] == "already_loaded"
+
+    # --- Dedup prevents repeated corrections ---
+
+    def test_enforce_mode_dedup_suppresses_repeated_correction(self):
+        """should_suppress_correction=True → no correction injected (dedup)."""
+        from extensions.python.tool_execute_before._10_skill_enforcer import (
+            SkillEnforcer,
+        )
+
+        skill = MagicMock()
+        skill.name = "test-driven-development"
+
+        ext = SkillEnforcer.__new__(SkillEnforcer)
+        ext.agent = _make_enforcer_agent(
+            loaded_skills=[],
+            last_user_message="implement feature",
+        )
+        ext.agent.hist_add_message = MagicMock()
+
+        with patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
+            return_value=_make_enforce_config(),
+        ), patch(
+            "helpers.skill_match.prefilter_match",
+            return_value=[skill],
+        ), patch(
+            "helpers.phase_governance.should_suppress_correction",
+            return_value=True,  # dedup says "recently corrected"
+        ), patch(
+            "extensions.python.tool_execute_after._05_skill_telemetry.log_gate_decision",
+            new_callable=AsyncMock,
+        ) as mock_log:
+            _run(ext.execute(
+                tool_name="code_execution_tool",
+                tool_args={"code": "x = 1"},
+            ))
+
+            # NO correction — suppressed by dedup
+            ext.agent.hist_add_message.assert_not_called()
+            # Telemetry shows suppressed_duplicate
+            mock_log.assert_called_once()
+            assert mock_log.call_args[1]["state"] == "suppressed_duplicate"
+
+    # --- Fail-safe in enforce mode ---
+
+    def test_enforce_mode_fail_safe_on_exception(self):
+        """Exception during enforce execution → no crash, no correction."""
+        from extensions.python.tool_execute_before._10_skill_enforcer import (
+            SkillEnforcer,
+        )
+
+        ext = SkillEnforcer.__new__(SkillEnforcer)
+        ext.agent = _make_enforcer_agent(
+            loaded_skills=[],
+            last_user_message="implement feature",
+        )
+        ext.agent.hist_add_message = MagicMock()
+
+        with patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
+            side_effect=RuntimeError("config explosion"),
+        ):
+            # Must NOT raise
+            _run(ext.execute(
+                tool_name="code_execution_tool",
+                tool_args={"code": "x = 1"},
+            ))
+
+            # No correction injected
+            ext.agent.hist_add_message.assert_not_called()
+
+    # --- Regression guard: default config value ---
+
+    def test_default_config_has_enforce_mode(self):
+        """default_config.yaml must have enforcement_mode: enforce after Task 6."""
+        import yaml
+        config_path = Path(__file__).parent.parent / "default_config.yaml"
+        with open(config_path) as f:
+            cfg = yaml.safe_load(f)
+        assert cfg["enforcement_mode"] == "enforce", (
+            f"Expected enforcement_mode='enforce', got '{cfg['enforcement_mode']}'"
+        )
+
+    def test_config_json_has_enforce_mode(self):
+        """config.json must have enforcement_mode: enforce after Task 6."""
+        config_path = Path(__file__).parent.parent / "config.json"
+        with open(config_path) as f:
+            cfg = json.load(f)
+        assert cfg["enforcement_mode"] == "enforce", (
+            f"Expected enforcement_mode='enforce', got '{cfg['enforcement_mode']}'"
+        )
+
+    # --- gate_correction progress event ---
+
+    def test_enforce_mode_logs_gate_correction_event(self):
+        """Correction triggers gate_correction progress event for dedup tracking."""
+        from extensions.python.tool_execute_before._10_skill_enforcer import (
+            SkillEnforcer,
+        )
+
+        skill = MagicMock()
+        skill.name = "debugging-and-error-recovery"
+
+        ext = SkillEnforcer.__new__(SkillEnforcer)
+        ext.agent = _make_enforcer_agent(
+            loaded_skills=[],
+            last_user_message="debug this error",
+        )
+        ext.agent.hist_add_message = MagicMock()
+
+        classify_result = self._make_classify_return(
+            "should_correct",
+            candidate="debugging-and-error-recovery",
+            reason="error debugging requires skill",
+        )
+
+        with patch(
+            "extensions.python.tool_execute_before._10_skill_enforcer._get_plugin_config",
+            return_value=_make_enforce_config(phase_governance_enabled=False),
+        ), patch(
+            "helpers.skill_match.prefilter_match",
+            return_value=[skill],
+        ), patch(
+            "helpers.skill_match.classify_skill",
+            new_callable=AsyncMock,
+            return_value=classify_result,
+        ), patch(
+            "helpers.workflow_state.append_progress_event",
+        ) as mock_progress, patch(
+            "extensions.python.tool_execute_after._05_skill_telemetry.log_gate_decision",
+            new_callable=AsyncMock,
+        ):
+            _run(ext.execute(
+                tool_name="code_execution_tool",
+                tool_args={"code": "x = 1"},
+            ))
+
+            # gate_correction progress event was logged
+            mock_progress.assert_called_once()
+            event = mock_progress.call_args[0][1]
+            assert event["event"] == "gate_correction"
+            assert event["candidate"] == "debugging-and-error-recovery"
+

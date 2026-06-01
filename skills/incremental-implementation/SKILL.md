@@ -58,6 +58,8 @@ contract:
     - test-driven-development
     - debugging-and-error-recovery
   conflicts: []
+depends_on:
+  - planning-and-task-breakdown
 ---
 
 # Incremental Implementation

@@ -624,6 +624,47 @@ class TestPhaseAdvancement:
         phase = ws.read_current_phase(mock_agent)
         assert phase["phase"] == "PLAN"  # Still PLAN, did not rewind
 
+    @pytest.mark.asyncio
+    async def test_advance_to_plan_includes_define_in_completed(self, mock_agent, tmp_project):
+        """Bug #2: advancing phase should populate phases_completed correctly.
+
+        When advancing from DEFINE to PLAN via plan artifact write,
+        phases_completed should include DEFINE (not be empty).
+        """
+        ws = _load_workflow_state()
+
+        # Write a spec → DEFINE
+        spec_dir = tmp_project / "docs" / "specs"
+        spec_dir.mkdir(parents=True)
+        spec_file = spec_dir / "feature-spec.md"
+        spec_file.write_text("# Spec\n")
+
+        ext = _make_ext(mock_agent)
+        await ext.execute(
+            tool_name="text_editor",
+            tool_args={"action": "write", "path": str(spec_file)},
+        )
+
+        phase = ws.read_current_phase(mock_agent)
+        assert phase["phase"] == "DEFINE"
+
+        # Write a plan → PLAN (forward advance)
+        plan_dir = tmp_project / "docs" / "plans"
+        plan_dir.mkdir(parents=True)
+        plan_file = plan_dir / "feature-plan.md"
+        plan_file.write_text("# Plan\n")
+
+        await ext.execute(
+            tool_name="text_editor",
+            tool_args={"action": "write", "path": str(plan_file)},
+        )
+
+        phase = ws.read_current_phase(mock_agent)
+        assert phase["phase"] == "PLAN"
+        # Bug #2 fix: phases_completed should include DEFINE
+        assert "DEFINE" in phase.get("phases_completed", []), \
+            f"Expected DEFINE in phases_completed, got {phase.get('phases_completed')}"
+
 
 # ---------------------------------------------------------------------------
 # Config disabled behavior

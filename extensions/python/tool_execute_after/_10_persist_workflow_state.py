@@ -490,9 +490,12 @@ class PersistWorkflowState(Extension):
             if target_rank > current_rank:
                 # Carry forward lifecycle_goal from current phase
                 lifecycle_goal = (current or {}).get("lifecycle_goal", "")
+                # Compute completed phases based on target position in phase order
+                ordered_phases = sorted(_PHASE_ORDER, key=_PHASE_ORDER.get)
+                target_idx = ordered_phases.index(target_phase) if target_phase in ordered_phases else 0
                 new_phase_data = {
                     "phase": target_phase,
-                    "phases_completed": [],
+                    "phases_completed": list(ordered_phases[:target_idx]),
                     "source": "artifact_inference",
                 }
                 if lifecycle_goal:
@@ -579,9 +582,12 @@ class PersistWorkflowState(Extension):
                     if isinstance(s, dict) and s.get("name")
                 }
 
-            deps = resolve_dependencies(skill_name, already_loaded)
-            if not deps:
+            all_deps = resolve_dependencies(skill_name, set())
+            if not all_deps:
                 return
+
+            skipped = [d for d in all_deps if d in already_loaded]
+            deps = [d for d in all_deps if d not in already_loaded]
 
             _log.info(
                 "Dependencies for '%s': %s (already loaded: %s)",

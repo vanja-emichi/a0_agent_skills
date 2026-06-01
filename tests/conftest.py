@@ -57,6 +57,9 @@ def _install_stubs():
     sys.modules["helpers.tool"] = MagicMock()
     sys.modules["helpers.plugins"] = MagicMock()
     sys.modules["helpers.projects"] = MagicMock()
+    # Prevent MagicMock file leaks: by default get_context_project_name returns
+    # None so no code path calls get_project_folder with a MagicMock path.
+    sys.modules["helpers.projects"].get_context_project_name.return_value = None
     sys.modules["helpers.skills"] = MagicMock()
 
     # Register real plugin helper modules so tests can import them without
@@ -188,6 +191,17 @@ def _clean_sys_modules():
 # ---------------------------------------------------------------------------
 
 PLUGIN_ROOT = Path(__file__).parent.parent
+PROJECT_ROOT = PLUGIN_ROOT.parent.parent / "projects" / PLUGIN_ROOT.name
+
+
+def _doc_path(filename: str) -> Path:
+    """Resolve a docs/ file, checking project dir then plugin dir."""
+    for root in (PROJECT_ROOT, PLUGIN_ROOT):
+        p = root / "docs" / filename
+        if p.exists():
+            return p
+    # Fallback so assertion messages show the expected path
+    return PROJECT_ROOT / "docs" / filename
 
 # Ensure plugin root is on sys.path for extension imports
 if str(PLUGIN_ROOT) not in sys.path:

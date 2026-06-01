@@ -9,7 +9,19 @@ Follow both skills' process to implement the next pending task.
 
 {raw}
 
-Pick the next pending task from tasks/todo.md. For each task you MUST:
+Resolve the artifact paths to locate the todo list and active spec:
+
+```python
+from helpers.workflow_state import resolve_artifact_paths, discover_feature_slug
+slug = discover_feature_slug(agent)
+paths = resolve_artifact_paths(agent, slug=slug)
+todo_path = paths["todo"]
+spec_path = paths["spec"]
+```
+
+Pick the next pending task from `todo_path`. When an active spec exists at `spec_path`, read it for success criteria and boundaries before implementing.
+
+For each task you MUST:
 
 1. Read the task's acceptance criteria
 2. Load relevant context (existing code, patterns, types)

@@ -6,7 +6,7 @@ logs a structured JSON event to the configured log path in the active project
 directory.
 
 Configuration keys (default_config.yaml):
-  telemetry_enabled: true           # Enabled by default — set to false to disable
+  telemetry_enabled: false          # Disabled by default for privacy — set to true to enable
   telemetry_log_path: .a0proj/skill_activations.jsonl  # Relative to project folder
   telemetry_max_lines: 0            # 0 = unlimited; >0 = rotate after N lines
   telemetry_debug: false            # Set to true to enable debug logging
@@ -113,22 +113,21 @@ def _build_entry(
     response: "Response | None",
 ) -> str:
     skill_name: str | None = tool_args.get("skill_name") or None
-    raw_query = tool_args.get("query") or None
-    query: str | None = str(raw_query)[:200] if raw_query else None
+    action: str | None = tool_args.get("action") or None
 
-    result_preview: str | None = None
-    try:
-        if response and response.message:
-            result_preview = str(response.message)[:200]
-    except Exception:
-        pass
+    # Privacy-safe query handling: for 'search' action, store only the action
+    # type and skill_name — never the freeform query text.
+    if action == "search":
+        query: str | None = action  # store only the action type, not user text
+    else:
+        raw_query = tool_args.get("query") or None
+        query: str | None = str(raw_query)[:200] if raw_query else None
 
     entry = {
         "ts": time.time_ns() / 1e9,
         "tool": full_tool_name,
         "skill_name": skill_name,
         "query": query,
-        "result_preview": result_preview,
     }
     return json.dumps(entry) + "\n"
 
@@ -167,7 +166,7 @@ async def log_gate_decision(
     try:
         cfg = _get_plugin_config(agent)
 
-        if not _config_bool(cfg.get("telemetry_enabled", True)):
+        if not _config_bool(cfg.get("telemetry_enabled", False)):
             return
 
         log_rel = (
@@ -202,7 +201,7 @@ class SkillTelemetry(Extension):
                 return
 
             cfg = _get_plugin_config(self.agent)
-            if not _config_bool(cfg.get("telemetry_enabled", True)):
+            if not _config_bool(cfg.get("telemetry_enabled", False)):
                 return
 
             full_tool_name, tool_args = _reconstruct_tool_info(
@@ -248,26 +247,16 @@ def _write_log_line(log_path: str, line: str, max_lines: int) -> None:
     with _write_lock:
         if max_lines > 0 and os.path.exists(log_path):
             try:
-                line_count = 0
                 with open(log_path, "r", encoding="utf-8") as fh:
                     if _fcntl:
                         try:
                             _fcntl.flock(fh.fileno(), _fcntl.LOCK_EX)
                         except OSError:
                             pass
-                    for _ in fh:
-                        line_count += 1
-                        if line_count > MAX_ROTATION_READ:
-                            break
+                    lines = fh.readlines()[:MAX_ROTATION_READ]
+                line_count = len(lines)
                 if line_count >= max_lines:
-                    with open(log_path, "r", encoding="utf-8") as fh:
-                        if _fcntl:
-                            try:
-                                _fcntl.flock(fh.fileno(), _fcntl.LOCK_EX)
-                            except OSError:
-                                pass
-                        existing = fh.readlines()[:MAX_ROTATION_READ]
-                    keep = existing[max_lines // 2 :]
+                    keep = lines[max_lines // 2 :]
                     tmp_fd, tmp_path = tempfile.mkstemp(dir=log_dir)
                     try:
                         with os.fdopen(tmp_fd, "w", encoding="utf-8") as fh:

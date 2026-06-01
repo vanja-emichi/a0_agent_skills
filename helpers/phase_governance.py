@@ -29,6 +29,7 @@ PHASE_SKILL_MAP: dict[str, list[str]] = {
     "DEFINE": [
         "interview-me",
         "spec-driven-development",
+        "idea-refine",
     ],
     "PLAN": [
         "planning-and-task-breakdown",
@@ -59,6 +60,9 @@ PHASE_SKILL_MAP: dict[str, list[str]] = {
         "documentation-and-adrs",
         "deprecation-and-migration",
     ],
+    "META": [
+        "using-agent-skills",
+    ],
 }
 
 # Reverse map: skill name -> phase name (for quick lookup)
@@ -66,6 +70,17 @@ _SKILL_TO_PHASE: dict[str, str] = {}
 for _phase, _skills in PHASE_SKILL_MAP.items():
     for _skill in _skills:
         _SKILL_TO_PHASE[_skill] = _phase
+
+# Phase → artifact type mapping for approval gates.
+# Only phases with approval gates are listed.
+# VERIFY is intentionally absent (no artifact to approve).
+PHASE_ARTIFACT_MAP: dict[str, str] = {
+    "DEFINE": "spec",
+    "PLAN": "plan",
+    "BUILD": "todo",
+    "REVIEW": "review",
+    "SHIP": "report",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -251,6 +266,101 @@ def transition_phase(agent, new_phase: str) -> dict | None:
 
 
 # ---------------------------------------------------------------------------
+# Approval gate (Task 2 — Phase Gate Check)
+# ---------------------------------------------------------------------------
+
+
+def check_phase_approval_gate(
+    agent,
+    from_phase: str | None,
+    to_phase: str,
+    enforcement_mode: str = "observe",
+) -> bool:
+    """Check whether a forward phase transition should be allowed.
+
+    Returns True if the transition may proceed, False if it should be
+    blocked because the *from* phase's artifact has not been approved.
+
+    Rules:
+    - Only forward transitions from phases with an artifact mapping are
+      gated.  Reentry, rewind, and initial/jump entries are always allowed.
+    - In **enforce** mode the gate *blocks* unapproved transitions.
+    - In **observe** mode the gate *allows* unapproved transitions but logs
+      a warning.
+    - On any error the gate returns True (fail-safe: never break the agent
+      loop).
+
+    Args:
+        agent: The agent instance (passed through to ``is_artifact_approved``).
+        from_phase: The current phase name, or ``None`` for initial entry.
+        to_phase: The target phase name.
+        enforcement_mode: ``"enforce"`` or ``"observe"`` (default ``"observe"``).
+
+    Returns:
+        True to allow the transition, False to block it.
+    """
+    try:
+        # --- Fast exits: transitions that never need approval ---
+
+        # Invalid target phase → allow (fail-safe)
+        if to_phase not in PHASE_ORDER:
+            return True
+
+        # Initial entry / jump (from_phase is None) → no gate
+        if from_phase is None:
+            return True
+
+        # Invalid source phase → allow (fail-safe)
+        if from_phase not in PHASE_ORDER:
+            return True
+
+        # Only forward transitions are gated
+        from_idx = PHASE_ORDER.index(from_phase)
+        to_idx = PHASE_ORDER.index(to_phase)
+        if to_idx <= from_idx:
+            # Reentry or rewind → no gate
+            return True
+
+        # --- Check if the *from* phase has an artifact mapping ---
+        artifact_type = PHASE_ARTIFACT_MAP.get(from_phase)
+        if artifact_type is None:
+            # Phase has no artifact (e.g. VERIFY) → no gate
+            return True
+
+        # --- Query approval state ---
+        from helpers import workflow_state
+        approved = workflow_state.is_artifact_approved(agent, artifact_type)
+
+        if approved:
+            return True
+
+        # --- Unapproved: behavior depends on enforcement mode ---
+        if enforcement_mode == "enforce":
+            _log.warning(
+                "Phase gate BLOCKED %s→%s: %s not approved (enforce mode)",
+                from_phase, to_phase, artifact_type,
+            )
+            return False
+        else:
+            # observe or unknown mode → warn but allow
+            _log.warning(
+                "Phase gate: %s→%s transition without approved %s "
+                "(%s mode — allowed)",
+                from_phase, to_phase, artifact_type, enforcement_mode,
+            )
+            return True
+
+    except Exception as exc:
+        # Fail-safe depends on enforcement mode:
+        # - enforce: deny by default (never bypass the gate on errors)
+        # - observe: allow by default (fail-safe doesn't block)
+        _log.warning("Approval gate check failed: %s", exc, exc_info=True)
+        if enforcement_mode == "enforce":
+            return False
+        return True
+
+
+# ---------------------------------------------------------------------------
 # Correction deduplication (Task 2)
 # ---------------------------------------------------------------------------
 
@@ -265,7 +375,7 @@ def get_last_correction_for_context(
     """
     try:
         from helpers import workflow_state
-        entries = workflow_state.read_progress_log(agent, tail=50)
+        entries = workflow_state.read_progress_log(agent, tail=200)
         # Search backwards for most recent match
         for entry in reversed(entries):
             if entry.get("event") != "gate_correction":

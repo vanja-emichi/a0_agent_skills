@@ -1,6 +1,6 @@
 # a0_agent_skills
 
-A plugin for [Agent Zero](https://github.com/frdel/agent-zero) that ports the [`addyosmani/agent-skills`](https://github.com/addyosmani/agent-skills) development workflow toolkit — **23 curated skills**, 3 specialist agent profiles, 7 slash commands, and **workflow governance** (enforcement gate, durable state, phase governance, skill contracts) — into the Agent Zero plugin system. It gives any Agent Zero agent access to a production-grade software engineering lifecycle: spec → plan → build → test → review → ship, with telemetry enabled by default.
+A plugin for [Agent Zero](https://github.com/frdel/agent-zero) that ports the [`addyosmani/agent-skills`](https://github.com/addyosmani/agent-skills) development workflow toolkit — **23 curated skills**, 3 specialist agent profiles, 7 slash commands, and **workflow governance** (enforcement gate, durable state, phase governance, skill contracts) — into the Agent Zero plugin system. It gives any Agent Zero agent access to a production-grade software engineering lifecycle: spec → plan → build → test → review → ship, with telemetry disabled by default.
 
 ---
 
@@ -53,7 +53,7 @@ If it is not present, install it via the Plugin Hub before enabling this plugin.
 
 ## Architecture Overview
 
-The plugin is organized as **four governance slices**, each built on Agent Zero extension points:
+The plugin is organized as **five governance slices**, each built on Agent Zero extension points:
 
 | Slice | Purpose | Extension Point | Helper Module |
 |-------|---------|----------------|---------------|
@@ -61,6 +61,7 @@ The plugin is organized as **four governance slices**, each built on Agent Zero 
 | **Durable State** | Persist plans, goals, phase across compaction/restart | `tool_execute_after` + `message_loop_prompts_after` | `workflow_state` |
 | **Phase Governance** | 6-phase advisory model with deduplication | `tool_execute_before` | `phase_governance` |
 | **Skill Contracts** | Structured metadata + runtime DAG validation | `tool_execute_after` | `skill_contracts` |
+| **Artifact Path Resolution** | Canonical artifact paths with no-project fallback | Command templates | `workflow_state` |
 
 ### Extension Points Used
 
@@ -80,6 +81,7 @@ The plugin is organized as **four governance slices**, each built on Agent Zero 
 | `workflow_state` | `helpers/workflow_state.py` | Atomic file I/O for `.a0proj/state/` artifacts |
 | `phase_governance` | `helpers/phase_governance.py` | Phase transitions, deduplication, advisory enforcement |
 | `skill_contracts` | `helpers/skill_contracts.py` | YAML frontmatter parsing, DAG construction, cycle detection |
+| `artifact_paths` | `helpers/workflow_state.py` | Canonical artifact path resolution, no-project fallback, slug discovery |
 
 ### Module Loading
 
@@ -175,12 +177,12 @@ call_subordinate(profile="test-engineer")
 
 | Command | When to use |
 |---|---|
-| `/spec` | Start a new feature or project — loads `spec-driven-development` and writes `SPEC.md`. Surfaces assumptions before writing any code. |
-| `/plan` | Break confirmed spec into tasks — loads `planning-and-task-breakdown` and writes `tasks/plan.md` + `tasks/todo.md`. |
-| `/build` | Implement the next task — loads `incremental-implementation` + `test-driven-development`. RED → GREEN → commit cycle. |
-| `/test` | TDD workflow or bug reproduction — loads `test-driven-development`. Write failing test first; use the Prove-It Pattern for bugs. |
-| `/review` | Single-perspective code review — delegates to the `code-reviewer` profile via `call_subordinate`. |
-| `/code-simplify` | Reduce complexity without changing behavior — loads `code-simplification`. Applies guard clauses, splits functions, removes dead code. |
+| `/spec` | Start a new feature or project — loads `spec-driven-development` and writes a feature-scoped spec to `docs/specs/<slug>-spec.md` via the artifact path resolver (falls back to `SPEC.md` when no slug is set). Surfaces assumptions before writing any code. |
+| `/plan` | Break confirmed spec into tasks — loads `planning-and-task-breakdown` and writes feature-scoped plan and task list via the artifact path resolver. |
+| `/build` | Implement the next task — loads `incremental-implementation` + `test-driven-development`. Reads active spec and todo from workflow state. RED → GREEN → commit cycle. |
+| `/test` | TDD workflow or bug reproduction — loads `test-driven-development`. Reads active spec for test criteria. Write failing test first; use the Prove-It Pattern for bugs. |
+| `/review` | Single-perspective code review — delegates to the `code-reviewer` profile via `call_subordinate`. Reads active spec for review boundaries. |
+| `/code-simplify` | Reduce complexity without changing behavior — loads `code-simplification`. Resolves spec path from workflow state. Applies guard clauses, splits functions, removes dead code. |
 | `/ship` | Pre-launch **parallel** review — runs `code-reviewer`, `security-auditor`, and `test-engineer` concurrently via `call_subordinate_parallel`, then produces a **GO / NO-GO** decision with rollback plan. |
 
 ### Example usage
@@ -206,6 +208,8 @@ The enforcement gate detects when the agent is about to use `code_execution_tool
 |------|-------------|
 | **`observe`** (default) | Logs would-fire decisions to telemetry. No behavior change, no classifier calls, no tool_args mutation. |
 | **`enforce`** | Runs the utility-model classifier. When a skill should have been loaded, appends an in-band corrective warning to `tool_args.message`. |
+
+> ⚠️ **Enforcement is advisory, not hard-blocking.** The `tool_execute_before` hook's return value is ignored by the Agent Zero framework (`agent.py ~927-935`), so the gate **cannot prevent a tool call from executing**. It can only nudge via argument mutation. Even in `enforce` mode, the agent may choose to ignore the corrective warning. This is a framework-level constraint, not a plugin limitation. See [ADR-006](docs/adrs/006-enforcement-strict-mode-decision.md) for the full decision record, including outcome-lift data supporting the advisory approach.
 
 ### How it works
 
@@ -400,7 +404,7 @@ All configuration lives in `default_config.yaml` and can be overridden per-proje
 
 ## Telemetry
 
-Telemetry is **enabled by default**. Every `skills_tool` activation and enforcement gate decision is logged to a JSONL file for workflow analysis.
+Telemetry is **disabled by default** for privacy. Every `skills_tool` activation and enforcement gate decision is logged to a JSONL file for workflow analysis when enabled.
 
 **Log location:** `.a0proj/skill_activations.jsonl` (relative to project folder).
 

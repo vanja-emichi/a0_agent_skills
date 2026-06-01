@@ -10,7 +10,7 @@ description: >-
   governance model (DEFINE→PLAN→BUILD→VERIFY→REVIEW→SHIP), and skill contracts
   with YAML frontmatter and runtime DAG validation.
 version: 1.0.0
-author: Addy Osmani (Agent Zero port)
+author: Vanja Bunjevac
 plugin_url: https://github.com/vanja-emichi/a0_agent_skills
 settings_sections:
   - agent

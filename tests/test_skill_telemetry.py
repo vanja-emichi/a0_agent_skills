@@ -107,7 +107,7 @@ def test_skills_tool_load_writes_log(tmp_path):
     assert entry["tool"] == "skills_tool:load"
     assert entry["skill_name"] == "test-driven-development"
     assert entry["query"] is None
-    assert "result_preview" in entry
+    assert "result_preview" not in entry
     assert isinstance(entry["ts"], float)
 
 
@@ -123,7 +123,11 @@ def test_exception_swallowed_agent_continues():
     plugins_mock = MagicMock()
     plugins_mock.get_plugin_config.side_effect = RuntimeError("config exploded")
 
-    with patch("helpers.plugins", plugins_mock):
+    projects_mock = MagicMock()
+    projects_mock.get_context_project_name.return_value = None
+
+    with patch("helpers.plugins", plugins_mock), \
+         patch("helpers.projects", projects_mock):
         # Must not raise
         _run(ext.execute(tool_name="skills_tool"))
 
@@ -364,10 +368,10 @@ def test_debug_log_silent_when_disabled():
 # ===========================================================================
 
 def test_build_entry_with_none_response():
-    """response=None → result_preview is None."""
+    """response=None → no result_preview field (privacy-safe schema)."""
     line = _build_entry("skills_tool:load", {"skill_name": "x"}, None)
     entry = json.loads(line)
-    assert entry["result_preview"] is None
+    assert "result_preview" not in entry
 
 import threading
 
@@ -493,15 +497,13 @@ def test_full_flow_with_rotation(tmp_path):
 
 
 def test_build_entry_truncates_long_message():
-    """message >200 chars → result_preview truncated to exactly 200 chars."""
+    """message >200 chars → no result_preview stored (privacy-safe schema)."""
     long_msg = "A" * 300
     response = MagicMock()
     response.message = long_msg
     line = _build_entry("skills_tool:load", {}, response)
     entry = json.loads(line)
-    assert entry["result_preview"] is not None
-    assert len(entry["result_preview"]) == 200
-    assert entry["result_preview"] == "A" * 200
+    assert "result_preview" not in entry
 
 
 def test_build_entry_empty_args():
@@ -513,8 +515,8 @@ def test_build_entry_empty_args():
 
 
 def test_build_entry_response_no_message_attr():
-    """Response without .message → result_preview is None."""
+    """Response without .message → no result_preview field (privacy-safe schema)."""
     response = MagicMock(spec=[])  # spec=[] means no attributes
     line = _build_entry("skills_tool:load", {}, response)
     entry = json.loads(line)
-    assert entry["result_preview"] is None
+    assert "result_preview" not in entry

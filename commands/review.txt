@@ -6,6 +6,17 @@ Use `call_subordinate` with the code-reviewer profile:
 call_subordinate(profile="code-reviewer", message="Review the current changes...")
 ```
 
+Before delegating, resolve artifact paths so the reviewer can reference the active spec:
+
+```python
+from helpers.workflow_state import resolve_artifact_paths, discover_feature_slug
+slug = discover_feature_slug(agent)
+paths = resolve_artifact_paths(agent, slug=slug)
+spec_path = paths["spec"]
+```
+
+If `spec_path` exists, include it in the reviewer's message so they can read it for acceptance criteria and boundaries.
+
 Instruct the code-reviewer to review the current changes (staged, recent commits, or the files/scope described below) across all five axes:
 
 1. **Correctness** — Does it match the spec? Edge cases handled? Tests adequate?

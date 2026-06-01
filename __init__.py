@@ -3,7 +3,7 @@
 import os
 import sys as _sys
 
-__version__ = "0.4.0"
+__version__ = "1.0.0"
 
 # ── sys.path injection for plugin-local helpers ──────────────────────
 # The plugin root contains _plugin_loader.py which extensions import.

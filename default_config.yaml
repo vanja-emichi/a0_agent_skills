@@ -7,9 +7,9 @@ telemetry_log_path: .a0proj/skill_activations.jsonl  # Relative to project folde
 telemetry_max_lines: 0          # 0 = unlimited; set e.g. 1000 to rotate automatically
 
 # Enforcement gate — controls skill-enforcement behavior
-enforcement_mode: observe          # observe (log only, no rewrites) or enforce (inject missing skill calls)
+enforcement_mode: enforce           # observe (log only, no rewrites) or enforce (inject missing skill calls)
 enforcement_classifier_model: null  # null = use utility model; set model name to override
-enforcement_shadow_sample_rate: 0.0 # 0.0 = disabled; 1.0 = classify every call; 0.1 = 10% sample
+enforcement_shadow_sample_rate: 0.1 # 0.0 = disabled; 1.0 = classify every call; 0.1 = 10% sample
 
 # Durable workflow state — persists workflow context across compaction and session breaks
 workflow_state_enabled: true        # Set to false to disable all state persistence and rehydration

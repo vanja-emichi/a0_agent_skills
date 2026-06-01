@@ -33,6 +33,8 @@ trigger_patterns:
   - check for vulnerabilities
   - vulnerability scan
   - security scan
+depends_on:
+  - code-review-and-quality
 ---
 
 # Security and Hardening

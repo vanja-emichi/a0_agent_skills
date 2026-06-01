@@ -1,0 +1,215 @@
+<html>
+<head><title>Agent Skills</title></head>
+<body>
+<div x-data>
+  <template x-if="config">
+    <div>
+      <div class="section-title">Agent Skills</div>
+      <div class="section-description">
+        Workflow governance and skill enforcement for Agent Zero. Controls telemetry,
+        enforcement gate behavior, workflow state persistence, phase governance, and
+        skill contract validation.
+      </div>
+
+      <!-- Telemetry -->
+      <div class="section-title" style="margin-top:1.5em;">Telemetry</div>
+      <div class="section-description">
+        Track skill activations and usage patterns for observability.
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <div class="field-title">Telemetry Enabled</div>
+          <div class="field-description">Enable or disable skill activation telemetry logging.</div>
+        </div>
+        <div class="field-control">
+          <select x-model="config.telemetry_enabled">
+            <option :value="true">Enabled</option>
+            <option :value="false">Disabled</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <div class="field-title">Telemetry Log Path</div>
+          <div class="field-description">File path for the JSONL telemetry log. Relative paths resolve from the project root.</div>
+        </div>
+        <div class="field-control">
+          <input type="text" x-model="config.telemetry_log_path" />
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <div class="field-title">Max Log Lines</div>
+          <div class="field-description">Maximum number of lines in the telemetry log before rotation. Set to 0 for unlimited.</div>
+        </div>
+        <div class="field-control">
+          <input type="number" min="0" x-model.number="config.telemetry_max_lines" />
+        </div>
+      </div>
+
+      <!-- Enforcement Gate -->
+      <div class="section-title" style="margin-top:1.5em;">Enforcement Gate</div>
+      <div class="section-description">
+        Control how the plugin enforces skill-driven workflows and phase compliance.
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <div class="field-title">Enforcement Mode</div>
+          <div class="field-description">
+            <b>Observe</b>: Log violations without injecting corrections.<br>
+            <b>Enforce</b>: Actively inject corrections when the agent skips required skills.
+          </div>
+        </div>
+        <div class="field-control">
+          <select x-model="config.enforcement_mode">
+            <option value="observe">Observe (log only)</option>
+            <option value="enforce">Enforce (inject corrections)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <div class="field-title">Classifier Model</div>
+          <div class="field-description">Model override for the enforcement classifier. Leave empty to use the utility model.</div>
+        </div>
+        <div class="field-control">
+          <input type="text" x-model="config.enforcement_classifier_model"
+            placeholder="Leave empty for utility model" />
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <div class="field-title">Shadow Sample Rate</div>
+          <div class="field-description">Fraction of messages to sample for shadow enforcement in observe mode (0.0–1.0).</div>
+        </div>
+        <div class="field-control">
+          <input type="number" min="0" max="1" step="0.1"
+            x-model.number="config.enforcement_shadow_sample_rate" />
+        </div>
+      </div>
+
+      <!-- Workflow State -->
+      <div class="section-title" style="margin-top:1.5em;">Workflow State</div>
+      <div class="section-description">
+        Persist workflow progress, loaded skills, and phase context across conversation turns.
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <div class="field-title">Workflow State Enabled</div>
+          <div class="field-description">Enable or disable durable workflow state persistence.</div>
+        </div>
+        <div class="field-control">
+          <select x-model="config.workflow_state_enabled">
+            <option :value="true">Enabled</option>
+            <option :value="false">Disabled</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <div class="field-title">Workflow State Path</div>
+          <div class="field-description">Directory path for workflow state files. Relative paths resolve from the project root.</div>
+        </div>
+        <div class="field-control">
+          <input type="text" x-model="config.workflow_state_path" />
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <div class="field-title">Max Progress Entries</div>
+          <div class="field-description">Maximum number of progress log entries to retain before pruning oldest.</div>
+        </div>
+        <div class="field-control">
+          <input type="number" min="0" x-model.number="config.max_progress_entries" />
+        </div>
+      </div>
+
+      <!-- Phase Governance -->
+      <div class="section-title" style="margin-top:1.5em;">Phase Governance</div>
+      <div class="section-description">
+        Enforce the six-phase development lifecycle (Define → Plan → Build → Verify → Review → Ship).
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <div class="field-title">Phase Governance Enabled</div>
+          <div class="field-description">Enable or disable phase-aware governance that tracks and enforces lifecycle progression.</div>
+        </div>
+        <div class="field-control">
+          <select x-model="config.phase_governance_enabled">
+            <option :value="true">Enabled</option>
+            <option :value="false">Disabled</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <div class="field-title">Correction Cooldown</div>
+          <div class="field-description">Minimum seconds between enforcement corrections for the same agent to avoid spam.</div>
+        </div>
+        <div class="field-control">
+          <input type="number" min="0"
+            x-model.number="config.enforcement_correction_cooldown_seconds" />
+        </div>
+      </div>
+
+      <!-- Skill Contracts -->
+      <div class="section-title" style="margin-top:1.5em;">Skill Contracts</div>
+      <div class="section-description">
+        Validate skill metadata, dependency graphs, and provide next-skill hints.
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <div class="field-title">Skill Contracts Enabled</div>
+          <div class="field-description">Enable or disable skill contract validation and dependency checking.</div>
+        </div>
+        <div class="field-control">
+          <select x-model="config.skill_contracts_enabled">
+            <option :value="true">Enabled</option>
+            <option :value="false">Disabled</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <div class="field-title">Validate on Build</div>
+          <div class="field-description">Validate the skill dependency graph when building or refreshing the skill registry.</div>
+        </div>
+        <div class="field-control">
+          <select x-model="config.skill_graph_validate_on_build">
+            <option :value="true">Enabled</option>
+            <option :value="false">Disabled</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-label">
+          <div class="field-title">Next Skill Hints</div>
+          <div class="field-description">Provide hints about which skill to load next based on the current workflow phase.</div>
+        </div>
+        <div class="field-control">
+          <select x-model="config.skill_next_skill_hints">
+            <option :value="true">Enabled</option>
+            <option :value="false">Disabled</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+  </template>
+</div>
+</body>
+</html>

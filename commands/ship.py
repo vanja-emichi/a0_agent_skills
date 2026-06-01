@@ -15,6 +15,7 @@ from __future__ import annotations
 import os
 import re
 import json
+import unicodedata
 from typing import Any
 
 
@@ -182,15 +183,18 @@ def _read_spec_context(project_path: str) -> dict[str, str]:
 def _sanitize_spec_text(text: str, max_len: int = 2000) -> str:
     """Sanitize spec-derived text before interpolation into specialist prompts.
 
-    1. Strip control characters
-    2. Remove instruction-injection patterns
-    3. Cap at max_len characters
+    1. NFKC normalization (collapse homoglyphs and invisible chars)
+    2. Strip control characters
+    3. Remove instruction-injection patterns
+    4. Cap at max_len characters
     """
+    # NFKC normalization: collapse lookalike chars (e.g. fullwidth Latin → ASCII)
+    text = unicodedata.normalize('NFKC', text)
     # Strip control characters (0x00-0x1f, 0x7f) and Unicode line/paragraph separators
     text = re.sub(r'[\x00-\x1f\x7f\u2028\u2029]', '', text)
-    # Remove instruction-injection patterns (DOTALL to handle any remaining line breaks)
+    # Remove instruction-injection patterns (expanded blocklist)
     text = re.sub(
-        r'(?is)(ignore|disregard|override|bypass)\s+(all|previous|above|security|safety)',
+        r'(?is)(ignore|disregard|override|bypass|forget|skip|never\s+(?:check|apply|validate)|pretend|act\s+as|you\s+are|new\s+instruction|system\s+prompt)\s+(all|every|each|previous|above|security|safety|instructions?|rules?|checks?|everything|guidelines?)',
         '',
         text,
     )

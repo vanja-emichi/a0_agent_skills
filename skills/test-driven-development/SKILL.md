@@ -48,6 +48,8 @@ contract:
   next_skills:
     - debugging-and-error-recovery
   conflicts: []
+depends_on:
+  - spec-driven-development
 ---
 
 # Test-Driven Development

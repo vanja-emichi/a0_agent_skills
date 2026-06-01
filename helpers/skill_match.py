@@ -40,10 +40,41 @@ decide whether the agent should have loaded one of these skills first.
 Respond with a JSON object:
 { "should_load": true/false, "reason": "short explanation" }
 
-Rules:
-- If the task involves implementing code, fixing bugs, refactoring, or writing tests, and a skill like test-driven-development or source-driven-development matches, say true.
-- If the task is trivial (listing files, printing hello, simple shell commands), say false.
-- If unsure, say false (prefer no correction over false positives).
+Decision rules (apply in order):
+
+1. TRIVIAL TASKS → false: listing files, printing output, showing contents,\
+   checking versions, reading config, simple shell commands, one-line fixes.
+
+2. NEW PROJECT/FEATURE/SERVICE → true: if the user wants to create something\
+   substantial (new module, service, feature, system), a spec or planning skill\
+   is needed. Keywords: spec, new project, new feature, design and implement.
+
+3. BUG/ERROR/CRASH → true: if the user reports failures, errors, crashes,\
+   or unexpected behavior, the debugging skill is needed.\
+   Keywords: failing, error, crash, segfault, broken, intermittent, ImportError.
+
+4. TESTS → true: if the user wants to implement logic, write functions, or\
+   fix code behavior, the TDD skill is needed. Keywords: implement function,\
+   write algorithm, add validation, build parser.
+
+5. REVIEW/AUDIT → true: if the user wants code reviewed for quality,\
+   standards, or general issues. But SECURITY-specific audits\
+   ("security vulnerabilities", "OWASP") go to security-and-hardening.
+
+6. SIMPLIFY/REFACTOR → true: if the user wants to simplify or clean up\
+   code. Keywords: simplify, cleaner, refactor for clarity.
+
+7. DEPLOY/SHIP → true: if the user wants to deploy, launch, or go to\
+   production. Keywords: deploy, production, launch, ship, release.
+
+8. If unsure, say false (prefer no correction over false positives).
+
+Key discrimination rules:
+- "design the REST API" → api-and-interface-design (not spec-driven)
+- "stress-test a plan" → doubt-driven-development (not planning)
+- "check for security vulnerabilities" → security-and-hardening (not code-review)
+- "audit security" → security-and-hardening (not code-review)
+- "simplify this function" → code-simplification (not TDD)
 """
 
 
@@ -65,12 +96,23 @@ def get_loaded_skills(agent: Any) -> Set[str]:
     Returns an empty set on any failure.
     """
     try:
+        names: Set[str] = set()
         # Fast path: read directly from agent data
         data = getattr(agent, "data", None)
         if isinstance(data, dict):
             loaded = data.get("loaded_skills")
             if isinstance(loaded, list):
-                return {str(s).strip() for s in loaded if str(s).strip()}
+                names |= {str(s).strip() for s in loaded if str(s).strip()}
+            # Plugin-private rehydrated names, set by the reattach extension
+            # after compaction/session resume. Kept separate from the
+            # core-rendered 'loaded_skills' key to avoid full-body re-injection,
+            # but still counted here so the gate does not re-nag for skills
+            # already loaded in a prior turn or session.
+            rehydrated = data.get("_a0skills_rehydrated_loaded")
+            if isinstance(rehydrated, list):
+                names |= {str(s).strip() for s in rehydrated if str(s).strip()}
+        if names:
+            return names
         # Fallback: use framework helper
         entries = get_loaded_skill_entries(agent)
         return {e["name"] for e in entries if e.get("name")}
@@ -174,7 +216,7 @@ async def classify_skill(
 
     candidate_names = [c.name for c in unloaded]
     candidate_descs = [
-        f"- {c.name}: {getattr(c, 'description', '')[:120]}" for c in unloaded
+        f"- {c.name}: {getattr(c, 'description', '')[:250]}" for c in unloaded
     ]
 
     user_msg = (
@@ -219,11 +261,12 @@ async def classify_skill(
                     "candidate": None,
                     "reason": f"malformed response: {raw[:80]}",
                 }
-        return {
-            "state": "classifier_unavailable",
-            "candidate": None,
-            "reason": f"malformed response: {raw[:80]}",
-        }
+        else:
+            return {
+                "state": "classifier_unavailable",
+                "candidate": None,
+                "reason": f"malformed response: {raw[:80]}",
+            }
 
     should_load = parsed.get("should_load", False)
     reason = parsed.get("reason", "")

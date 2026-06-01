@@ -8,7 +8,17 @@ Follow the skill's complete process to simplify the code described below while p
 
 {raw}
 
-1. Read project conventions (SPEC.md, CLAUDE.md, or AGENTS.md if present)
+1. Read project conventions. Resolve the active spec path and read it if available:
+
+```python
+from helpers.workflow_state import resolve_artifact_paths, discover_feature_slug
+slug = discover_feature_slug(agent)
+paths = resolve_artifact_paths(agent, slug=slug)
+spec_path = paths["spec"]
+```
+
+   Also check for CLAUDE.md or AGENTS.md if present in the project root.
+
 2. Identify the target code — recent changes unless a broader scope is specified
 3. You MUST understand the code's purpose, callers, edge cases, and test coverage before touching it
 4. Scan for simplification opportunities:

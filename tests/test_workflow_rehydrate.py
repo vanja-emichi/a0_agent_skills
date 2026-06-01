@@ -105,7 +105,9 @@ def _load_extension():
 def _setup_modules():
     _ensure_agent_stub()
     _load_workflow_state()
-    _load_extension()
+    _ext = _load_extension()
+    # Reset specs cache so each test gets fresh filesystem results
+    _ext._reset_specs_cache()
 
 
 @pytest.fixture
@@ -519,6 +521,24 @@ class TestNextSkillHints:
         state_block = loop_data.extras_persistent.get("workflow_state", "")
         assert "Next Skill Hints" not in state_block
 
+    @pytest.mark.asyncio
+    async def test_hints_enabled_explicitly_in_config(self, tmp_project):
+        """Rehydrated state includes hints when skill_next_skill_hints is explicitly True."""
+        agent = _make_agent(tmp_project, config={"skill_next_skill_hints": True})
+
+        ws = _load_workflow_state()
+        ws.save_loaded_skills(agent, {
+            "skills": [{"name": "test-driven-development", "loaded_at": 1.0}]
+        })
+
+        ext = _make_ext(agent)
+        loop_data = _LoopData()
+        await ext.execute(loop_data=loop_data)
+
+        state_block = loop_data.extras_persistent.get("workflow_state", "")
+        assert "Next Skill Hints" in state_block
+        assert "debugging-and-error-recovery" in state_block
+
 
 # ---------------------------------------------------------------------------
 # Regression: rehydration must NOT repopulate the core-rendered
@@ -646,3 +666,196 @@ class TestPlanPathFromArtifacts:
 
         state_block = loop_data.extras_persistent["workflow_state"]
         assert "**Current Task:** Task 5 of 10" in state_block
+
+
+# ---------------------------------------------------------------------------
+# Task 7: Spec status filtering — shipped specs filtered from proposals
+# ---------------------------------------------------------------------------
+
+
+class TestSpecStatusFiltering:
+    """Tests for spec status filtering in rehydrated state (Task 7)."""
+
+    @pytest.mark.asyncio
+    async def test_shipped_spec_excluded_from_state_block(self, tmp_path):
+        """Specs with Status: SHIPPED are excluded from active specs."""
+        proj = tmp_path / "test_project"
+        proj.mkdir()
+        specs_dir = proj / "docs" / "specs"
+        specs_dir.mkdir(parents=True)
+
+        # Create a shipped spec
+        shipped_spec = specs_dir / "old-feature-spec.md"
+        shipped_spec.write_text("# Old Feature\n\n**Status:** Shipped\n\nDone.")
+
+        # Create an active spec
+        active_spec = specs_dir / "new-feature-spec.md"
+        active_spec.write_text("# New Feature\n\n**Status:** Draft\n\nWork in progress.")
+
+        agent = _make_agent(proj)
+        ws = _load_workflow_state()
+        ws.save_active_plan(agent, {"plan_name": "test"})
+
+        ext = _make_ext(agent)
+        loop_data = _LoopData()
+        await ext.execute(loop_data=loop_data)
+
+        state_block = loop_data.extras_persistent.get("workflow_state", "")
+        # Active spec should appear
+        assert "new-feature-spec.md" in state_block
+        # Shipped spec should NOT appear
+        assert "old-feature-spec.md" not in state_block
+
+    @pytest.mark.asyncio
+    async def test_approved_spec_excluded_from_state_block(self, tmp_path):
+        """Specs with Status: Approved are excluded from active specs."""
+        proj = tmp_path / "test_project"
+        proj.mkdir()
+        specs_dir = proj / "docs" / "specs"
+        specs_dir.mkdir(parents=True)
+
+        approved_spec = specs_dir / "approved-feature-spec.md"
+        approved_spec.write_text("# Approved Feature\n\n**Status:** Approved\n\nReady.")
+
+        draft_spec = specs_dir / "draft-feature-spec.md"
+        draft_spec.write_text("# Draft Feature\n\n**Status:** Draft\n\nWIP.")
+
+        agent = _make_agent(proj)
+        ws = _load_workflow_state()
+        ws.save_active_plan(agent, {"plan_name": "test"})
+
+        ext = _make_ext(agent)
+        loop_data = _LoopData()
+        await ext.execute(loop_data=loop_data)
+
+        state_block = loop_data.extras_persistent.get("workflow_state", "")
+        assert "draft-feature-spec.md" in state_block
+        assert "approved-feature-spec.md" not in state_block
+
+    @pytest.mark.asyncio
+    async def test_in_progress_spec_shown_in_state_block(self, tmp_path):
+        """Specs with Status: In Progress are shown as active."""
+        proj = tmp_path / "test_project"
+        proj.mkdir()
+        specs_dir = proj / "docs" / "specs"
+        specs_dir.mkdir(parents=True)
+
+        wip_spec = specs_dir / "wip-feature-spec.md"
+        wip_spec.write_text("# WIP Feature\n\n**Status:** In Progress\n\nWorking.")
+
+        agent = _make_agent(proj)
+        ws = _load_workflow_state()
+        ws.save_active_plan(agent, {"plan_name": "test"})
+
+        ext = _make_ext(agent)
+        loop_data = _LoopData()
+        await ext.execute(loop_data=loop_data)
+
+        state_block = loop_data.extras_persistent.get("workflow_state", "")
+        assert "wip-feature-spec.md" in state_block
+        assert "In Progress" in state_block
+
+    @pytest.mark.asyncio
+    async def test_no_specs_dir_no_error(self, tmp_path):
+        """When no docs/specs/ directory exists, extension still works."""
+        proj = tmp_path / "test_project"
+        proj.mkdir()
+        # No docs/specs/ created
+
+        agent = _make_agent(proj)
+        ws = _load_workflow_state()
+        ws.save_active_plan(agent, {"plan_name": "test"})
+
+        ext = _make_ext(agent)
+        loop_data = _LoopData()
+        # Must not raise
+        await ext.execute(loop_data=loop_data)
+
+        # State block should exist (from plan) but not have spec section
+        state_block = loop_data.extras_persistent.get("workflow_state", "")
+        assert "Active Specs" not in state_block
+
+
+# ---------------------------------------------------------------------------
+# Specs cache TTL — ensures _scan_active_specs caching works correctly
+# ---------------------------------------------------------------------------
+
+
+class TestSpecsCacheTTL:
+    """Tests for specs scan caching with TTL."""
+
+    @pytest.mark.asyncio
+    async def test_specs_cached_within_ttl(self, tmp_path):
+        """Second call within TTL returns cached result without re-reading files."""
+        proj = tmp_path / "test_project"
+        proj.mkdir()
+        specs_dir = proj / "docs" / "specs"
+        specs_dir.mkdir(parents=True)
+
+        spec_file = specs_dir / "feature-spec.md"
+        spec_file.write_text("# Feature\n\n**Status:** Draft\n\nWIP.")
+
+        agent = _make_agent(proj)
+        ws = _load_workflow_state()
+        ws.save_active_plan(agent, {"plan_name": "test"})
+
+        ext_mod = _load_extension()
+        ext_mod._reset_specs_cache()
+
+        ext = _make_ext(agent)
+        loop_data1 = _LoopData()
+        await ext.execute(loop_data=loop_data1)
+
+        # Delete the spec file — if cache works, second call still shows it
+        spec_file.unlink()
+
+        loop_data2 = _LoopData()
+        await ext.execute(loop_data=loop_data2)
+
+        state_block2 = loop_data2.extras_persistent.get("workflow_state", "")
+        assert "feature-spec.md" in state_block2, "Cached result should still list deleted file"
+
+    @pytest.mark.asyncio
+    async def test_specs_cache_expires_after_ttl(self, tmp_path):
+        """Cache expires after TTL and re-reads filesystem."""
+        proj = tmp_path / "test_project"
+        proj.mkdir()
+        specs_dir = proj / "docs" / "specs"
+        specs_dir.mkdir(parents=True)
+
+        spec_file = specs_dir / "feature-spec.md"
+        spec_file.write_text("# Feature\n\n**Status:** Draft\n\nWIP.")
+
+        agent = _make_agent(proj)
+        ws = _load_workflow_state()
+        ws.save_active_plan(agent, {"plan_name": "test"})
+
+        ext_mod = _load_extension()
+        ext_mod._reset_specs_cache()
+
+        # Set a very short TTL for testing
+        original_ttl = ext_mod._SPECS_CACHE_TTL
+        ext_mod._SPECS_CACHE_TTL = 0.01  # 10ms
+
+        try:
+            ext = _make_ext(agent)
+            loop_data1 = _LoopData()
+            await ext.execute(loop_data=loop_data1)
+
+            # Wait for TTL to expire
+            import time
+            time.sleep(0.05)
+
+            # Delete the spec file
+            spec_file.unlink()
+
+            loop_data2 = _LoopData()
+            await ext.execute(loop_data=loop_data2)
+
+            state_block2 = loop_data2.extras_persistent.get("workflow_state", "")
+            assert "feature-spec.md" not in state_block2, (
+                "After TTL expiry, re-scan should not find deleted file"
+            )
+        finally:
+            ext_mod._SPECS_CACHE_TTL = original_ttl
+            ext_mod._reset_specs_cache()

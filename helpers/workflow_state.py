@@ -243,28 +243,55 @@ def discover_feature_slug(agent) -> str | None:
 _VALID_ARTIFACT_TYPES = frozenset({"spec", "plan", "todo", "idea", "intent", "review", "report"})
 
 
+def _resolve_artifact_path_for_type(agent, artifact_type: str) -> str | None:
+    """Resolve the file path for a given artifact type.
+
+    Uses discover_feature_slug + resolve_artifact_paths to find the
+    canonical path.  Returns None on any failure.
+    """
+    try:
+        slug = discover_feature_slug(agent)
+        paths = resolve_artifact_paths(agent, slug)
+        path = paths.get(artifact_type)
+        if isinstance(path, str):
+            return path
+    except Exception:
+        pass
+    return None
+
+
 def mark_artifact_approved(agent, artifact_type: str) -> str | None:
     """Mark an artifact as approved in workflow_artifacts.json.
 
-    Records approval with timestamp and emits an 'approval' progress event.
-    Returns the path to workflow_artifacts.json on success, None on failure.
+    Records approval with timestamp and mtime, and emits an 'approval'
+    progress event.  Returns the path to workflow_artifacts.json on
+    success, None on failure.
     """
     if artifact_type not in _VALID_ARTIFACT_TYPES:
         _log.warning(
             "Unknown artifact type in mark_artifact_approved: %s (expected one of %s)",
             artifact_type, sorted(_VALID_ARTIFACT_TYPES),
         )
+        return None
     try:
         existing = read_workflow_artifacts(agent)
         if existing is None:
             existing = {}
 
-        for key in ("approved", "approved_at"):
+        for key in ("approved", "approved_at", "approved_mtime"):
             if key not in existing or not isinstance(existing[key], dict):
                 existing[key] = {}
 
         existing["approved"][artifact_type] = True
         existing["approved_at"][artifact_type] = time.time()
+
+        # Store the artifact file's mtime for later invalidation checks
+        artifact_path = _resolve_artifact_path_for_type(agent, artifact_type)
+        if artifact_path and os.path.isfile(artifact_path):
+            try:
+                existing["approved_mtime"][artifact_type] = os.path.getmtime(artifact_path)
+            except OSError:
+                _log.debug("Could not read mtime for %s", artifact_path)
 
         result = save_workflow_artifacts(agent, existing)
 
@@ -278,6 +305,66 @@ def mark_artifact_approved(agent, artifact_type: str) -> str | None:
     except Exception as exc:
         _log.warning("Failed to mark artifact approved: %s", exc)
         return None
+
+
+def is_artifact_approved(agent, artifact_type: str) -> bool:
+    """Check if an artifact has been approved and is still valid.
+
+    Reads the ``approved`` dict from ``workflow_artifacts.json``.
+    If ``approved_mtime`` is recorded for the artifact type, verifies
+    the file has not been modified since approval (mtime check).
+
+    Returns True if the artifact was explicitly approved and (when
+    applicable) the file has not changed since approval.  Returns
+    False otherwise.
+
+    Fail-safe: returns False on any error.
+    Legacy: approvals without mtime data are treated as valid (backward
+    compatible).
+    """
+    try:
+        data = read_workflow_artifacts(agent)
+        if not data or not isinstance(data, dict):
+            return False
+        approved = data.get("approved")
+        if not isinstance(approved, dict):
+            return False
+        if not approved.get(artifact_type, False):
+            return False
+
+        # --- Mtime invalidation check ---
+        approved_mtime = data.get("approved_mtime")
+        if isinstance(approved_mtime, dict) and artifact_type in approved_mtime:
+            stored_mtime = approved_mtime[artifact_type]
+            if not isinstance(stored_mtime, (int, float)):
+                # Corrupt mtime - treat as valid (fail-safe)
+                return True
+
+            # Resolve the artifact path and check current mtime
+            artifact_path = _resolve_artifact_path_for_type(agent, artifact_type)
+            if artifact_path is None:
+                # Cannot resolve path - treat as valid (legacy)
+                return True
+
+            if not os.path.isfile(artifact_path):
+                # Artifact file deleted - approval invalid
+                return False
+
+            try:
+                current_mtime = os.path.getmtime(artifact_path)
+            except OSError:
+                # Cannot read mtime (permission error, etc.) - fail-safe: valid
+                return True
+
+            if current_mtime != stored_mtime:
+                # File changed since approval - invalidated
+                return False
+
+        # Either no mtime stored (legacy) or mtime matches - approved
+        return True
+    except Exception:
+        _log.debug("is_artifact_approved failed", exc_info=True)
+        return False
 
 
 def _ensure_dir(path: str) -> None:

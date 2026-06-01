@@ -26,6 +26,7 @@ Configuration keys (default_config.yaml):
 from __future__ import annotations
 
 import logging
+import random
 
 from helpers.extension import Extension
 
@@ -35,11 +36,17 @@ _log = logging.getLogger(__name__)
 # calls on every execute().  Reset via _reset_helpers_cache() in tests.
 _cached_helpers = None
 
+# Module-level flag ensuring validate_graph() runs at most once per session,
+# even though the check lives inside execute().  Reset via
+# _reset_helpers_cache() in tests (which also resets this flag).
+_graph_validated = False
+
 
 def _reset_helpers_cache() -> None:
-    """Clear the cached helpers tuple (for test teardown)."""
-    global _cached_helpers
+    """Clear the cached helpers tuple and graph-validated flag (for test teardown)."""
+    global _cached_helpers, _graph_validated
     _cached_helpers = None
+    _graph_validated = False
 
 
 def _get_plugin_config(agent) -> dict:
@@ -58,7 +65,7 @@ def _get_last_user_message(agent) -> str | None:
     try:
         msg = getattr(agent, "last_user_message", None)
         if msg is not None:
-            text = getattr(msg, "message", None)
+            text = getattr(msg, "content", None)
             if text:
                 return text
     except Exception:
@@ -172,6 +179,7 @@ def _get_helpers():
         _skill_contracts.get_skill_contract,
         _skill_contracts.get_skill_conflicts,
         _skill_contracts.get_skills_for_phase,
+        _skill_contracts.validate_graph,
     )
 
 
@@ -356,6 +364,7 @@ class SkillEnforcer(Extension):
                 get_skill_contract,
                 get_skill_conflicts,
                 get_skills_for_phase,
+                validate_graph_fn,
             ) = _get_helpers()
 
             # ── Gate: only target tools ────────────────────────────────
@@ -378,6 +387,23 @@ class SkillEnforcer(Extension):
 
             # ── Skill contracts config (Slice 4) ───────────────────────
             contracts_enabled = config_bool(cfg.get("skill_contracts_enabled", True))
+
+            # ── Graph validation on build config ─────────────────────────
+            # Runs at most once per session (flag reset only in tests via
+            # _reset_helpers_cache).  The setting name says "on_build" because
+            # the intent is build-time validation, not per-tool-call.
+            global _graph_validated
+            graph_validate_on_build = config_bool(
+                cfg.get("skill_graph_validate_on_build", True)
+            )
+            if graph_validate_on_build and not _graph_validated:
+                _graph_validated = True
+                findings = validate_graph_fn()
+                for finding in findings:
+                    _log.warning(
+                        "Skill graph validation finding: %s",
+                        finding.get("details", finding),
+                    )
 
             # ── Read current phase (if governance enabled) ──────────────
             current_phase = None
@@ -509,8 +535,7 @@ class SkillEnforcer(Extension):
                     recommended_next=recommended_next,
                 )
             else:
-                # Observe mode: log would-fire, do NOT call classifier,
-                # do NOT mutate tool_args
+                # Observe mode: log would-fire, do NOT mutate tool_args
                 await log_gate_decision(
                     agent=self.agent,
                     tool_name=tool_name,
@@ -521,6 +546,37 @@ class SkillEnforcer(Extension):
                     phase=current_phase,
                     recommended_next=recommended_next,
                 )
+
+                # ── Shadow sampling: optionally call classifier for data ──
+                # On N% of tool calls, run the classifier in observe mode
+                # to collect accuracy data WITHOUT affecting behavior.
+                shadow_rate = float(
+                    cfg.get("enforcement_shadow_sample_rate", 0.0)
+                )
+                if shadow_rate > 0.0 and random.random() < shadow_rate:
+                    try:
+                        verdict = await classify_skill(
+                            agent=self.agent,
+                            tool_name=tool_name,
+                            tool_args=tool_args or {},
+                            candidates=unloaded,
+                            last_user_message=last_msg,
+                        )
+                        await log_gate_decision(
+                            agent=self.agent,
+                            tool_name=tool_name,
+                            mode="observe_shadow",
+                            state=verdict["state"],
+                            candidate=verdict.get("candidate"),
+                            reason=verdict.get("reason"),
+                            phase=current_phase,
+                            recommended_next=recommended_next,
+                        )
+                    except Exception:
+                        _log.debug(
+                            "Shadow sample classifier call failed",
+                            exc_info=True,
+                        )
 
         except Exception:
             # Enforcer MUST NOT break the agent loop under any circumstances.

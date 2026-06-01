@@ -4,6 +4,12 @@ You MUST invoke the spec-driven-development skill. Load it now:
 skills_tool:load skill_name=spec-driven-development
 ```
 
+Also load the markdown-documents companion for proper file creation:
+
+```
+skills_tool:load skill_name=markdown-documents
+```
+
 Follow the skill's complete process. Begin by understanding what the user wants to build. You MUST ask clarifying questions about:
 
 1. The objective and target users
@@ -13,8 +19,31 @@ Follow the skill's complete process. Begin by understanding what the user wants 
 
 Then generate a structured spec covering all six core areas: objective, commands, project structure, code style, testing strategy, and boundaries.
 
-You MUST save the spec as **SPEC.md in the project root** and confirm with the user before proceeding.
+You MUST save the spec using the artifact path resolver:
+
+```python
+from helpers.workflow_state import resolve_artifact_paths, discover_feature_slug
+slug = discover_feature_slug(agent)  # may be None for first spec
+# When slug is None (no feature slug discovered), resolve_artifact_paths
+# falls back to legacy paths (e.g. SPEC.md at project root).
+paths = resolve_artifact_paths(agent, slug=slug)
+spec_path = paths["spec"]
+```
+
+Save the spec to `spec_path` and confirm with the user before proceeding.
 
 Surface assumptions first. Do NOT write any code until the spec is confirmed.
+
+## Approval Shortcut
+
+If {raw} contains `--approve`, skip the normal spec creation workflow. Instead:
+
+1. Load the workflow state helpers:
+```python
+from helpers.workflow_state import mark_artifact_approved, discover_feature_slug, resolve_artifact_paths
+```
+2. Call `mark_artifact_approved(agent, "spec")` to record the approval.
+3. Confirm to the user: "✅ Spec approved and recorded in workflow state."
+4. Do NOT create or modify the spec file — only record the approval.
 
 {raw}
