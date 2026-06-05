@@ -1,0 +1,10 @@
+name: a0_agent_skills
+title: Agent Skills
+description: >-
+  Production-grade engineering skills, specialist agent profiles, lifecycle
+  slash commands, and reference checklists for Agent Zero. Provides 24
+  development-phase workflows, 3 subordinate agent profiles (code-reviewer,
+  security-auditor, test-engineer), 7 slash commands, and 5 reference
+  checklists.
+version: 1.0.0
+author: Vanja Bunjevac (Emichi d.o.o.)

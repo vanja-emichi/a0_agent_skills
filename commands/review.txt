@@ -1,0 +1,13 @@
+Load the `dox-project-context` skill using `skills_tool` with `action: load, skill_name: "dox-project-context"`, then load the `code-review-and-quality` skill using `skills_tool` with `action: load, skill_name: "code-review-and-quality"`. Follow both workflows.
+
+Review the current changes (staged or recent commits) across six axes:
+
+1. **Correctness** — Does it match the spec? Edge cases handled? Tests adequate?
+2. **Readability** — Clear names? Straightforward logic? Well-organized?
+3. **Architecture** — Follows existing patterns? Clean boundaries? Right abstraction level?
+4. **Security** — Input validated? Secrets safe? Auth checked? (Load `security-and-hardening` skill for deeper analysis)
+5. **Performance** — No N+1 queries? No unbounded ops? (Load `performance-optimization` skill for deeper analysis)
+6. **DOX compliance** — Applicable `AGENTS.md` chain read? Local contracts followed? Child DOX Indexes refreshed? Stale or contradictory docs removed? Verification section followed?
+
+Categorize findings as Critical, Important, or Suggestion.
+Output a structured review with specific file:line references and fix recommendations.

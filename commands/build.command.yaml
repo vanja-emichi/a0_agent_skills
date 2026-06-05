@@ -1,0 +1,4 @@
+name: build
+description: Implement the next task incrementally — build, test, verify, commit
+type: text
+template_path: build.txt

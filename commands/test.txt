@@ -1,0 +1,18 @@
+Load the `dox-project-context` skill using `skills_tool` with `action: load, skill_name: "dox-project-context"`, then load the `test-driven-development` skill using `skills_tool` with `action: load, skill_name: "test-driven-development"`. Follow both workflows.
+
+Before choosing tests, read the applicable `AGENTS.md` chain for the files or features under test and use the nearest `AGENTS.md` Verification section as a required source of checks.
+
+For new features:
+1. Write tests that describe the expected behavior (they should FAIL)
+2. Implement the code to make them pass
+3. Refactor while keeping tests green
+4. Run the local DOX Verification checks before claiming done
+
+For bug fixes (Prove-It pattern):
+1. Write a test that reproduces the bug (must FAIL)
+2. Confirm the test fails
+3. Implement the fix
+4. Confirm the test passes
+5. Run the local DOX Verification checks and the full test suite for regressions when appropriate
+
+For browser-related issues, also load `browser-testing-with-devtools` using `skills_tool` with `action: load, skill_name: "browser-testing-with-devtools"`.

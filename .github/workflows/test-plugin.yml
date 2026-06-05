@@ -1,0 +1,86 @@
+name: Test Agent Zero Plugin
+
+on:
+  push:
+    branches: [development, main]
+  pull_request:
+    branches: [development, main]
+  workflow_dispatch:
+
+jobs:
+  validate-skills:
+    name: Validate skill content
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Validate all skills
+        run: node scripts/validate-skills.js
+
+  syntax-check:
+    name: Python syntax check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Check all Python files compile
+        run: |
+          find . -name '*.py' -not -path './.git/*' -not -path './__pycache__/*' | sort | while read f; do
+            echo "Compiling: $f"
+            python -m py_compile "$f"
+          done
+          echo "All Python files compile successfully"
+
+  structural-tests:
+    name: Structural tests
+    runs-on: ubuntu-latest
+    needs: [validate-skills, syntax-check]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Detect environment
+        run: |
+          echo "=== Python version ==="
+          python --version
+          echo "=== Pip version ==="
+          pip --version
+          echo "=== Installed packages ==="
+          pip list 2>/dev/null || echo "No packages installed"
+          echo "=== Check for existing venvs ==="
+          ls -la /opt/venv*/bin/python 2>/dev/null || echo "No /opt/venv* found"
+
+      - name: Install test dependencies
+        run: |
+          # Only install what structural tests actually need
+          # Do NOT install framework deps (langchain, litellm, etc.)
+          pip install pytest pytest-xdist requests pyyaml
+
+      - name: Verify dependencies
+        run: |
+          python -c "import pytest; print(f'pytest {pytest.__version__}')"
+          python -c "import requests; print(f'requests {requests.__version__}')"
+          python -c "import yaml; print(f'PyYAML {yaml.__version__}')"
+
+      - name: Run structural tests
+        run: |
+          # Exclude runtime integration tests that need the A0 framework
+          python -m pytest tests/ -v -m "not e2e" --tb=short \
+            --ignore=tests/test_dox_behavior.py \
+            --ignore=tests/test_runtime_commands.py \
+            --ignore=tests/test_runtime_extensions_and_hooks.py \
+            --ignore=tests/test_runtime_skills_and_agents.py

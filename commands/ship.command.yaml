@@ -1,0 +1,5 @@
+name: ship
+description: Run the pre-launch checklist via fan-out to specialist agents, then synthesize a go/no-go decision
+type: script
+template_path: ship.py
+include_history: true

@@ -1,0 +1,18 @@
+Load the `dox-project-context` skill using `skills_tool` with `action: load, skill_name: "dox-project-context"`, then load the `code-simplification` skill using `skills_tool` with `action: load, skill_name: "code-simplification"`. Follow both workflows.
+
+Simplify recently changed code (or the specified scope) while preserving exact behavior:
+
+1. Read project conventions from the applicable AGENTS.md chain, not only the root file
+2. Identify the target code — recent changes unless a broader scope is specified
+3. Understand the code's purpose, callers, edge cases, and test coverage before touching it
+4. Scan for simplification opportunities:
+   - Deep nesting → guard clauses or extracted helpers
+   - Long functions → split by responsibility
+   - Nested ternaries → if/else or switch
+   - Generic names → descriptive names
+   - Duplicated logic → shared functions
+   - Dead code → remove after confirming
+5. Apply each simplification incrementally — run local DOX Verification checks and tests after each change
+6. Perform DOX closeout if simplification changes durable structure, contracts, workflows, or verification
+
+If tests fail after a simplification, revert that change and reconsider. Load `code-review-and-quality` using `skills_tool` with `action: load, skill_name: "code-review-and-quality"` to review the result.
