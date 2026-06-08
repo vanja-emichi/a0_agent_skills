@@ -1,4 +1,4 @@
-Load the `dox-project-context` skill using `skills_tool` with `action: load, skill_name: "dox-project-context"`, then load the `code-simplification` skill using `skills_tool` with `action: load, skill_name: "code-simplification"`. Follow both workflows.
+Load the `code-simplification` skill using `skills_tool` with `action: load, skill_name: "code-simplification"`. Follow the workflow.
 
 Simplify recently changed code (or the specified scope) while preserving exact behavior:
 

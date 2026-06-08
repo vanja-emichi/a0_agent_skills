@@ -1,6 +1,6 @@
 """E2e tests for Agent Zero plugin extensions.
 
-Tests that plugin extensions (meta-skill injection, SDD cache, simplify-ignore)
+Tests that plugin extensions (SDD cache, simplify-ignore, skill auto-unload)
 work correctly in a live agent session.
 
 Prerequisites:
@@ -24,39 +24,26 @@ def client(a0_client: A0E2EClient) -> A0E2EClient:
 
 
 # ------------------------------------------------------------------
-# Test: Meta-skill injection via agent_init extension
+# Test: Meta-skill content in agent0 specifics override
 # ------------------------------------------------------------------
 
-class TestMetaSkillInjection:
-    """Verify the _00_inject_meta_skill.py extension auto-loads using-agent-skills."""
+class TestMetaSkillSpecificsOverride:
+    """Verify the agent.system.main.specifics.md override includes meta-skill content."""
 
-    def test_meta_skill_injected_in_scheduler_task(self, client, task_tracker):
-        """Create a scheduler task and verify using-agent-skills is loaded."""
-        task = client.create_and_run_task(
-            name="e2e-meta-skill-inject",
-            system_prompt="You are a test agent. Respond with 'META_OK' in your response.",
-            prompt="Say hello and confirm you are ready.",
-        )
-        task_tracker.append(task["uuid"])
+    def test_specifics_override_file_exists(self):
+        """Verify the specifics override file exists in the plugin."""
+        import os
+        path = "/a0/usr/plugins/a0_agent_skills/agents/agent0/prompts/agent.system.main.specifics.md"
+        assert os.path.isfile(path), f"Specifics override file missing: {path}"
 
-        result = client.wait_for_task(task["uuid"])
-        assert result is not None, "Task did not complete"
-
-        context_id = result.get("context_id")
-        assert context_id, "No context_id in task result"
-
-        # Check chat.json for loaded skills
-        chat = client.get_chat_json(context_id)
-        assert chat is not None, "Chat not found"
-
-        agents = chat.get("agents", [])
-        assert agents, "No agents in chat"
-
-        data = agents[0].get("data", {})
-        loaded = data.get("loaded_skills", [])
-        assert "using-agent-skills" in loaded, (
-            f"using-agent-skills not in loaded_skills: {loaded}"
-        )
+    def test_specifics_override_has_meta_skill_content(self):
+        """Verify the specifics override contains meta-skill operating behaviors."""
+        import os
+        path = "/a0/usr/plugins/a0_agent_skills/agents/agent0/prompts/agent.system.main.specifics.md"
+        content = open(path).read()
+        # Core operating behaviors
+        assert "skill" in content.lower(), "Specifics override missing skill references"
+        assert "AGENTS.md" in content or "DOX" in content, "Specifics override missing DOX/AGENTS.md reference"
 
 
 # ------------------------------------------------------------------
@@ -67,13 +54,14 @@ class TestExtensionFilePresence:
     """Verify all extension files exist and are valid Python."""
 
     EXPECTED_EXTENSIONS = [
-        "extensions/python/agent_init/_00_inject_meta_skill.py",
         "extensions/python/monologue_end/_10_simplify_ignore.py",
+        "extensions/python/monologue_end/_15_skill_auto_unload.py",
         "extensions/python/text_editor_patch_after/_10_simplify_ignore.py",
         "extensions/python/text_editor_write_after/_10_simplify_ignore.py",
         "extensions/python/tool_execute_after/_10_sdd_cache.py",
         "extensions/python/tool_execute_before/_10_sdd_cache.py",
         "extensions/python/tool_execute_before/_20_simplify_ignore.py",
+        "extensions/python/system_prompt/_10a_dox_interpreter.py",
     ]
 
     def test_all_extension_files_present(self):

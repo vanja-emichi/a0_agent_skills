@@ -1,0 +1,29 @@
+{
+  "skill_name": "code-simplification",
+  "evals": [
+    {
+      "id": "cs-chestertons-fence",
+      "name": "Understands code before simplifying (Chestertons Fence)",
+      "prompt": "I have this function that looks unnecessarily complex. Simplify it:\n\nfunction processOrder(order) {\n  if (order.items && order.items.length > 0) {\n    if (order.payment && order.payment.status === 'completed') {\n      if (!order.shipping || order.shipping.status !== 'shipped') {\n        return { success: true, total: order.items.reduce((s, i) => s + i.price * i.qty, 0) };\n      } else {\n        return { success: false, error: 'already shipped' };\n      }\n    } else {\n      return { success: false, error: 'payment not completed' };\n    }\n  } else {\n    return { success: false, error: 'no items' };\n  }\n}",
+      "expected_output": "The model should first understand what each condition guards against before simplifying, use guard clauses to reduce nesting, and verify behavior is preserved.",
+      "assertions": [
+        "The output acknowledges or analyzes what each condition checks for before simplifying (Chestertons Fence).",
+        "The output uses guard clauses or early returns to reduce nesting rather than restructuring control flow entirely.",
+        "The output preserves all the same error messages and return conditions as the original.",
+        "The output mentions that tests should still pass without modification as a verification step."
+      ]
+    },
+    {
+      "id": "cs-no-behavior-change",
+      "name": "Preserves behavior exactly while simplifying",
+      "prompt": "This function works but is hard to read. Simplify it WITHOUT changing what it does:\n\nfunction getDiscount(customer) {\n  let discount = 0;\n  if (customer.tier === 'gold') {\n    discount = discount + 0.2;\n    if (customer.years > 5) {\n      discount = discount + 0.05;\n    }\n    if (customer.referrals > 10) {\n      discount = discount + 0.03;\n    }\n  } else if (customer.tier === 'silver') {\n    discount = discount + 0.1;\n    if (customer.years > 3) {\n      discount = discount + 0.02;\n    }\n  }\n  return Math.min(discount, 0.3);\n}",
+      "expected_output": "The model should simplify for readability while preserving exact behavior for all inputs, including the Math.min cap and all conditional paths.",
+      "assertions": [
+        "The output preserves the Math.min(discount, 0.3) cap that prevents discounts exceeding 30 percent.",
+        "The output preserves all the same discount amounts and conditions for gold, silver, and default tiers.",
+        "The output mentions that existing tests should pass without modification as proof of preserved behavior.",
+        "The output does NOT change the function signature, return type, or add new behavior."
+      ]
+    }
+  ]
+}

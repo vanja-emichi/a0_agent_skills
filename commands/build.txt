@@ -1,9 +1,9 @@
-Load the `dox-project-context` skill using `skills_tool` with `action: load, skill_name: "dox-project-context"`, load the `incremental-implementation` skill using `skills_tool` with `action: load, skill_name: "incremental-implementation"`, and also load `test-driven-development` using `skills_tool` with `action: load, skill_name: "test-driven-development"`. Follow all applicable workflows.
+Load the `incremental-implementation` skill using `skills_tool` with `action: load, skill_name: "incremental-implementation"`, and also load `test-driven-development` using `skills_tool` with `action: load, skill_name: "test-driven-development"`. Follow all applicable workflows.
 
 Pick the next pending task from tasks/todo.md or the plan. For each task:
 
 1. Read the task's acceptance criteria and touched paths
-2. Perform DOX preflight for every target path: read root `AGENTS.md` and every child `AGENTS.md` along the route
+2. Perform DOX preflight for every target path: read root `AGENTS.md` and every child `AGENTS.md` along the route (nearest contract wins for local details)
 3. Load relevant context (existing code, patterns, types)
 4. Write a failing test for the expected behavior (RED)
 5. Implement the minimum code to pass the test (GREEN)

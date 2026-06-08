@@ -19,7 +19,7 @@ def run(payload):
     parts = []
 
     parts.append("Run the pre-launch checklist via fan-out to specialist agents.\n")
-    parts.append("Load `dox-project-context` using `skills_tool` before fan-out. Read the applicable AGENTS.md chain for the target, or pass the relevant DOX context to each specialist.\n")
+    parts.append("Read the applicable `AGENTS.md` chain for the target before fan-out, or pass the relevant DOX context to each specialist.\n")
 
     # Phase A
     parts.append("## Phase A — Fan-out to specialists\n")

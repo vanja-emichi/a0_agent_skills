@@ -76,21 +76,20 @@ def test_framework_skill_helpers_discover_plugin_skills(plugin_skill_root):
 
     for expected in {
         "using-agent-skills",
-        "dox-project-context",
         "test-driven-development",
         "security-and-hardening",
     }:
         assert expected in names
 
+    # dox-project-context has been removed; verify it is absent
+    assert "dox-project-context" not in names, (
+        "dox-project-context skill should not exist"
+    )
+
     using = skills_helper.find_skill("using-agent-skills")
     assert using is not None
     assert using.path.resolve() == (SKILLS_DIR / "using-agent-skills").resolve()
     assert using.description
-
-    dox = skills_helper.find_skill("dox-project-context")
-    assert dox is not None
-    assert dox.path.resolve() == (SKILLS_DIR / "dox-project-context").resolve()
-    assert "AGENTS.md" in dox.description
 
 
 @pytest.mark.runtime_integration

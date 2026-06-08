@@ -1,0 +1,31 @@
+{
+  "skill_name": "incremental-implementation",
+  "evals": [
+    {
+      "id": "inc-file-upload-slices",
+      "name": "Incremental: build file upload feature in vertical slices",
+      "prompt": "Build a file upload feature.",
+      "expected_output": "The response should break the feature into small vertical slices, implement the thinnest useful slice first, test each slice before expanding, and grow the feature incrementally.",
+      "assertions": [
+        "The output breaks the file upload feature into multiple small slices or steps rather than one big implementation.",
+        "The output implements the thinnest useful slice first (e.g., single file upload with no validation before multi-file with progress).",
+        "The output mentions testing or verifying each slice before moving to the next.",
+        "The output describes building incrementally from simple to complex.",
+        "The output mentions that each slice should be deployable or independently testable."
+      ]
+    },
+    {
+      "id": "inc-sequence-five-requirements",
+      "name": "Incremental: sequencing work for multiple requirements",
+      "prompt": "A feature has 5 requirements. How do you sequence the work?",
+      "expected_output": "The response should describe prioritizing the thinnest useful slice first, testing before expanding, and avoiding big-bang implementation of all requirements at once.",
+      "assertions": [
+        "The output describes prioritizing or identifying the most important or thinnest useful requirement to implement first.",
+        "The output mentions implementing and testing one requirement before moving to the next.",
+        "The output warns against implementing all requirements at once (big-bang approach).",
+        "The output mentions that early slices should deliver value even if incomplete.",
+        "The output describes a feedback loop where each implemented requirement informs the next."
+      ]
+    }
+  ]
+}

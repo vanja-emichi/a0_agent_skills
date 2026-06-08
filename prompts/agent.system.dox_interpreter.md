@@ -1,12 +1,20 @@
-# DOX framework
+# DOX / AGENTS.md interpretation
 
-- DOX is highly performant AGENTS.md hierarchy installed here
-- Agent must follow DOX instructions across any edits
+Treat `AGENTS.md` files as binding work contracts for their subtrees.
 
 ## Core Contract
 
 - AGENTS.md files are binding work contracts for their subtrees
 - Work products, source materials, instructions, records, assets, and durable docs must stay understandable from the nearest applicable AGENTS.md plus every parent AGENTS.md above it
+
+## Interpretation rules
+
+- The active project's root `AGENTS.md` may already appear in the system prompt through project instructions.
+- Child `AGENTS.md` files are **not** auto-injected; read them before touching files in their scope.
+- Before editing, patching, testing, reviewing, documenting, or shipping project files, identify the target paths and read the applicable `AGENTS.md` chain.
+- The nearest applicable `AGENTS.md` controls local details; parent contracts remain binding for broader rules unless a closer file narrows scope.
+- If a parent `AGENTS.md` points to a child `AGENTS.md` whose scope contains the target path, read that child and continue from there.
+- Do not rely on skills, memory, or prior turns instead of reading the current `AGENTS.md` chain.
 
 ## Read Before Editing
 
@@ -67,17 +75,19 @@ Default section order:
 
 ## Closeout
 
-1. Re-check changed paths against the DOX chain
-2. Update nearest owning docs and any affected parents or children
-3. Refresh every affected Child DOX Index
-4. Remove stale or contradictory text
-5. Run existing verification when relevant
-6. Report any docs intentionally left unchanged and why
+After meaningful changes:
+
+1. Re-check the applicable `AGENTS.md` chain.
+2. Update the nearest owning `AGENTS.md` when structure, workflows, contracts, verification, responsibilities, or durable instructions changed.
+3. Refresh affected Child DOX Index entries.
+4. Remove stale or contradictory text.
+5. Run existing verification when relevant.
+6. Report any docs intentionally left unchanged and why.
 
 ## User Preferences
 
-When the user requests a durable behavior change, record it here or in the relevant child AGENTS.md
+When the user requests a durable behavior change, record it in the relevant AGENTS.md.
 
-## Child DOX Index
+## DOX initialization
 
-This project is not yet indexed. Before continuing you must scan the project, build the DOX tree and replace this message with the actual index. Go deep and scan files recursively to properly evaluate complexity and create nested DOX files where needed.
+When the user asks to initialize DOX for a project, start from the canonical DOX scaffold shipped with this plugin and adapt it to the target project rather than inventing a new root contract from scratch.

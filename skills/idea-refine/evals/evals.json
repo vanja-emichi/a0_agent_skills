@@ -1,0 +1,29 @@
+{
+  "skill_name": "idea-refine",
+  "evals": [
+    {
+      "id": "ir-pushback-and-reframe",
+      "name": "Pushes back on weak ideas and reframes the problem",
+      "prompt": "Help me refine this idea: I want to build a tool that automatically generates commit messages from code diffs.",
+      "expected_output": "The model should not just agree and start planning. It should push back, reframe as a How Might We question, and ask who it's for or what success looks like before converging on a direction.",
+      "assertions": [
+        "The output pushes back on at least one aspect of the idea or asks a challenging question rather than immediately agreeing.",
+        "The output reframes the idea or asks who the tool is for and what success looks like.",
+        "The output does NOT immediately jump to implementation details or a single solution.",
+        "The output explores at least one alternative angle or variation on the original idea."
+      ]
+    },
+    {
+      "id": "ir-assumptions-and-tradeoffs",
+      "name": "Surfaces key assumptions and identifies trade-offs",
+      "prompt": "I want to build a CLI that hooks into git, uses AI to analyze diffs, and suggests conventional commit messages. What assumptions am I making and what could go wrong? Give me your honest assessment without reading any files.",
+      "expected_output": "The model should list explicit assumptions being made (AI quality, user workflow, language support) and identify risks without trying to read reference files first.",
+      "assertions": [
+        "The output lists at least 2 specific assumptions the idea depends on (e.g., AI will produce good enough messages, users want conventional format, git hooks are reliable).",
+        "The output identifies at least one risk or thing that could go wrong with the approach.",
+        "The output suggests something to NOT do or explicitly excludes scope to stay focused.",
+        "The output challenges at least one assumption honestly rather than just validating the idea."
+      ]
+    }
+  ]
+}

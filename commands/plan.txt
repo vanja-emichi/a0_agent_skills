@@ -1,4 +1,9 @@
-Load the `dox-project-context` skill using `skills_tool` with `action: load, skill_name: "dox-project-context"`, then load the `planning-and-task-breakdown` skill using `skills_tool` with `action: load, skill_name: "planning-and-task-breakdown"`. Follow both workflows.
+Load the `planning-and-task-breakdown` skill using `skills_tool` with `action: load, skill_name: "planning-and-task-breakdown"`. Follow the workflow.
+
+DOX preflight:
+1. Read the active project's root `AGENTS.md` if present.
+2. For each area likely to change, read every child `AGENTS.md` along the route (nearest contract wins for local details).
+3. Capture durable project rules, boundaries, required artifacts, and verification expectations that the plan must respect.
 
 Read the existing spec at `tasks/spec.md`, the relevant codebase sections, and the applicable `AGENTS.md` chain for the areas likely to change. Then:
 

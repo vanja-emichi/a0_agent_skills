@@ -70,26 +70,6 @@ def _extension_paths_for(point: str):
 
 
 @pytest.mark.runtime_integration
-def test_extension_dispatch_loads_plugin_agent_init_extension(monkeypatch):
-    from helpers import extension, subagents
-
-    monkeypatch.setattr(
-        subagents,
-        "get_paths",
-        lambda agent, *parts: _extension_paths_for(parts[-1]),
-    )
-
-    agent = FakeAgent()
-    assert "loaded_skills" not in agent.data
-
-    extension.call_extensions_sync("agent_init", agent=agent)
-    assert agent.data["loaded_skills"] == ["using-agent-skills"]
-
-    extension.call_extensions_sync("agent_init", agent=agent)
-    assert agent.data["loaded_skills"] == ["using-agent-skills"]
-
-
-@pytest.mark.runtime_integration
 @pytest.mark.parametrize(
     ("point", "expected_modules", "kwargs"),
     [

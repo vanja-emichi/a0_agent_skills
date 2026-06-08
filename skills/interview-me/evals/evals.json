@@ -1,0 +1,42 @@
+{
+  "skill_name": "interview-me",
+  "evals": [
+    {
+      "id": "im-hypothesis-before-action",
+      "name": "Stops to hypothesize before building",
+      "prompt": "Build me a dashboard for our metrics.",
+      "expected_output": "The model should not immediately propose chart libraries or layouts. It should state a hypothesis about what the user actually wants with a confidence number, then ask one focused question at a time with a guess attached.",
+      "assertions": [
+        "The output contains an explicit hypothesis or initial read of what the user wants (not just questions).",
+        "The output includes a confidence number or percentage indicating uncertainty.",
+        "The output asks one question at a time rather than a batch list of questions.",
+        "The output attaches a guess or reasoning to the question rather than asking baldly.",
+        "The output does NOT propose specific technologies, layouts, or implementation details."
+      ]
+    },
+    {
+      "id": "im-detect-want-vs-should",
+      "name": "Detects want vs should want in user answers",
+      "prompt": "I am building a notification system. When asked who it is for, I say 'It should be scalable and follow clean architecture principles so it can handle our growing user base.'",
+      "expected_output": "The model should detect that the answer is pattern-matching best-practice talk rather than describing an actual need, and push back to find the real requirement.",
+      "assertions": [
+        "The output identifies that the answer uses buzzwords or best-practice language instead of specifics.",
+        "The output does not accept 'scalable' or 'clean architecture' at face value as a requirement.",
+        "The output asks a follow-up question designed to surface the actual problem or need behind the convention.",
+        "The output mentions or implies the concept that the user said what a thoughtful answer sounds like rather than what they actually want."
+      ]
+    },
+    {
+      "id": "im-restate-with-out-of-scope",
+      "name": "Restates intent with explicit out-of-scope section",
+      "prompt": "After several questions, you now understand: the user wants a personal experiment tracker (not a team dashboard) to list which experiments are running and see early signals. The user confirmed this.",
+      "expected_output": "The model should produce a structured restate of intent that includes outcome, user, why now, success criteria, constraint, and critically an out-of-scope section, then seek explicit confirmation.",
+      "assertions": [
+        "The output contains a structured restatement with labeled sections (outcome, user, success criteria, etc.).",
+        "The output explicitly includes an 'out of scope' or 'not doing' section listing what is excluded.",
+        "The output uses language close to the user's own words rather than introducing new jargon.",
+        "The output asks for explicit confirmation (yes/no/refine) rather than assuming agreement."
+      ]
+    }
+  ]
+}

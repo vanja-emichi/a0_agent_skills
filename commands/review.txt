@@ -1,4 +1,4 @@
-Load the `dox-project-context` skill using `skills_tool` with `action: load, skill_name: "dox-project-context"`, then load the `code-review-and-quality` skill using `skills_tool` with `action: load, skill_name: "code-review-and-quality"`. Follow both workflows.
+Load the `code-review-and-quality` skill using `skills_tool` with `action: load, skill_name: "code-review-and-quality"`. Follow the workflow.
 
 Review the current changes (staged or recent commits) across six axes:
 

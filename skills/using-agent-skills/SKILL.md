@@ -1,9 +1,10 @@
 ---
+persist: true
 name: using-agent-skills
 description: Discovers and invokes agent skills. Use when starting a session or when you need to discover which skill applies to the current task. This is the meta-skill that governs how all other skills are discovered and invoked.
 ---
 
-> **Note:** This skill is automatically injected at the start of every Agent Zero session by the `_00_inject_meta_skill.py` extension. You don't need to load it manually — its content is already in your context.
+> **Note:** The core content of this skill is replicated in the `agents/agent0/prompts/agent.system.main.specifics.md` override so it is available in the agent0 system prompt at startup. Loading this skill explicitly is still useful for the full discovery workflow, but the key guidance is already in context.
 
 # Using Agent Skills
 
@@ -20,7 +21,6 @@ Task arrives
     │
     ├── Don't know what you want yet? ──────→ interview-me
     ├── Have a rough concept, need variants? → idea-refine
-    ├── Project/file work or repository edits? ─→ dox-project-context
     ├── New project/feature/change? ──→ spec-driven-development
     ├── Have a spec, need tasks? ──────→ planning-and-task-breakdown
     ├── Implementing code? ────────────→ incremental-implementation
@@ -42,12 +42,6 @@ Task arrives
     ├── Writing docs/ADRs? ───────────→ documentation-and-adrs
     └── Deploying/launching? ─────────→ shipping-and-launch
 ```
-
-## DOX Project Contracts
-
-For any task that plans, edits, tests, reviews, documents, or ships project files, load `dox-project-context` with `skills_tool` before mutation. Follow the active project's `AGENTS.md` hierarchy: root contract first, then every child `AGENTS.md` along each target path.
-
-`using-agent-skills` routes to DOX; it does not replace the DOX walk. Child `AGENTS.md` files are not automatically injected by Agent Zero and must be read explicitly when their subtree is touched.
 
 ## Core Operating Behaviors
 
@@ -150,22 +144,21 @@ These are the subtle errors that look like productivity but create problems:
 For a complete feature, the typical skill sequence is:
 
 ```
- 1. dox-project-context        → Read and apply AGENTS.md contracts before project work
- 2. interview-me               → Extract what the user actually wants
- 3. idea-refine                → Refine vague ideas
- 4. spec-driven-development    → Define what we're building
- 5. planning-and-task-breakdown → Break into verifiable chunks
- 6. context-engineering        → Load the right context
- 7. source-driven-development  → Verify against official docs
- 8. incremental-implementation → Build slice by slice
- 9. doubt-driven-development   → Cross-examine non-trivial decisions in-flight
-10. test-driven-development    → Prove each slice works
-11. code-review-and-quality    → Review before merge
-12. code-simplification        → Reduce unnecessary complexity while preserving behavior
-13. git-workflow-and-versioning → Clean commit history
-14. documentation-and-adrs     → Document decisions
-15. deprecation-and-migration  → Retire old systems and move users safely when needed
-16. shipping-and-launch        → Deploy safely
+ 1. interview-me               → Extract what the user actually wants
+ 2. idea-refine                → Refine vague ideas
+ 3. spec-driven-development    → Define what we're building
+ 4. planning-and-task-breakdown → Break into verifiable chunks
+ 5. context-engineering        → Load the right context
+ 6. source-driven-development  → Verify against official docs
+ 7. incremental-implementation → Build slice by slice
+ 8. doubt-driven-development   → Cross-examine non-trivial decisions in-flight
+ 9. test-driven-development    → Prove each slice works
+10. code-review-and-quality    → Review before merge
+11. code-simplification        → Reduce unnecessary complexity while preserving behavior
+12. git-workflow-and-versioning → Clean commit history
+13. documentation-and-adrs     → Document decisions
+14. deprecation-and-migration  → Retire old systems and move users safely when needed
+15. shipping-and-launch        → Deploy safely
 ```
 
 Not every task needs every skill. A bug fix might only need: `debugging-and-error-recovery` → `test-driven-development` → `code-review-and-quality`.
@@ -174,7 +167,6 @@ Not every task needs every skill. A bug fix might only need: `debugging-and-erro
 
 | Phase | Skill | One-Line Summary |
 |-------|-------|-----------------|
-| Governance | dox-project-context | Apply AGENTS.md project contracts before and after project work |
 | Define | interview-me | Surface what the user actually wants before any plan, spec, or code exists |
 | Define | idea-refine | Refine ideas through structured divergent and convergent thinking |
 | Define | spec-driven-development | Requirements and acceptance criteria before code |
@@ -198,12 +190,14 @@ Not every task needs every skill. A bug fix might only need: `debugging-and-erro
 | Ship | documentation-and-adrs | Document the why, not just the what |
 | Ship | shipping-and-launch | Pre-launch checklist, monitoring, rollback plan |
 
-Files (use skills_tool action=read_file to open):
-/a0/usr/plugins/a0_agent_skills/skills/using-agent-skills/
-├── SKILL.md
-└── references/
-    ├── accessibility-checklist.md
-    ├── orchestration-patterns.md
-    ├── performance-checklist.md
-    ├── security-checklist.md
-    └── testing-patterns.md
+## References
+
+Shared checklists and pattern guides for skill workflows:
+
+| File | Purpose |
+|------|---------|
+| `security-checklist.md` | Security hardening checklist |
+| `performance-checklist.md` | Performance optimization checklist |
+| `accessibility-checklist.md` | Accessibility compliance checklist |
+| `testing-patterns.md` | Testing strategy patterns |
+| `orchestration-patterns.md` | Agent orchestration patterns |

@@ -1,0 +1,29 @@
+{
+  "skill_name": "api-and-interface-design",
+  "evals": [
+    {
+      "id": "aid-versioning-strategy",
+      "name": "Designs API versioning strategy with backward compatibility awareness",
+      "prompt": "I have a v1 REST API with GET /api/v1/users that returns {id, name, email}. I need to add a role field and change email to emailAddresses (an array). How should I version and migrate this?",
+      "expected_output": "The model should correctly classify changes as breaking vs non-breaking, then describe a concrete migration strategy (versioning OR additive extension) that maintains backward compatibility during transition.",
+      "assertions": [
+        "The output correctly identifies that renaming 'email' to 'emailAddresses' (string to array) is a breaking change for existing consumers.",
+        "The output recommends a concrete strategy for handling the breaking change (e.g., URL versioning /api/v2/, header-based versioning, or additive migration with both fields).",
+        "The output describes a migration plan that keeps existing consumers working during transition, not an immediate cutover.",
+        "The output recommends adding the 'role' field as a non-breaking additive change that can go in v1 immediately."
+      ]
+    },
+    {
+      "id": "aid-breaking-change-classification",
+      "name": "Classifies API changes as breaking or non-breaking",
+      "prompt": "Review these proposed changes to our REST API and classify each as breaking or non-breaking:\n1. Add a new optional 'avatarUrl' field to the user response\n2. Remove the deprecated 'phone' field from the user response\n3. Change GET /api/users from returning an array to returning {users: [], total: number}\n4. Add a new endpoint POST /api/users/bulk\n5. Change the error response format from {error: string} to {error: {code: string, message: string}}",
+      "expected_output": "The model should correctly classify each change, explain why each is breaking or non-breaking, and recommend a strategy for handling the breaking ones.",
+      "assertions": [
+        "The output correctly classifies adding 'avatarUrl' as non-breaking (additive change).",
+        "The output correctly classifies removing 'phone' as breaking (removing a field consumers may depend on).",
+        "The output correctly classifies changing the response shape (array to object) as breaking.",
+        "The output correctly classifies adding a new endpoint as non-breaking."
+      ]
+    }
+  ]
+}

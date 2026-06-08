@@ -1,0 +1,30 @@
+{
+  "skill_name": "frontend-ui-engineering",
+  "evals": [
+    {
+      "id": "fui-avoid-ai-aesthetic",
+      "name": "Avoids AI-generated UI aesthetic and follows design system",
+      "prompt": "Create a task list component for a project management app. The design system uses Tailwind CSS with slate as the primary color and a spacing scale of 4px increments.",
+      "expected_output": "The model should produce a component that uses the project actual design tokens, avoids generic AI defaults (purple/indigo, rounded-2xl, excessive gradients), and includes loading/empty/error states.",
+      "assertions": [
+        "The output uses the project specified color palette (slate) rather than defaulting to purple or indigo.",
+        "The output uses the design system spacing scale rather than arbitrary pixel values.",
+        "The output does NOT use excessive rounded corners (like rounded-2xl), heavy gradients, or shadow-heavy design.",
+        "The output includes a loading state (skeleton, not just a spinner), an empty state, and error handling.",
+        "The output separates data fetching (container) from presentation (component) in the component architecture."
+      ]
+    },
+    {
+      "id": "fui-accessibility-integration",
+      "name": "Implements keyboard navigation and ARIA labels",
+      "prompt": "Build a modal dialog component that opens when a user clicks Delete task. The dialog should have a confirm and cancel button, and users should be able to close it with Escape.",
+      "expected_output": "The model should implement focus trapping, ARIA labels, keyboard support (Escape to close, Tab cycling), and return focus to the trigger element on close.",
+      "assertions": [
+        "The output implements focus management (moving focus to the dialog on open, returning on close).",
+        "The output includes keyboard handling for Escape key to close the dialog.",
+        "The output uses proper ARIA attributes (role=dialog, aria-modal, aria-labelledby or aria-label).",
+        "The output uses semantic HTML elements (button, dialog) rather than divs with onClick handlers."
+      ]
+    }
+  ]
+}

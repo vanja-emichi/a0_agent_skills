@@ -1,8 +1,8 @@
 """Contract and parity tests for DOX workflow prerequisites.
 
-These tests verify static DOX contracts, routing, and source/plugin parity.
-They are intentionally shallow guardrails; real scheduler-based behavioral
-coverage lives in the batch scheduler harness tests.
+These tests verify static DOX contracts, routing, and the AGENTS.md-based
+authority model. They are intentionally shallow guardrails; real
+scheduler-based behavioral coverage lives in the e2e test suite.
 """
 
 from __future__ import annotations
@@ -17,6 +17,7 @@ import pytest
 A0_ROOT = Path("/a0")
 PLUGIN_DIR = Path(__file__).resolve().parents[1]
 SKILLS_DIR = PLUGIN_DIR / "skills"
+PROMPTS_DIR = PLUGIN_DIR / "prompts"
 
 if str(A0_ROOT) not in sys.path:
     sys.path.insert(0, str(A0_ROOT))
@@ -99,228 +100,124 @@ def dox_test_env(monkeypatch, tmp_path):
 
 
 @pytest.mark.dox_contract
-def test_framework_plumbing_root_only_injection(dox_test_env, monkeypatch):
-    """Prove dox-project-context explicitly states child AGENTS.md files are not auto-injected.
-
-    This is the foundation DOX relies on: the skill must teach that only root
-    AGENTS.md is auto-injected and child contracts must be read manually.
-    """
-    dox_skill_path = SKILLS_DIR / "dox-project-context" / "SKILL.md"
-    assert dox_skill_path.exists(), "dox-project-context skill not found"
-
-    skill_content = dox_skill_path.read_text()
-
-    # The skill must explicitly state that child AGENTS.md files are NOT auto-loaded
-    child_not_auto_loaded = any(phrase in skill_content for phrase in [
-        "child `AGENTS.md` files are not automatically loaded",
-        "not automatically injected",
-        "not automatically loaded",
-        "must be read manually",
-    ])
-
-    assert child_not_auto_loaded, (
-        "dox-project-context does not explicitly state that child AGENTS.md files "
-        "are not automatically loaded by the framework"
-    )
-
-
-@pytest.mark.dox_contract
-def test_framework_plumbing_child_not_auto_injected(dox_test_env, monkeypatch):
-    """Prove dox-project-context teaches the manual chain-walk requirement.
-
-    If child AGENTS.md files were auto-injected, there would be no need for
-    the explicit walk process. The skill must teach manual traversal.
-    """
-    dox_skill_path = SKILLS_DIR / "dox-project-context" / "SKILL.md"
-    skill_content = dox_skill_path.read_text()
-
-    # The skill must teach explicit manual reading of AGENTS.md files
-    manual_read_required = all(phrase in skill_content for phrase in [
-        "walk from the project root",
-        "Read every `AGENTS.md` found along the route",
-    ])
-
-    assert manual_read_required, (
-        "dox-project-context does not teach explicit manual reading of AGENTS.md "
-        "files along the target path, which is required since they are not auto-injected"
-    )
-
-
-@pytest.mark.dox_contract
-def test_dox_skill_teaches_chain_walk():
-    """Prove dox-project-context skill explicitly teaches the chain-walk process.
-    
-    The skill must instruct agents to read child AGENTS.md files before
-    editing target paths, not just rely on root injection.
-    """
-    dox_skill_path = SKILLS_DIR / "dox-project-context" / "SKILL.md"
-    assert dox_skill_path.exists(), "dox-project-context skill not found"
-    
-    skill_content = dox_skill_path.read_text()
-    
-    # The skill must mention reading AGENTS.md files along the path
-    assert "walk" in skill_content.lower() or "route" in skill_content.lower(), (
-        "dox-project-context does not teach path walking"
-    )
-    
-    # The skill must mention child AGENTS.md files explicitly
-    assert "child" in skill_content.lower() and "AGENTS.md" in skill_content, (
-        "dox-project-context does not mention child AGENTS.md files"
-    )
-    
-    # The skill must distinguish between root and child injection
-    assert "not automatically" in skill_content.lower() or "manually" in skill_content.lower(), (
-        "dox-project-context does not teach that child AGENTS.md must be read manually"
-    )
-
-
-@pytest.mark.dox_contract
-def test_nearest_contract_precedence_in_dox_skill():
-    """Prove dox-project-context teaches that nearest contract wins for local details.
-    
-    When parent and child AGENTS.md conflict, the skill must instruct
-    agents to follow the closer contract for local work.
-    """
-    dox_skill_path = SKILLS_DIR / "dox-project-context" / "SKILL.md"
-    skill_content = dox_skill_path.read_text()
-    
-    # The skill must mention precedence or conflict resolution
-    precedence_mentioned = any(phrase in skill_content.lower() for phrase in [
-        "nearest",
-        "closest",
-        "precedence",
-        "conflict",
-        "parent and child",
-        "local contract",
-    ])
-    
-    assert precedence_mentioned, (
-        "dox-project-context does not teach nearest-contract precedence"
-    )
-    
-    # The skill must explicitly state local contracts control local details
-    local_controls = any(phrase in skill_content for phrase in [
-        "nearest `AGENTS.md` as the local contract",
-        "closest file owns local details",
-        "use the nearest",
-        "local contract wins",
-    ])
-    
-    assert local_controls, (
-        "dox-project-context does not state that nearest contract controls local details"
-    )
-
-
-@pytest.mark.dox_contract
-def test_subordinate_handoff_in_dox_skill():
-    """Prove dox-project-context teaches DOX context must be passed to subordinates.
-    
-    Subordinate agents do not automatically receive the main agent's loaded
-    skills or context, so DOX context must be explicitly handed off.
-    """
-    dox_skill_path = SKILLS_DIR / "dox-project-context" / "SKILL.md"
-    skill_content = dox_skill_path.read_text()
-    
-    # The skill must mention subordinate handoff
-    subordinate_mentioned = any(phrase in skill_content.lower() for phrase in [
-        "subordinate",
-        "call_subordinate",
-        "delegate",
-        "handoff",
-        "pass.*context",
-    ])
-    
-    assert subordinate_mentioned, (
-        "dox-project-context does not mention subordinate context handoff"
-    )
-    
-    # The skill must explicitly state subordinates need DOX context
-    dox_context_passed = any(phrase in skill_content for phrase in [
-        "include either",
-        "relevant DOX contract excerpts",
-        "instruction to read the applicable `AGENTS.md` chain",
-        "Subordinates should report DOX gaps",
-    ])
-    
-    assert dox_context_passed, (
-        "dox-project-context does not teach passing DOX context to subordinates"
-    )
-
-
-@pytest.mark.dox_contract
-def test_source_plugin_dox_skill_parity():
-    """Prove source and plugin dox-project-context skills are semantically aligned.
-    
-    The installed plugin skill must match the source authoring truth,
-    not drift into a different workflow description.
-    """
-    source_skill = (
-        Path("/a0/usr/projects/a0_agent_skills/skills/dox-project-context/SKILL.md")
-    )
+def test_dox_project_context_skill_removed():
+    """Prove the dox-project-context skill has been removed from both locations."""
     plugin_skill = SKILLS_DIR / "dox-project-context" / "SKILL.md"
+    source_skill = Path("/a0/usr/projects/a0_agent_skills/skills/dox-project-context/SKILL.md")
     
-    assert source_skill.exists(), "Source dox-project-context skill not found"
-    assert plugin_skill.exists(), "Plugin dox-project-context skill not found"
-    
-    source_content = source_skill.read_text()
-    plugin_content = plugin_skill.read_text()
-    
-    # The core workflow sections should match
-    for section_marker in ["## Core Process", "### 1. DOX preflight", "### 3. DOX closeout"]:
-        if section_marker in source_content:
-            assert section_marker in plugin_content, (
-                f"Plugin skill missing section: {section_marker}"
-            )
-    
-    # The skill should not have drifted on key behavioral requirements
-    key_requirements = [
-        "Read every `AGENTS.md` found along the route",
-        "nearest `AGENTS.md` as the local contract",
-        "Update the nearest owning `AGENTS.md`",
-    ]
-    
-    for requirement in key_requirements:
-        if requirement in source_content:
-            assert requirement in plugin_content, (
-                f"Plugin skill drifted on requirement: {requirement}"
-            )
+    assert not plugin_skill.exists(), (
+        "dox-project-context skill should not exist in plugin"
+    )
+    assert not source_skill.exists(), (
+        "dox-project-context skill should not exist in source project"
+    )
 
 
 @pytest.mark.dox_contract
-def test_using_agent_skills_routes_to_dox():
-    """Prove using-agent-skills meta-skill routes project work to dox-project-context.
-    
-    The meta-skill should explicitly direct agents to load dox-project-context
-    before any project/file mutation, not just mention it in passing.
-    """
+def test_dox_interpreter_teaches_agents_md_chain_reading(dox_test_env, monkeypatch):
+    """Prove the DOX interpreter teaches reading AGENTS.md chain before mutation."""
+    interpreter_path = PROMPTS_DIR / "agent.system.dox_interpreter.md"
+    assert interpreter_path.exists(), "DOX interpreter prompt not found"
+
+    interpreter_content = interpreter_path.read_text()
+
+    # The interpreter must teach reading AGENTS.md chain
+    chain_reading = any(phrase in interpreter_content.lower() for phrase in [
+        "agents.md chain",
+        "read the applicable",
+    ])
+
+    assert chain_reading, (
+        "DOX interpreter does not teach AGENTS.md chain reading"
+    )
+
+
+@pytest.mark.dox_contract
+def test_dox_interpreter_teaches_nearest_contract_wins(dox_test_env, monkeypatch):
+    """Prove the DOX interpreter teaches that nearest contract wins for local details."""
+    interpreter_path = PROMPTS_DIR / "agent.system.dox_interpreter.md"
+    interpreter_content = interpreter_path.read_text()
+
+    # Must mention nearest contract precedence
+    nearest_mentioned = any(phrase in interpreter_content.lower() for phrase in [
+        "nearest applicable",
+        "nearest contract",
+    ])
+
+    assert nearest_mentioned, (
+        "DOX interpreter does not teach nearest-contract precedence"
+    )
+
+
+@pytest.mark.dox_contract
+def test_dox_interpreter_teaches_closeout():
+    """Prove the DOX interpreter teaches closeout (updating AGENTS.md after mutation)."""
+    interpreter_path = PROMPTS_DIR / "agent.system.dox_interpreter.md"
+    interpreter_content = interpreter_path.read_text()
+
+    # Must mention closeout (section header or phrase)
+    closeout_found = any(phrase in interpreter_content for phrase in [
+        "## Closeout",
+        "DOX closeout",
+    ])
+    assert closeout_found, (
+        "DOX interpreter does not teach DOX closeout"
+    )
+    assert "nearest owning" in interpreter_content, (
+        "DOX interpreter does not mention updating nearest owning AGENTS.md"
+    )
+
+
+@pytest.mark.dox_contract
+def test_dox_interpreter_declares_agents_md_authority():
+    """Prove the DOX interpreter states AGENTS.md files are binding work contracts."""
+    interpreter_path = PROMPTS_DIR / "agent.system.dox_interpreter.md"
+    interpreter_content = interpreter_path.read_text()
+
+    # Must state AGENTS.md files are binding
+    assert "binding work contracts" in interpreter_content, (
+        "DOX interpreter does not declare AGENTS.md as binding contracts"
+    )
+    assert "AGENTS.md" in interpreter_content
+
+
+@pytest.mark.dox_contract
+def test_no_dox_project_context_references_remain():
+    """Prove no runtime code still references dox-project-context as a dependency."""
     meta_skill_path = SKILLS_DIR / "using-agent-skills" / "SKILL.md"
-    assert meta_skill_path.exists(), "using-agent-skills skill not found"
-    
     skill_content = meta_skill_path.read_text()
     
-    # The skill must route to dox-project-context for project work
-    routing_present = any(phrase in skill_content for phrase in [
-        "load `dox-project-context`",
-        "load dox-project-context",
-        "apply `dox-project-context`",
-        "use `dox-project-context`",
-    ])
-    
-    assert routing_present, (
-        "using-agent-skills does not route to dox-project-context"
+    assert "dox-project-context" not in skill_content, (
+        "using-agent-skills still references removed dox-project-context"
     )
     
-    # The routing should be conditional on project/file work
-    conditional_routing = any(phrase in skill_content.lower() for phrase in [
-        "project.*dox-project-context",
-        "file.*dox-project-context",
-        "edit.*dox-project-context",
-        "before mutation",
-        "before editing",
-    ])
-    
-    assert conditional_routing, (
-        "using-agent-skills does not conditionally route to dox-project-context for project work"
+    # Also verify command templates don't reference it
+    commands_dir = PLUGIN_DIR / "commands"
+    for cmd_file in ("spec.txt", "plan.txt", "build.txt", "test.txt", "review.txt", "code-simplify.txt"):
+        cmd_path = commands_dir / cmd_file
+        if cmd_path.exists():
+            content = cmd_path.read_text()
+            assert "dox-project-context" not in content, (
+                f"{cmd_file} still references removed dox-project-context"
+            )
+
+
+@pytest.mark.dox_contract
+def test_dox_interpreter_routes_to_agents_md():
+    """Prove the DOX interpreter routes project work to AGENTS.md chain."""
+    interpreter_path = PROMPTS_DIR / "agent.system.dox_interpreter.md"
+    assert interpreter_path.exists(), "DOX interpreter prompt not found"
+
+    interpreter_content = interpreter_path.read_text()
+
+    # The interpreter must route to AGENTS.md for project work
+    assert "AGENTS.md" in interpreter_content, (
+        "DOX interpreter does not mention AGENTS.md"
+    )
+
+    # Must NOT reference dox-project-context
+    assert "dox-project-context" not in interpreter_content, (
+        "DOX interpreter still references removed dox-project-context"
     )
 
 
@@ -329,11 +226,10 @@ def test_lifecycle_commands_include_dox_gates():
     """Prove lifecycle commands include DOX preflight and closeout gates.
     
     Commands that mutate or review project files must explicitly include
-    DOX workflow steps, not just mention DOX in passing.
+    DOX workflow steps referencing AGENTS.md chain.
     """
     commands_dir = PLUGIN_DIR / "commands"
     
-    # Commands that should have DOX gates
     commands_needing_dox = [
         "spec.txt",
         "plan.txt",
@@ -350,17 +246,14 @@ def test_lifecycle_commands_include_dox_gates():
         
         cmd_content = cmd_path.read_text()
         
-        # Each command should mention DOX preflight or closeout
-        # The primary gate is loading dox-project-context or mentioning AGENTS.md
         has_dox_gate = (
-            "dox-project-context" in cmd_content or
-            "dox preflight" in cmd_content.lower() or
-            "dox closeout" in cmd_content.lower() or
-            "AGENTS.md" in cmd_content
+            "dox preflight" in cmd_content.lower()
+            or "dox closeout" in cmd_content.lower()
+            or "AGENTS.md" in cmd_content
         )
 
         assert has_dox_gate, (
-            f"Command {cmd_file} does not load dox-project-context or include DOX gates"
+            f"Command {cmd_file} does not include DOX gates (AGENTS.md reference)"
         )
 
 
@@ -385,14 +278,12 @@ def test_agent_profiles_are_dox_aware():
         if not profile_dir.exists():
             continue
         
-        # Look for the main system prompt
         prompt_files = list(profile_dir.glob("prompts/*.md"))
         if not prompt_files:
             continue
         
         prompt_content = "\n".join(f.read_text() for f in prompt_files)
         
-        # The profile should mention AGENTS.md as binding
         agents_aware = any(phrase in prompt_content for phrase in [
             "AGENTS.md",
             "project contracts",

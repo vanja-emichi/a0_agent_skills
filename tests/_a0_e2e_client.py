@@ -22,6 +22,7 @@ Usage::
 
 from __future__ import annotations
 
+import json
 import logging
 import shutil
 import time
@@ -51,6 +52,116 @@ def _is_response_tool(content: str) -> bool:
         return isinstance(data, dict) and data.get("tool_name") == "response"
     except (ValueError, TypeError):
         return '"tool_name": "response"' in content
+
+
+def _loads_json_maybe(value: Any) -> Any:
+    """Parse JSON strings while leaving already-parsed values untouched."""
+    if isinstance(value, str):
+        try:
+            return json.loads(value)
+        except Exception:
+            return value
+    return value
+
+
+def iter_history_messages(chat: dict[str, Any]) -> list[dict[str, Any]]:
+    """Flatten persisted history messages for all agents."""
+    messages: list[dict[str, Any]] = []
+    for agent_index, agent in enumerate(chat.get("agents", [])):
+        hist = _loads_json_maybe(agent.get("history", ""))
+        if not isinstance(hist, dict):
+            continue
+
+        def add_many(source: str, items: list[dict[str, Any]]) -> None:
+            for msg in items:
+                if isinstance(msg, dict):
+                    enriched = dict(msg)
+                    enriched.setdefault("source", source)
+                    enriched.setdefault("agent_index", agent_index)
+                    messages.append(enriched)
+
+        current = hist.get("current")
+        if isinstance(current, dict):
+            add_many("current", current.get("messages", []))
+
+        for bulk in hist.get("bulks", []) or []:
+            for record in bulk.get("records", []) or []:
+                add_many("bulks", record.get("messages", []))
+
+        for topic in hist.get("topics", []) or []:
+            add_many("topics", topic.get("messages", []))
+
+    return messages
+
+
+def extract_tool_calls_from_chat(chat: dict[str, Any]) -> list[dict[str, Any]]:
+    """Extract JSON tool calls from persisted chat history."""
+    calls: list[dict[str, Any]] = []
+    for index, msg in enumerate(iter_history_messages(chat)):
+        content = msg.get("content", "")
+        parsed = _loads_json_maybe(content)
+        if not isinstance(parsed, dict) or "tool_name" not in parsed:
+            continue
+        calls.append(
+            {
+                "message_index": index,
+                "agent_index": msg.get("agent_index", 0),
+                "tool_name": parsed.get("tool_name"),
+                "tool_args": parsed.get("tool_args", {}) or {},
+                "content": content,
+            }
+        )
+    return calls
+
+
+def find_tool_calls(
+    calls: list[dict[str, Any]],
+    *,
+    tool_name: str | None = None,
+    action: str | None = None,
+    path: str | None = None,
+) -> list[dict[str, Any]]:
+    """Filter normalized tool calls by tool, action, and path."""
+    matched: list[dict[str, Any]] = []
+    for call in calls:
+        args = call.get("tool_args", {}) or {}
+        if tool_name is not None and call.get("tool_name") != tool_name:
+            continue
+        if action is not None and args.get("action") != action:
+            continue
+        if path is not None and args.get("path") != path:
+            continue
+        matched.append(call)
+    return matched
+
+
+def assert_tool_read_before_write(
+    calls: list[dict[str, Any]],
+    *,
+    required_reads: list[str],
+    target_path: str,
+) -> None:
+    """Assert required AGENTS.md reads occurred before target mutation."""
+    mutations = find_tool_calls(calls, tool_name="text_editor", path=target_path)
+    mutations = [
+        c for c in mutations if c.get("tool_args", {}).get("action") in {"write", "patch"}
+    ]
+    assert mutations, f"No text_editor write/patch call found for {target_path}"
+    first_mutation = min(c["message_index"] for c in mutations)
+
+    for read_path in required_reads:
+        reads = find_tool_calls(calls, tool_name="text_editor", action="read", path=read_path)
+        assert reads, f"Missing text_editor read for required AGENTS.md: {read_path}"
+        assert min(c["message_index"] for c in reads) < first_mutation, (
+            f"Required read happened after mutation: {read_path}"
+        )
+
+
+def file_sha256(path: str | Path) -> str:
+    """Return SHA256 digest for a file path."""
+    import hashlib
+
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
 def gather_evidence(a0_client: "A0E2EClient", task_result: dict) -> dict:

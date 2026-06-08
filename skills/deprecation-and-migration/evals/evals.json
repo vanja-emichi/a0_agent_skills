@@ -1,0 +1,29 @@
+{
+  "skill_name": "deprecation-and-migration",
+  "evals": [
+    {
+      "id": "dam-replacement-first",
+      "name": "Builds replacement before deprecating",
+      "prompt": "Our LegacyAuthService has known security vulnerabilities and is hard to maintain. 12 services depend on its API. I want to deprecate it and migrate to NewAuthService. Start by announcing the deprecation.",
+      "expected_output": "The model should refuse to start with deprecation announcement and instead insist on building and proving the replacement first, then migrating consumers incrementally.",
+      "assertions": [
+        "The output does NOT start with announcing deprecation or setting a removal date.",
+        "The output insists the replacement must be built and production-proven first.",
+        "The output recommends migrating consumers one at a time, not all at once.",
+        "The output mentions verifying zero active usage before removing the old system."
+      ]
+    },
+    {
+      "id": "dam-strangler-pattern",
+      "name": "Uses strangler pattern for incremental migration",
+      "prompt": "I need to migrate from our old REST API to a new GraphQL API. 50 clients depend on the REST endpoints. The new GraphQL API covers 80 percent of use cases. Just switch them over.",
+      "expected_output": "The model should recommend the strangler pattern or adapter pattern for incremental migration rather than a big-bang cutover, and flag the 20 percent coverage gap.",
+      "assertions": [
+        "The output does NOT recommend switching all clients at once.",
+        "The output recommends an incremental migration pattern (strangler, adapter, or feature flag).",
+        "The output flags that the new API only covers 80 percent of use cases and the gap must be addressed before full migration.",
+        "The output mentions the Churn Rule: if you own the deprecated system, you are responsible for migrating consumers."
+      ]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-Load the `dox-project-context` skill using `skills_tool` with `action: load, skill_name: "dox-project-context"`, then load the `test-driven-development` skill using `skills_tool` with `action: load, skill_name: "test-driven-development"`. Follow both workflows.
+Load the `test-driven-development` skill using `skills_tool` with `action: load, skill_name: "test-driven-development"`. Follow the workflow.
 
 Before choosing tests, read the applicable `AGENTS.md` chain for the files or features under test and use the nearest `AGENTS.md` Verification section as a required source of checks.
 

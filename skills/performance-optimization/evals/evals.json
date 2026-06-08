@@ -1,0 +1,29 @@
+{
+  "skill_name": "performance-optimization",
+  "evals": [
+    {
+      "id": "po-measure-first",
+      "name": "Measures before optimizing rather than guessing",
+      "prompt": "My app feels slow. The task list page takes a long time to load. I think it is the database queries. Can you optimize the queries?",
+      "expected_output": "The model should insist on measuring first to identify the actual bottleneck rather than assuming it is the database queries and optimizing them blindly.",
+      "assertions": [
+        "The output recommends measuring or profiling before making any optimization changes.",
+        "The output does NOT immediately optimize database queries without evidence they are the bottleneck.",
+        "The output describes a measurement workflow (baseline, identify, fix, verify).",
+        "The output mentions specific metrics to check (LCP, TTFB, response time, bundle size) rather than vague performance advice."
+      ]
+    },
+    {
+      "id": "po-n1-query-detection",
+      "name": "Identifies and fixes N+1 query patterns",
+      "prompt": "I profiled the task list page and the bottleneck IS the database. Here is the current code that makes 51 queries for 50 tasks: it fetches all tasks then loops to get each owner individually. The page loads in 2.3 seconds. Fix this.",
+      "expected_output": "The model should identify the N+1 query pattern and fix it with a single query using include/join, then verify the improvement with measurement.",
+      "assertions": [
+        "The output identifies the N+1 query pattern (one query per task for the owner).",
+        "The output replaces the loop with a single query using include/join to fetch related data.",
+        "The output mentions verifying the fix by measuring again and comparing to the 2.3s baseline.",
+        "The output does NOT suggest adding caching as the primary fix (the right fix is eliminating N+1)."
+      ]
+    }
+  ]
+}

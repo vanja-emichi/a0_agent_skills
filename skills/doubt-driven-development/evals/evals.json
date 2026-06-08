@@ -1,0 +1,41 @@
+{
+  "skill_name": "doubt-driven-development",
+  "evals": [
+    {
+      "id": "ddd-claim-extract-doubt",
+      "name": "Follows CLAIM-EXTRACT-DOUBT cycle for non-trivial decisions",
+      "prompt": "I have implemented a caching layer for our API. It uses an in-memory Map with TTL expiry and lazy cleanup on reads. The cache stores user permission objects. I think it is thread-safe because JavaScript is single-threaded. Should I ship this?",
+      "expected_output": "The model should surface the claim explicitly, extract the artifact and contract separately, and invoke adversarial review rather than just saying it looks good or listing informal concerns.",
+      "assertions": [
+        "The output names the decision as an explicit CLAIM before evaluating it (e.g., stating what is being asserted and why it matters).",
+        "The output separates the ARTIFACT (the caching code) from the CONTRACT (what it must guarantee) for review.",
+        "The output frames the review adversarially (looking for what is wrong) rather than seeking validation.",
+        "The output does NOT just approve the implementation with a quick checklist."
+      ]
+    },
+    {
+      "id": "ddd-reconcile-findings",
+      "name": "Reconciles reviewer findings against artifact text",
+      "prompt": "A fresh-context reviewer flagged that your caching layer does not handle the case where permissions change on the server but the stale cache still returns old values. The reviewer says this is a data integrity issue. Your implementation has a 5-minute TTL. How do you handle this finding?",
+      "expected_output": "The model should classify the finding against the artifact (valid and actionable, valid trade-off, contract misread, or noise) rather than blindly accepting or dismissing the reviewer output.",
+      "assertions": [
+        "The output classifies the finding using a structured categorization (actionable, trade-off, noise, contract issue) rather than a simple agree/disagree.",
+        "The output re-reads the artifact context (the 5-minute TTL) before classifying, rather than rubber-stamping the reviewer.",
+        "The output does NOT automatically treat the reviewer output as authoritative without examining the specific context.",
+        "The output mentions or implies bounded stopping conditions (e.g., 3-cycle limit, trivial findings threshold)."
+      ]
+    },
+    {
+      "id": "ddd-offer-cross-model",
+      "name": "Offers cross-model review in interactive sessions",
+      "prompt": "I am about to commit a non-trivial change to the authentication middleware that changes how session tokens are validated. This is security-sensitive and irreversible in production. I am working interactively with you right now.",
+      "expected_output": "The model should explicitly offer cross-model review as an option, even if it seems low-stakes, because the skill mandates surfacing the choice in every interactive doubt cycle.",
+      "assertions": [
+        "The output explicitly offers a cross-model second opinion option to the user.",
+        "The output does NOT silently skip the cross-model offer.",
+        "The output mentions that the user decides whether the cost is worth it, not the agent.",
+        "The output includes the adversarial framing (finding issues, not validating) in its review approach."
+      ]
+    }
+  ]
+}

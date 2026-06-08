@@ -1,0 +1,32 @@
+{
+  "skill_name": "spec-driven-development",
+  "evals": [
+    {
+      "id": "sdd-auth-spec-first",
+      "name": "Spec first: user authentication system",
+      "prompt": "Build a user authentication system for a web application. The app uses React on the frontend and Node.js/Express on the backend with PostgreSQL.",
+      "expected_output": "The response should start by defining requirements and writing a specification document before writing any code. It should cover acceptance criteria, tech stack decisions, project structure, and success criteria.",
+      "assertions": [
+        "The output starts with requirements gathering or specification writing rather than jumping into code implementation.",
+        "The output mentions writing a spec, specification, or requirements document before any code.",
+        "The output defines acceptance criteria or success criteria for the authentication system.",
+        "The output identifies assumptions about the project (e.g., session vs JWT, browser targets, database choice).",
+        "The output covers at least 3 of the 6 core spec areas: objective, commands, project structure, code style, testing strategy, or boundaries.",
+        "The output mentions human review or approval of the spec before proceeding to implementation."
+      ]
+    },
+    {
+      "id": "sdd-dark-mode-spec-first",
+      "name": "Spec first: adding dark mode feature",
+      "prompt": "The user asks you to add dark mode to their existing React application. The app currently uses CSS modules for styling and has about 30 components.",
+      "expected_output": "The response should define scope, constraints, and acceptance criteria before implementing. It should surface assumptions about the approach.",
+      "assertions": [
+        "The output defines or asks about the scope of dark mode (e.g., all pages vs specific, system preference detection, toggle mechanism).",
+        "The output lists assumptions about the implementation approach before starting.",
+        "The output defines acceptance criteria or success criteria for what 'done' looks like.",
+        "The output mentions testing strategy for the dark mode feature.",
+        "The output does NOT jump directly into code implementation without requirements clarification."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "skill_name": "planning-and-task-breakdown",
+  "evals": [
+    {
+      "id": "ptb-vertical-slicing",
+      "name": "Slices work vertically instead of horizontally",
+      "prompt": "I have a spec for a task management app with these features: user registration, login, task CRUD, and task assignment. Break this into implementation tasks.",
+      "expected_output": "The model should slice vertically (one complete user flow per task) rather than horizontally (all DB, then all API, then all UI), building foundations first.",
+      "assertions": [
+        "The output maps dependencies between components (schema, API, UI) before listing tasks.",
+        "The output organizes tasks as vertical slices where each task delivers working, testable functionality end-to-end.",
+        "The output does NOT group all database work, then all API work, then all UI work as separate phases.",
+        "Each task includes specific, testable acceptance criteria (not just 'implement the feature')."
+      ]
+    },
+    {
+      "id": "ptb-decompose-large-task",
+      "name": "Decomposes a large feature into smaller tasks",
+      "prompt": "Break down 'add search to my app' into implementation tasks. The search needs full-text search, filters, and pagination.",
+      "expected_output": "The model should decompose this into 3-5 smaller tasks, each with clear scope and acceptance criteria, rather than treating it as one task.",
+      "assertions": [
+        "The output breaks the feature into at least 3 separate tasks, not one monolithic task.",
+        "Each task has a clear, narrow scope that could be implemented independently.",
+        "The output does NOT contain a single task titled 'implement search' that covers everything.",
+        "The output orders tasks so dependencies are built first (e.g., search infrastructure before UI)."
+      ]
+    }
+  ]
+}

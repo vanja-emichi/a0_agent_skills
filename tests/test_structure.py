@@ -167,7 +167,7 @@ class TestSkills:
             if os.path.isdir(os.path.join(self.SKILLS_DIR, d))
             and os.path.isfile(os.path.join(self.SKILLS_DIR, d, "SKILL.md"))
         )
-        assert count == 24, f"Expected 24 skills, found {count}"
+        assert count == 23, f"Expected 23 skills, found {count}"
 
     def test_all_skill_frontmatter_valid(self):
         """Every SKILL.md must have non-empty name and description in frontmatter."""
@@ -344,37 +344,46 @@ class TestReferences:
 
 
 class TestDoxIntegration:
-    """Validate the DOX project-context skill and lifecycle gates."""
+    """Validate DOX authority via AGENTS.md files and lifecycle gates."""
 
-    def test_dox_skill_files_exist(self):
+    def test_dox_skill_removed(self):
+        """The dox-project-context skill has been removed; DOX authority is now in AGENTS.md."""
         skill_dir = os.path.join(PLUGIN_DIR, "skills", "dox-project-context")
-        for fname in ("SKILL.md", "AGENTS.template.md", "dox-checklist.md"):
-            path = os.path.join(skill_dir, fname)
-            assert os.path.isfile(path), f"dox-project-context missing {fname}"
-            assert os.path.getsize(path) > 0, f"dox-project-context/{fname} is empty"
+        assert not os.path.isdir(skill_dir), (
+            "dox-project-context skill directory should not exist"
+        )
 
-    def test_using_agent_skills_routes_to_dox(self):
-        path = os.path.join(PLUGIN_DIR, "skills", "using-agent-skills", "SKILL.md")
+    def test_using_agent_skills_routes_to_agents_md(self):
+        """Meta-skill routes project work to AGENTS.md chain via DOX interpreter."""
+        path = os.path.join(PLUGIN_DIR, "prompts", "agent.system.dox_interpreter.md")
         with open(path, encoding="utf-8") as f:
             content = f.read()
-        assert "dox-project-context" in content
         assert "AGENTS.md" in content
+        assert "dox-project-context" not in content, (
+            "DOX interpreter should not reference dox-project-context"
+        )
 
     def test_lifecycle_commands_include_dox_gate(self):
+        """Lifecycle commands reference AGENTS.md chain, not a skill."""
         commands_dir = os.path.join(PLUGIN_DIR, "commands")
         for fname in ("spec.txt", "plan.txt", "build.txt", "test.txt", "review.txt", "code-simplify.txt"):
             with open(os.path.join(commands_dir, fname), encoding="utf-8") as f:
                 content = f.read()
-            assert "dox-project-context" in content, f"{fname} does not load dox-project-context"
             assert "AGENTS.md" in content, f"{fname} does not mention AGENTS.md contracts"
+            assert "dox-project-context" not in content, (
+                f"{fname} still references removed dox-project-context"
+            )
 
     def test_ship_command_includes_dox_readiness(self):
+        """Ship command uses AGENTS.md chain for DOX readiness."""
         path = os.path.join(PLUGIN_DIR, "commands", "ship.py")
         with open(path, encoding="utf-8") as f:
             content = f.read()
-        assert "dox-project-context" in content
         assert "DOX readiness" in content
         assert "AGENTS.md" in content
+        assert "dox-project-context" not in content, (
+            "ship.py should not reference removed dox-project-context"
+        )
 
     def test_agent_profiles_are_dox_aware(self):
         agents_dir = os.path.join(PLUGIN_DIR, "agents")
