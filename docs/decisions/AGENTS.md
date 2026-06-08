@@ -14,6 +14,8 @@
 - `ADR-004-sdd-documentation-cache.md`: SDD documentation cache.
 - `ADR-005-simplify-ignore-file-protection.md`: Simplify-ignore file protection.
 - `ADR-006-e2e-test-harness.md`: HTTP-API-driven E2E test harness.
+- `ADR-007-eval-framework-and-behavioral-fixes.md`: Eval framework integration and behavioral skill fixes.
+- `ADR-008-dox-skills-prompt-restructuring.md`: DOX/skills prompt restructuring — removal of enforcement extensions in favor of prompt-based DOX.
 
 ## Local Contracts
 

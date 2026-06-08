@@ -10,6 +10,8 @@ This directory contains all ADRs for the `a0_agent_skills` Agent Zero plugin.
 | [ADR-004](ADR-004-sdd-documentation-cache.md) | SDD Documentation Cache | Accepted | 2026-06-05 |
 | [ADR-005](ADR-005-simplify-ignore-file-protection.md) | Simplify-Ignore File Protection | Accepted | 2026-06-05 |
 | [ADR-006](ADR-006-e2e-test-harness.md) | HTTP-API-Driven E2E Test Harness for Agent Zero Plugins | Accepted | 2026-06-05 |
+| [ADR-007](ADR-007-eval-framework-and-behavioral-fixes.md) | Eval Framework and Behavioral Fixes | Accepted | 2026-06-05 |
+| [ADR-008](ADR-008-dox-skills-prompt-restructuring.md) | DOX/Skills Prompt Restructuring (Enforcement Removal) | Accepted | 2026-06-05 |
 
 ## ADR Lifecycle
 

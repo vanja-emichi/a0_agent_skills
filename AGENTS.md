@@ -133,7 +133,6 @@ See [Extensions section](#extensions) below for descriptions.
 | `prompts/agent.system.dox_interpreter.md` | System-prompt interpreter explaining how Agent Zero should apply AGENTS.md / DOX contracts |
 | `templates/dox/AGENTS.md` | Canonical DOX root scaffold copied from `source_dox/_AGENTS.md` for project initialization |
 | `agents/agent0/prompts/agent.system.main.specifics.md` | Agent0 specifics override injecting skill discovery and DOX awareness at position 1 of the main prompt |
-| `core-behaviors.promptinclude.md` | Legacy condensed operating rules reference retained for compatibility |
 
 ### Config
 
@@ -181,7 +180,7 @@ Two Python environments exist inside the Docker container:
 | Eval report | `test_eval_report` | Local + CI | Python 3.13 |
 | Runtime integration | `test_runtime_commands`, `test_runtime_extensions_and_hooks`, `test_runtime_skills_and_agents` (marked `@pytest.mark.runtime_integration`) | Local only (A0 runtime) | `/opt/venv-a0/bin/python` with A0 framework |
 | Framework conformance | `test_framework_conformance` | Local only (A0 runtime) | `/opt/venv-a0/bin/python` — compares LogItem dataclass fields against plugin mocks |
-| E2e behavioral | `test_e2e_dox_behavior`, `test_e2e_dox_closeout`, `test_e2e_skill_loading`, `test_e2e_agent_profiles`, `test_e2e_extensions` (injection), `test_e2e_command_execution`, `test_e2e_command_rendering`, `test_e2e_reference_access`, `test_e2e_extension_behavior` | Live server only | A0 server on port 80, env vars `A0_E2E_USERNAME`/`A0_E2E_PASSWORD` |
+| E2e behavioral | `test_e2e_dox_behavior`, `test_e2e_dox_closeout`, `test_e2e_skill_loading`, `test_e2e_agent_profiles`, `test_e2e_extensions` (injection), `test_e2e_command_execution`, `test_e2e_command_rendering`, `test_e2e_reference_access`, `test_e2e_extension_behavior`, `test_e2e_prompt_override` | Live server only | A0 server on port 80, env vars `A0_E2E_USERNAME`/`A0_E2E_PASSWORD` |
 
 CI excludes runtime integration tests (they import `helpers.*` from the A0 framework which isn't available on GitHub Actions).
 
@@ -210,12 +209,6 @@ CI excludes runtime integration tests (they import `helpers.*` from the A0 frame
 |---|---|---|
 | `_10_sdd_cache.py` | `tool_execute_before` | Before `browser` tool navigate/content actions, checks cache for URL. If cached and server returns HTTP 304, redirects to no-op (`action=list`) and stores cached content for post-extension to surface. |
 | `_10_sdd_cache.py` | `tool_execute_after` | After `browser` tool, either serves cached content (on hit) or stores new response with ETag/Last-Modified from HEAD request. Cache stored in `.a0proj/sdd-cache/<hash>.json`. |
-
-### Prompt Include
-
-| File | Purpose |
-|---|---|
-| `core-behaviors.promptinclude.md` | Condensed operating rules reference retained for compatibility. The authoritative runtime path is the agent0 specifics override (position 1) plus the DOX interpreter system_prompt extension (position 2). |
 
 ### Design principles
 

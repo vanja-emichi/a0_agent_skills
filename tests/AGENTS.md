@@ -17,6 +17,7 @@
 - `test_e2e_dox_closeout.py`: E2e DOX closeout compliance checks.
 - `test_e2e_extension_behavior.py`: E2e extension injection and behavior tests.
 - `test_e2e_extensions.py`: E2e extension presence and compilation checks.
+- `test_e2e_prompt_override.py`: E2e verification that the agent0 specifics override is injected at position 1 of the main system prompt.
 - `test_e2e_reference_access.py`: E2e reference checklist access via skills_tool.
 - `test_e2e_skill_loading.py`: E2e skill loading and content verification.
 - `test_eval_report.py`: Tests for eval report generation and quality metrics.
@@ -35,7 +36,7 @@
 - Tests run via `pytest` from the plugin root using `pytest.ini` configuration.
 - E2E tests require a running Agent Zero instance; the client helper manages HTTP sessions.
 - Unit tests should not depend on live services.
-- Credentials from environment variables only (`A0_E2E_USERNAME`, `A0_E2E_PASSWORD`)
+- Credentials resolved from env vars (`A0_E2E_USERNAME`, `A0_E2E_PASSWORD`) first, then fallback to framework dotenv `/a0/usr/.env` (`AUTH_LOGIN`, `AUTH_PASSWORD`) via `_resolve_credentials()` in conftest.py
 
 ## Work Guidance
 

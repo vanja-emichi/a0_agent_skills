@@ -21,7 +21,7 @@
 
 - Add new pre-execution hooks by creating `_NN_<name>.py` with the next available prefix number.
 - Keep hooks idempotent — tool calls may be retried.
-- Test via `test_runtime_extensions_and_hooks.py`, `test_extension_inject.py`, and `test_e2e_extensions.py`.
+- Test via `test_runtime_extensions_and_hooks.py`, `test_e2e_extension_behavior.py`, and `test_e2e_extensions.py`.
 
 ## Verification
 
