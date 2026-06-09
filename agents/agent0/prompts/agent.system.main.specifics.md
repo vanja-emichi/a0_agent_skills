@@ -43,16 +43,8 @@ review: code-review-and-quality → code-simplification → security-and-hardeni
 ship: git-workflow-and-versioning → ci-cd-and-automation → documentation-and-adrs → shipping-and-launch
 not every task needs every skill — a bug fix is debug → test → review
 
-## DOX awareness
+## agent0-exclusive
 
-before working in any project read the applicable AGENTS.md chain
-walk from root to target path reading every AGENTS.md found along each route
-after meaningful changes update the nearest AGENTS.md
-refresh affected Child DOX Index entries
-re-check DOX chain when scope or targets change
+auto-loading the meta-skill (`using-agent-skills`) at session start is restricted to agent number 0 — do not change this guard
 
-## subordinate delegation
-
-when delegating include relevant AGENTS.md chain paths in the message
-include active DOX contracts the subordinate should follow
-subordinates see DOX interpreter at position 2 but lack your project context
+subordinates inherit the project root AGENTS.md via shared context (call_subordinate shares the context object) and see the DOX interpreter at position 2 — they do NOT lack project context; what they lack is the meta-skill auto-load and any target paths the superior does not provide

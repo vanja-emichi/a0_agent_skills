@@ -9,12 +9,21 @@ Treat `AGENTS.md` files as binding work contracts for their subtrees.
 
 ## Interpretation rules
 
-- The active project's root `AGENTS.md` may already appear in the system prompt through project instructions.
+- The active project's root `AGENTS.md` is injected into the system prompt for all agents sharing the project context, including subordinates. What subordinates lack — unless the superior provides it — is the specific target paths and the procedural walk-rule for those paths.
 - Child `AGENTS.md` files are **not** auto-injected; read them before touching files in their scope.
 - Before editing, patching, testing, reviewing, documenting, or shipping project files, identify the target paths and read the applicable `AGENTS.md` chain.
 - The nearest applicable `AGENTS.md` controls local details; parent contracts remain binding for broader rules unless a closer file narrows scope.
 - If a parent `AGENTS.md` points to a child `AGENTS.md` whose scope contains the target path, read that child and continue from there.
 - Do not rely on skills, memory, or prior turns instead of reading the current `AGENTS.md` chain.
+- Re-read the applicable DOX chain when scope or targets change during a task.
+
+## Catch-All Traversal
+
+For any target path with no matching entry in a routing table or Child DOX Index:
+- Do not guess the governing contract from memory or nearby files.
+- Walk the filesystem from the nearest containing root toward the target, reading every `AGENTS.md` encountered on the route before acting.
+- "Repository root" means the nearest ancestor directory that contains an `AGENTS.md` root contract — not only the project root. A path under `/a0/usr/chats/` is governed starting from `/a0/usr/AGENTS.md`; a path in a project subdirectory is governed starting from that project's own `AGENTS.md`.
+- This rule covers all unenumerated targets: runtime state directories (`chats/`, `memory/`, `uploads/`, `scheduler/`), in-project `.a0proj/` contents, and any path not yet listed in a routing table.
 
 ## Read Before Editing
 
@@ -87,6 +96,18 @@ After meaningful changes:
 ## User Preferences
 
 When the user requests a durable behavior change, record it in the relevant AGENTS.md.
+
+## Subordinate Delegation
+
+When delegating to subordinates, include the relevant AGENTS.md chain paths in the message and the active DOX contracts the subordinate should follow.
+
+Subordinates share the superior's project context — they receive the project root AGENTS.md through the shared context object. What they actually lack — unless the superior provides it — is the specific target paths and the procedural walk-rule for those paths. Provide both explicitly in the delegation message so the subordinate can walk the chain correctly for its assigned targets.
+
+## Skill Discovery
+
+Any agent may search and load skills on demand via `skills_tool`. Use `action: search` with task keywords to find applicable skills, then `action: load` before following one. Skills are workflows — follow steps in order and do not skip verification.
+
+This is awareness only. Auto-loading of the meta-skill at session start is restricted to the main agent (agent number 0) and must not be changed.
 
 ## DOX initialization
 

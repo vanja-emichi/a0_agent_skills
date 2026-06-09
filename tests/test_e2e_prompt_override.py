@@ -35,8 +35,12 @@ DOX_MARKER = "Child `AGENTS.md` files are **not** auto-injected"
 
 # Production content markers in the agent0 specifics override
 SKILL_DISCOVERY_MARKER = "skill discovery"
-DOX_AWARENESS_MARKER = "dox awareness"
-SUBORDINATE_DELEGATION_MARKER = "subordinate delegation"
+AGENT0_EXCLUSIVE_MARKER = "agent0-exclusive"
+
+# Markers now in the shared DOX interpreter (moved from agent0 specifics via Task 1.2)
+CATCH_ALL_TRAVERSAL_MARKER = "Catch-All Traversal"
+SKILL_DISCOVERY_INTERPRETER_MARKER = "Skill Discovery"
+SUBORDINATE_DELEGATION_MARKER = "Subordinate Delegation"
 
 AGENT0_OVERRIDE_SPECIFICS = (
     PLUGIN_DIR / "agents" / "agent0" / "prompts" / "agent.system.main.specifics.md"
@@ -69,19 +73,38 @@ class TestPromptOverrideStructure:
         )
 
     def test_agent0_override_contains_production_content(self):
-        """Override file contains production content (skill discovery, DOX awareness, subordinate delegation)."""
+        """Override file contains agent0-exclusive content (skill discovery, lifecycle, agent0 guard)."""
         content = AGENT0_OVERRIDE_SPECIFICS.read_text(encoding="utf-8").lower()
         assert SKILL_DISCOVERY_MARKER in content, (
             f"Expected '{SKILL_DISCOVERY_MARKER}' in {AGENT0_OVERRIDE_SPECIFICS}. "
             f"Content: {content[:200]}"
         )
-        assert DOX_AWARENESS_MARKER in content, (
-            f"Expected '{DOX_AWARENESS_MARKER}' in {AGENT0_OVERRIDE_SPECIFICS}. "
+        assert AGENT0_EXCLUSIVE_MARKER in content, (
+            f"Expected '{AGENT0_EXCLUSIVE_MARKER}' in {AGENT0_OVERRIDE_SPECIFICS}. "
             f"Content: {content[:200]}"
         )
+
+    def test_agent0_override_lacks_moved_sections(self):
+        """Agent0 specifics no longer contains DOX awareness or subordinate delegation (moved to interpreter)."""
+        content = AGENT0_OVERRIDE_SPECIFICS.read_text(encoding="utf-8").lower()
+        assert "dox awareness" not in content, (
+            f"'dox awareness' should no longer be in agent0 specifics (moved to interpreter)"
+        )
+        assert "subordinate delegation" not in content, (
+            f"'subordinate delegation' should no longer be in agent0 specifics (moved to interpreter)"
+        )
+
+    def test_dox_interpreter_contains_moved_sections(self):
+        """DOX interpreter now contains catch-all traversal, subordinate delegation, and skill discovery."""
+        content = PLUGIN_DOX_PROMPT.read_text(encoding="utf-8")
+        assert CATCH_ALL_TRAVERSAL_MARKER in content, (
+            f"Expected '{CATCH_ALL_TRAVERSAL_MARKER}' in DOX interpreter"
+        )
         assert SUBORDINATE_DELEGATION_MARKER in content, (
-            f"Expected '{SUBORDINATE_DELEGATION_MARKER}' in {AGENT0_OVERRIDE_SPECIFICS}. "
-            f"Content: {content[:200]}"
+            f"Expected '{SUBORDINATE_DELEGATION_MARKER}' in DOX interpreter"
+        )
+        assert SKILL_DISCOVERY_INTERPRETER_MARKER in content, (
+            f"Expected '{SKILL_DISCOVERY_INTERPRETER_MARKER}' in DOX interpreter"
         )
 
     def test_framework_agent0_specifics_lacks_override(self):
