@@ -10,7 +10,7 @@
 - `_a0_e2e_client.py`: HTTP client helper for end-to-end tests against the Agent Zero API.
 - `test_dox_behavior.py`: Unit tests for DOX contract routing and closeout behavior.
 - `test_dox_interpreter.py`: Structural and runtime tests for the DOX system-prompt interpreter and canonical scaffold template.
-- `test_e2e_agent_profiles.py`: E2e agent profile loading and behavior.
+- `test_e2e_agent_profiles.py`: E2e agent profile loading, behavior, and ADR-009 subordinate DOX propagation (project root AGENTS.md + catch-all traversal rule inherited by subordinate via shared context).
 - `test_e2e_command_execution.py`: E2e command execution via scheduler tasks.
 - `test_e2e_command_rendering.py`: E2e command template rendering.
 - `test_e2e_dox_behavior.py`: E2e DOX chain reading through live agent sessions.
