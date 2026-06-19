@@ -1,0 +1,10 @@
+# Ignore everything by default.
+*
+
+# Keep the project-facing files.
+!.gitignore
+!AGENTS.md
+!README.md
+!LICENSE
+!paper.md
+!banner.png
