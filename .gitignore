@@ -1,19 +1,10 @@
-**/__pycache__/
-*.py[cod]
-.pytest_cache/
-*.pyc
+# Ignore everything by default.
+*
 
-# Test artifacts
-MagicMock/
-.toggle-*
-
-# Secrets and credentials
-.env
-.env.*
-*.pem
-*.key
-*.p12
-secrets.yaml
-
-# OS files
-.DS_Store
+# Keep the project-facing files.
+!.gitignore
+!AGENTS.md
+!README.md
+!LICENSE
+!paper.md
+!banner.png

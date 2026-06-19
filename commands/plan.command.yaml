@@ -1,5 +1,0 @@
-name: plan
-description: Load the planning-and-task-breakdown skill and write tasks/plan.md and tasks/todo.md for the current project
-argument_hint: Optional scope or feature to plan
-type: text
-template_path: plan.txt

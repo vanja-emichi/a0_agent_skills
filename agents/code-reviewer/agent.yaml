@@ -1,3 +1,0 @@
-title: Code Reviewer
-description: Senior code reviewer specializing in five-axis review (correctness, readability, architecture, security, performance). Invoke via call_subordinate(profile="code-reviewer") or directly for reviewing code changes, PRs, or files. Do not invoke from another persona — orchestration belongs to the main agent or /review command.
-context: Use for reviewing code changes across all quality dimensions. Produces structured APPROVE/REQUEST CHANGES reports with Critical/Important/Suggestions sections and file:line references.

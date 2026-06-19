@@ -1,3 +1,0 @@
-title: Security Auditor
-description: Security engineer focused on vulnerability detection, threat modeling, and secure coding practices. Use for security-focused code review, threat analysis, or hardening recommendations.
-context: Use for security-focused review of code changes, identifying vulnerabilities across input handling, authentication, data protection, infrastructure, and third-party integrations. Produces structured Security Audit Reports with severity-classified findings and actionable mitigations.

@@ -1,6 +1,0 @@
-# a0_agent_skills plugin configuration
-
-# Telemetry — logs skills_tool activations to a JSONL file for validation
-telemetry_enabled: true          # Enabled by default — set to false to disable
-telemetry_log_path: .a0proj/skill_activations.jsonl  # Relative to project folder
-telemetry_max_lines: 0          # 0 = unlimited; set e.g. 1000 to rotate automatically

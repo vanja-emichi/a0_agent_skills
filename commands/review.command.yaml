@@ -1,5 +1,0 @@
-name: review
-description: Conduct a five-axis code review by delegating to the code-reviewer agent profile — covers correctness, readability, architecture, security, and performance
-argument_hint: Optional scope, file path, or PR description to review
-type: text
-template_path: review.txt
