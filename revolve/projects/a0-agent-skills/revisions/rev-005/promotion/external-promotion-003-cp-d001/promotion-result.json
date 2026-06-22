@@ -1,0 +1,42 @@
+{
+  "summary": {
+    "promotion_id": "external-promotion-003-cp-d001",
+    "checkpoint": "cp-d001-d4-d5-e2e-evalrunner",
+    "external_promotion_applied": true,
+    "verification_exit_codes": {
+      "post-static": 0,
+      "post-semantic": 0,
+      "post-structural": 0,
+      "post-runtime": 0
+    },
+    "identity_matches": true,
+    "final_matches": true,
+    "restored_due_to_failure": false,
+    "backup_path": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/promotion/external-promotion-003-cp-d001/pre-promotion-live-backup-a0_agent_skills"
+  },
+  "results": {
+    "identity": {
+      "matches_candidate": true
+    },
+    "post-static": {
+      "exit_code": 0,
+      "tail": "      },\n      \"project_context_pass\": true,\n      \"subordinate_boundary_pass\": true,\n      \"tool_json_examples\": 0,\n      \"json_errors\": [],\n      \"eval_exists\": true,\n      \"eval_a0_specific\": true\n    }\n  ]\n}"
+    },
+    "post-semantic": {
+      "exit_code": 0,
+      "tail": "      \"skill\": \"spec-driven-development\",\n      \"total\": 14,\n      \"d1\": 3,\n      \"d2\": 3,\n      \"d3\": 3,\n      \"d4\": 3,\n      \"d5\": 2\n    }\n  ]\n}"
+    },
+    "post-structural": {
+      "exit_code": 0,
+      "tail": "...sssssssss............................................................ [ 46%]\n........................................................................ [ 92%]\n......s....                                                              [100%]\n145 passed, 10 skipped, 85 deselected in 1.21s"
+    },
+    "post-runtime": {
+      "exit_code": 0,
+      "tail": "................                                                         [100%]\n16 passed, 224 deselected in 14.40s"
+    },
+    "final_state": {
+      "restored": false,
+      "matches": true
+    }
+  }
+}

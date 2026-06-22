@@ -1,0 +1,18 @@
+{
+  "run_id": "run-005-cp-b001-deeper-architecture",
+  "checkpoint": "cp-b001-deeper-architecture",
+  "suite": "runtime_architecture_v2",
+  "tests": 37,
+  "passed": 37,
+  "failed": 0,
+  "exit_code": 0,
+  "validity": "valid",
+  "new_test_classes": {
+    "TestPromptInheritance": "3/3 passed",
+    "TestAPISurface": "2/2 passed",
+    "TestSkillsInjectionMechanism": "4/4 passed",
+    "TestWorkflowArtifactLifecycle": "6/6 passed"
+  },
+  "total_test_classes": 12,
+  "decision": "all deeper architecture gates passed; eligible for promotion"
+}

@@ -1,0 +1,17 @@
+{
+  "run_id": "run-006-cp-c001-http-api",
+  "checkpoint": "cp-c001-api-harness",
+  "suite": "http_api_v1",
+  "tests": 4,
+  "passed": 4,
+  "failed": 0,
+  "exit_code": 0,
+  "validity": "valid",
+  "test_details": {
+    "TestPluginAPI.test_plugins_list_contains_a0_agent_skills": "PASSED",
+    "TestSkillsCatalogAPI.test_skills_list_returns_plugin_skills": "PASSED",
+    "TestProjectsAPI.test_projects_list_contains_test_project": "PASSED",
+    "TestSkillsCatalogEndpoint.test_skills_catalog_plugin_endpoint": "PASSED"
+  },
+  "decision": "Layer 4 HTTP/API tests passed; plugin discoverable via HTTP API"
+}

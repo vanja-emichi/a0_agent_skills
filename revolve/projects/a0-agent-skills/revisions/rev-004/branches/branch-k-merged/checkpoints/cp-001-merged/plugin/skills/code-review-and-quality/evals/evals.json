@@ -1,0 +1,51 @@
+{
+  "skill_name": "code-review-and-quality",
+  "evals": [
+    {
+      "id": "crq-five-axis-review",
+      "name": "Conducts 5-axis code review with severity prioritization",
+      "prompt": "Review this code change: A new function `processPayment(amount, userId)` that calls the payment API, updates the database, and sends an email notification. There is no error handling, no logging, and the database update uses string interpolation for the query. Give me a structured review with severity ratings.",
+      "expected_output": "The model should produce a structured review covering at least correctness, security, and performance dimensions, with severity ratings (critical/major/minor) and constructive feedback for each finding.",
+      "assertions": [
+        "The output identifies the SQL injection vulnerability as a critical or high-severity security finding.",
+        "The output assigns explicit severity levels to findings (e.g., critical, major, minor, or equivalent).",
+        "The output reviews across at least 3 dimensions (correctness, security, and one other: readability, architecture, or performance).",
+        "The output provides constructive, actionable suggestions for how to fix each issue, not just describing what's wrong.",
+        {
+          "type": "llm judge",
+          "prompt": "Does the output demonstrate awareness of five-axis review (correctness, readability, architecture, security, performance) \u2014 not just generic code review tips? It should reference specific steps or concepts from the code-review-and-quality workflow.",
+          "expected": true,
+          "_category": "discovery"
+        }
+      ],
+      "_mutation_check": "Break by: removing the SQL injection assertion (assertion 1 of crq-five-axis-review) and replacing with 'output mentions code review'. Expected: eval should fail with score < 0.5 because the agent could produce a generic review that never identifies the critical security vulnerability."
+    },
+    {
+      "id": "crq-review-prioritization",
+      "name": "Prioritizes review findings and distinguishes blocking from non-blocking",
+      "prompt": "I'm reviewing a PR that has these issues: (1) a typo in a comment, (2) a missing index on a database query that will be slow at scale, (3) a race condition in concurrent access, (4) inconsistent code formatting. Which ones should block the merge?",
+      "expected_output": "The model should prioritize findings by severity and risk, distinguishing blocking issues (race condition) from non-blocking (typo, formatting) and providing clear reasoning.",
+      "assertions": [
+        "The output identifies the race condition as a blocking issue that must be fixed before merge.",
+        "The output classifies the typo and formatting as non-blocking or low-priority that should not block merge.",
+        "The output identifies the missing database index as a significant concern that should be addressed but explains whether it blocks merge or can be a follow-up.",
+        "The output provides clear reasoning for each priority classification, not just a list of severity levels."
+      ],
+      "_mutation_check": "Break by: removing all assertions or providing unrelated output. Expected: eval should fail with score < 0.5."
+    },
+    {
+      "id": "crq-a0-parallel-five-axis",
+      "name": "Conduct 5-axis review using A0 parallel subordinate delegation",
+      "prompt": "Review a large pull request that touches database migrations, API endpoints, frontend components, and CI/CD configuration. The review needs to cover all five dimensions: correctness, readability, architecture, security, and performance. How do you structure the review?",
+      "expected_output": "The response should describe using A0-native patterns: delegating review dimensions to subordinate agents via call_subordinate (code-reviewer profile) in parallel, with each subordinate focusing on specific axes, then consolidating findings into a unified prioritized review.",
+      "assertions": [
+        "The output suggests using call_subordinate with the code-reviewer profile for structured code review.",
+        "The output references using parallel to review different dimensions or components concurrently.",
+        "The output describes assigning specific review axes (correctness, security, performance, etc.) to separate parallel workstreams.",
+        "The output describes consolidating parallel review findings into a unified report with severity prioritization.",
+        "The output maintains the five-axis review framework (correctness, readability, architecture, security, performance) within the delegation structure."
+      ],
+      "_mutation_check": "Break by: suggest a single sequential review with no delegation or parallelism. Expected: eval should fail with score < 0.5."
+    }
+  ]
+}

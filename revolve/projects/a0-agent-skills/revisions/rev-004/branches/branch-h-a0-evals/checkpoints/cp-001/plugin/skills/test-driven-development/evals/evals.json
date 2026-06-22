@@ -1,0 +1,53 @@
+{
+  "skill_name": "test-driven-development",
+  "evals": [
+    {
+      "id": "tdd-string-reverse",
+      "name": "TDD: implement string reverse with test-first approach",
+      "prompt": "Implement a string reverse function.",
+      "expected_output": "The response should follow a strict test-first approach: write a failing test before any implementation code, then implement the minimum code to pass, then refactor. This is the red-green-refactor cycle.",
+      "assertions": [
+        "The output writes or describes writing a test before the implementation.",
+        "The output mentions running the test and seeing it fail first (red phase).",
+        "The output describes implementing the minimum code to make the test pass (green phase).",
+        "The output mentions refactoring after the test passes.",
+        "The output explicitly mentions red-green-refactor or describes the TDD cycle.",
+        {
+          "type": "llm judge",
+          "prompt": "Does the output demonstrate awareness of red-green-refactor TDD cycle \u2014 not just generic testing advice? It should reference specific steps or concepts from the test-driven-development workflow.",
+          "expected": true,
+          "_category": "discovery"
+        }
+      ],
+      "_mutation_check": "Break by: write the implementation first, then write tests afterward (no red phase). Expected: eval should fail with score < 0.5."
+    },
+    {
+      "id": "tdd-low-coverage",
+      "name": "TDD: handling low test coverage",
+      "prompt": "Tests pass but coverage is low. What do you do?",
+      "expected_output": "The response should describe a systematic approach to measuring coverage, identifying untested code paths, and adding targeted tests for edge cases and boundary conditions.",
+      "assertions": [
+        "The output mentions measuring or checking code coverage with a specific tool or metric.",
+        "The output describes identifying untested code paths, branches, or functions.",
+        "The output mentions adding tests for edge cases or boundary conditions.",
+        "The output describes prioritizing which coverage gaps to address first.",
+        "The output mentions iteratively improving coverage rather than trying to reach 100% in one step."
+      ],
+      "_mutation_check": "Break by: suggest rewriting the entire test suite from scratch to reach 100% coverage immediately. Expected: eval should fail with score < 0.5."
+    },
+    {
+      "id": "tdd-a0-subordinate-test-generation",
+      "name": "TDD: delegate test writing across independent modules using A0 subordinates",
+      "prompt": "I need to write tests using TDD for a project with three independent modules: a user authentication module, a data export module, and a notification module. None of them depend on each other. How should I approach this?",
+      "expected_output": "The response should describe using A0-native delegation patterns: calling subordinate agents with the test-engineer profile to write tests for each independent module concurrently via parallel, while maintaining the red-green-refactor discipline within each module's test suite.",
+      "assertions": [
+        "The output recognizes that independent modules can be tested concurrently.",
+        "The output references using call_subordinate with the test-engineer profile or similar specialist delegation for test writing.",
+        "The output mentions using parallel for concurrent test development across independent modules.",
+        "The output maintains TDD discipline (red-green-refactor) within each delegated testing task.",
+        "The output describes how to integrate results from parallel test-writing subordinates into a cohesive test suite."
+      ],
+      "_mutation_check": "Break by: suggest writing all tests in a single sequential pass without any delegation or parallelism. Expected: eval should fail with score < 0.5."
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "skill_name": "debugging-and-error-recovery",
+  "evals": [
+    {
+      "id": "dbg-intermittent-500",
+      "name": "Debug intermittent 500 errors in production",
+      "prompt": "Production API returns 500 errors intermittently. How do you debug?",
+      "expected_output": "The response should describe a systematic debugging approach: reproduce the issue, isolate the failing component, examine logs and error patterns, form and test hypotheses, then fix and verify.",
+      "assertions": [
+        "The output mentions reproducing the issue or establishing reliable reproduction steps.",
+        "The output mentions isolating or narrowing down the failing component or code path.",
+        "The output mentions checking logs, error traces, or monitoring data.",
+        "The output describes a fix cycle: identify root cause, implement fix, verify resolution.",
+        "The output mentions narrowing scope or eliminating variables systematically rather than guessing.",
+        {
+          "type": "llm judge",
+          "prompt": "Does the output demonstrate awareness of systematic reproduce-localize-fix-guard workflow \u2014 not just generic debugging tips? It should reference specific steps or concepts from the debugging-and-error-recovery workflow.",
+          "expected": true,
+          "_category": "discovery"
+        }
+      ],
+      "_mutation_check": "Break by: suggest randomly changing code until the error stops without reproducing or isolating first. Expected: eval should fail with score < 0.5."
+    },
+    {
+      "id": "dbg-dependency-upgrade-regression",
+      "name": "Debug test regression after dependency upgrade",
+      "prompt": "A test that was passing now fails after a dependency upgrade.",
+      "expected_output": "The response should describe a methodical approach: checking the dependency changelog, using bisect to find the breaking version, pinning or adjusting versions, and verifying the fix.",
+      "assertions": [
+        "The output mentions checking the changelog or release notes of the upgraded dependency.",
+        "The output mentions bisecting or binary searching to find the breaking version.",
+        "The output mentions pinning versions or using version ranges to control upgrades.",
+        "The output mentions comparing behavior between the old and new dependency versions.",
+        "The output describes verifying the fix by running the full test suite, not just the failing test."
+      ],
+      "_mutation_check": "Break by: removing all assertions or providing unrelated output. Expected: eval should fail with score < 0.5."
+    }
+  ]
+}

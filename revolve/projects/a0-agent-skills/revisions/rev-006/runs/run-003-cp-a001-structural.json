@@ -1,0 +1,11 @@
+{
+  "run_id": "run-003-cp-a001-structural",
+  "checkpoint": "cp-a001-architecture-fixes",
+  "suite": "structural_non_e2e",
+  "passed": 145,
+  "skipped": 10,
+  "deselected": 107,
+  "exit_code": 0,
+  "validity": "valid",
+  "decision": "no structural regressions"
+}

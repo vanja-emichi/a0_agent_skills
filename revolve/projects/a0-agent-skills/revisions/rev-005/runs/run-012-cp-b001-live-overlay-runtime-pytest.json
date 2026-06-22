@@ -1,0 +1,19 @@
+{
+  "summary": {
+    "run_id": "run-012-cp-b001-live-overlay-runtime-pytest",
+    "candidate": "cp-b001-runtime-contract-depth",
+    "pytest_exit_code": 0,
+    "restore_ok": true,
+    "restore_diff": {
+      "missing": [],
+      "added": [],
+      "changed": []
+    },
+    "log_path": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/runs/run-012-cp-b001-live-overlay-runtime-pytest.log"
+  },
+  "result": {
+    "command": "/opt/venv-a0/bin/python -m pytest tests -q -m runtime_integration --tb=short",
+    "exit_code": 0,
+    "stdout": "................                                                         [100%]\n16 passed, 224 deselected in 14.07s\n"
+  }
+}

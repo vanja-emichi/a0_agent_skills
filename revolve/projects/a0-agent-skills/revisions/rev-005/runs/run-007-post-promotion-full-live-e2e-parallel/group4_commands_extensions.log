@@ -1,0 +1,34 @@
+GROUP=group4_commands_extensions
+COMMAND=/opt/venv/bin/python -m pytest tests/e2e/test_e2e_command_execution.py tests/e2e/test_e2e_command_rendering.py tests/e2e/test_e2e_extensions.py -v -m e2e --tb=short
+CWD=/a0/usr/plugins/a0_agent_skills
+CREDENTIAL_PRESENCE={'A0_E2E_USERNAME': True, 'A0_E2E_PASSWORD': True, 'source_AUTH_LOGIN_present': True, 'source_AUTH_PASSWORD_present': True}
+
+============================= test session starts ==============================
+platform linux -- Python 3.13.12, pytest-9.1.1, pluggy-1.6.0 -- /opt/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /a0/usr/plugins/a0_agent_skills
+configfile: pytest.ini
+plugins: mock-3.15.1, anyio-4.14.0
+collecting ... collected 19 items
+
+tests/e2e/test_e2e_command_execution.py::TestCommandDiscovery::test_all_plugin_commands_discovered PASSED [  5%]
+tests/e2e/test_e2e_command_execution.py::TestCommandDiscovery::test_plugin_commands_have_correct_type PASSED [ 10%]
+tests/e2e/test_e2e_command_execution.py::TestCommandDiscovery::test_plugin_commands_have_description PASSED [ 15%]
+tests/e2e/test_e2e_command_execution.py::TestCommandDiscovery::test_plugin_commands_marked_as_plugin_scope PASSED [ 21%]
+tests/e2e/test_e2e_command_execution.py::TestTextCommandResolution::test_text_command_resolves_with_content PASSED [ 26%]
+tests/e2e/test_e2e_command_execution.py::TestTextCommandResolution::test_spec_command_contains_expected_sections PASSED [ 31%]
+tests/e2e/test_e2e_command_execution.py::TestTextCommandResolution::test_text_command_with_no_args_still_resolves PASSED [ 36%]
+tests/e2e/test_e2e_command_execution.py::TestScriptCommandResolution::test_ship_command_resolves PASSED [ 42%]
+tests/e2e/test_e2e_command_execution.py::TestScriptCommandResolution::test_ship_command_returns_expected_structure PASSED [ 47%]
+tests/e2e/test_e2e_command_rendering.py::TestCommandRendering::test_text_command_renders_skill_and_user_input[spec] PASSED [ 52%]
+tests/e2e/test_e2e_command_rendering.py::TestCommandRendering::test_text_command_renders_skill_and_user_input[plan] PASSED [ 57%]
+tests/e2e/test_e2e_command_rendering.py::TestCommandRendering::test_text_command_renders_skill_and_user_input[build] PASSED [ 63%]
+tests/e2e/test_e2e_command_rendering.py::TestCommandRendering::test_text_command_renders_skill_and_user_input[test] PASSED [ 68%]
+tests/e2e/test_e2e_command_rendering.py::TestCommandRendering::test_text_command_renders_skill_and_user_input[review] PASSED [ 73%]
+tests/e2e/test_e2e_command_rendering.py::TestCommandRendering::test_text_command_renders_skill_and_user_input[code-simplify] PASSED [ 78%]
+tests/e2e/test_e2e_command_rendering.py::TestShipCommandRendering::test_ship_command_resolves PASSED [ 84%]
+tests/e2e/test_e2e_extensions.py::TestMetaSkillSpecificsOverride::test_specifics_override_file_absent PASSED [ 89%]
+tests/e2e/test_e2e_extensions.py::TestExtensionFilePresence::test_all_extension_files_present PASSED [ 94%]
+tests/e2e/test_e2e_extensions.py::TestExtensionFilePresence::test_all_extension_files_compile PASSED [100%]
+
+============================== 19 passed in 2.74s ==============================

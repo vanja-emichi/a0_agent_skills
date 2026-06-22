@@ -1,0 +1,19 @@
+{
+  "checkpoint_id": "cp-live-20260620-0129",
+  "source": "/a0/usr/plugins/a0_agent_skills",
+  "stored_at": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/checkpoints/cp-live-20260620-0129/subject/a0_agent_skills.tar.gz",
+  "created_cest": "2026-06-20T01:29:04+02:00",
+  "file_count": 155,
+  "skill_count": 24,
+  "command_count": 8,
+  "profile_count": 3,
+  "key_hashes": {
+    "plugin.yaml": "60929a363132ec9d857ba3fb98b84e455396e9ee8b3f848b06d7a45a482ebab2",
+    "AGENTS.md": "246b3e3fbd4ece557499fb832a4e3032f0d277ee8eb1d82f2d34d0f21ac3e96f",
+    "tests/e2e/test_e2e_command_execution.py": "32dfa19868cff6ad62c327a6bab78731cddd03e46d4b26556b158b2e267d448a",
+    "tests/e2e/test_e2e_extension_behavior.py": "2f26793f40b57fd02300c70485bbffdb170671cdbcfcf46f5b738b533f5fd7bd",
+    "skills/using-agent-skills/SKILL.md": "423341d5f948234a83f645371bd33ed5eea7f25231acff7ec7be7ef227603ccd"
+  },
+  "storage_format": "tar.gz",
+  "restore_command": "tar xzf /a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/checkpoints/cp-live-20260620-0129/subject/a0_agent_skills.tar.gz -C /a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/checkpoints/cp-live-20260620-0129/subject/"
+}

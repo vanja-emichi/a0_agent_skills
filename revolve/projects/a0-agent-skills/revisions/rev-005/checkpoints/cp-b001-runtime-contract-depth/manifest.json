@@ -1,0 +1,10 @@
+{
+  "checkpoint_id": "cp-b001-runtime-contract-depth",
+  "parent": "cp-a001-harness-truth",
+  "branch": "branch-b-runtime-contract-depth",
+  "storage": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/checkpoints/cp-b001-runtime-contract-depth/subject/a0_agent_skills.tar.gz",
+  "created_cest": "2026-06-20T02:11:30+02:00",
+  "status": "pending baseline semantic evaluation",
+  "storage_format": "tar.gz",
+  "restore_command": "tar xzf /a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/checkpoints/cp-b001-runtime-contract-depth/subject/a0_agent_skills.tar.gz -C /a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/checkpoints/cp-b001-runtime-contract-depth/subject/"
+}

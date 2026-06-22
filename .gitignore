@@ -1,17 +1,1 @@
-# Ignore everything by default.
-*
-
-# Keep the project-facing files.
-!.gitignore
-!AGENTS.md
-!README.md
-!LICENSE
-!paper.md
-!banner.png
-# Track project metadata (except secrets)
-!.a0proj/
-!.a0proj/project.json
-!.a0proj/agents.json
-!.a0proj/mcp_servers.json
-!.a0proj/variables.env
 .a0proj/secrets.env

@@ -1,0 +1,10 @@
+{
+  "run_id": "run-004-cp-a001-existing-runtime",
+  "checkpoint": "cp-a001-architecture-fixes",
+  "suite": "existing_runtime_integration",
+  "passed": 12,
+  "failed": 0,
+  "exit_code": 0,
+  "validity": "valid",
+  "decision": "no runtime regressions"
+}

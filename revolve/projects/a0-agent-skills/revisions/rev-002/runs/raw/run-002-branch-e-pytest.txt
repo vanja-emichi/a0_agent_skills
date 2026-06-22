@@ -1,0 +1,21 @@
+.......sssssssss.....................F.................................. [ 42%]
+........................................................................ [ 84%]
+....F.................s....                                              [100%]
+=================================== FAILURES ===================================
+_________ test_plugin_helpers_resolve_plugin_and_route_lifecycle_hooks _________
+tests/test_runtime_extensions_and_hooks.py:108: in test_plugin_helpers_resolve_plugin_and_route_lifecycle_hooks
+    assert plugin_dir == PLUGIN_DIR.resolve()
+E   AssertionError: assert PosixPath('/a0/usr/plugins/a0_agent_skills') == PosixPath('/tmp/rev002_branch_e_42V1/plugin')
+E    +  where PosixPath('/tmp/rev002_branch_e_42V1/plugin') = resolve()
+E    +    where resolve = PosixPath('/tmp/rev002_branch_e_42V1/plugin').resolve
+__________________ TestPluginYaml.test_name_matches_directory __________________
+tests/test_structure.py:37: in test_name_matches_directory
+    assert manifest["name"] == os.path.basename(PLUGIN_DIR)
+E   AssertionError: assert 'a0_agent_skills' == 'plugin'
+E     
+E     - plugin
+E     + a0_agent_skills
+=========================== short test summary info ============================
+FAILED tests/test_runtime_extensions_and_hooks.py::test_plugin_helpers_resolve_plugin_and_route_lifecycle_hooks
+FAILED tests/test_structure.py::TestPluginYaml::test_name_matches_directory
+2 failed, 159 passed, 10 skipped, 69 deselected in 17.45s

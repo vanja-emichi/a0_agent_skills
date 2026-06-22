@@ -1,0 +1,38 @@
+{
+  "skill_name": "git-workflow-and-versioning",
+  "evals": [
+    {
+      "id": "gw-atomic-commits",
+      "name": "Creates atomic commits with descriptive messages",
+      "prompt": "I have completed implementing a new task sharing feature. Here is what I changed: added a sharing API endpoint, updated the task model with a sharedWith field, added a ShareButton component, wrote tests for the API, and also fixed a typo in the sidebar and updated some dependencies. How should I commit this?",
+      "expected_output": "The model should separate these into atomic commits - each doing one logical thing - with descriptive messages that explain why, not just what.",
+      "assertions": [
+        "The output recommends separating the changes into multiple commits, not one big commit.",
+        "The output separates the feature work from the unrelated typo fix and dependency updates.",
+        "The output recommends commit messages that explain intent (why) not just description (what).",
+        "The output uses conventional commit types (feat, fix, refactor, chore) in message format.",
+        "The output recommends committing tests alongside or before the feature code, not as an afterthought.",
+        {
+          "type": "llm judge",
+          "prompt": "Does the output demonstrate awareness of atomic commits, save-point patterns, or clean history practices \u2014 not just generic git advice? It should reference specific steps or concepts from the git-workflow-and-versioning workflow.",
+          "expected": true,
+          "_category": "discovery"
+        }
+      ],
+      "_mutation_check": "Break by: output recommends one big commit with all changes combined and no separation of concerns. Expected: eval should fail with score < 0.5."
+    },
+    {
+      "id": "gw-save-point-pattern",
+      "name": "Uses save point pattern for agent work safety",
+      "prompt": "I am an AI agent about to implement a complex refactoring of the authentication module. The changes touch 8 files. How should I structure my work?",
+      "expected_output": "The model should describe the save point pattern: implement slice, test, verify, commit, then next slice - so each increment is a reversible checkpoint.",
+      "assertions": [
+        "The output recommends committing after each small successful increment, not at the end.",
+        "The output describes a work pattern of: implement slice, test, verify, commit, repeat.",
+        "The output mentions using git reset or revert to recover if a change breaks something.",
+        "The output recommends checking what is about to be committed (git diff --staged) and checking for secrets before each commit."
+      ],
+      "_mutation_check": "Break by: output recommends implementing all changes first then committing at the end with no incremental checkpoints. Expected: eval should fail with score < 0.5."
+    }
+  ]
+}

@@ -1,0 +1,87 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.4, pytest-9.1.0, pluggy-1.6.0 -- /opt/venv-a0/bin/python
+cachedir: .pytest_cache
+rootdir: /a0/usr/plugins/a0_agent_skills
+configfile: pytest.ini
+plugins: mock-3.15.1, asyncio-1.4.0, xdist-3.8.0, anyio-4.13.0, langsmith-0.3.45
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+created: 4/4 workers
+4 workers [30 items]
+
+scheduling tests via LoadScheduling
+
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-api-and-interface-design] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-ci-cd-and-automation] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-debugging-and-error-recovery] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-code-simplification] 
+[gw2] [  3%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-code-simplification] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-context-engineering] 
+[gw1] [  6%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-ci-cd-and-automation] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-code-review-and-quality] 
+[gw3] [ 10%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-debugging-and-error-recovery] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-deprecation-and-migration] 
+[gw0] [ 13%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-api-and-interface-design] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-browser-testing-with-devtools] 
+[gw3] [ 16%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-deprecation-and-migration] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-frontend-ui-engineering] 
+[gw0] [ 20%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-browser-testing-with-devtools] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-git-workflow-and-versioning] 
+[gw2] [ 23%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-context-engineering] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-documentation-and-adrs] 
+[gw1] [ 26%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-code-review-and-quality] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-doubt-driven-development] 
+[gw3] [ 30%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-frontend-ui-engineering] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-idea-refine] 
+[gw1] [ 33%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-doubt-driven-development] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-observability-and-instrumentation] 
+[gw0] [ 36%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-git-workflow-and-versioning] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-incremental-implementation] 
+[gw2] [ 40%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-documentation-and-adrs] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-interview-me] 
+[gw3] [ 43%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-idea-refine] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-performance-optimization] 
+[gw1] [ 46%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-observability-and-instrumentation] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-planning-and-task-breakdown] 
+[gw0] [ 50%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-incremental-implementation] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-security-and-hardening] 
+[gw2] [ 53%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-interview-me] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-shipping-and-launch] 
+[gw3] [ 56%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-performance-optimization] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-source-driven-development] 
+[gw1] [ 60%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-planning-and-task-breakdown] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-spec-driven-development] 
+[gw0] [ 63%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-security-and-hardening] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-test-driven-development] 
+[gw2] [ 66%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-shipping-and-launch] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-using-agent-skills] 
+[gw3] [ 70%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-source-driven-development] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-tests] 
+[gw1] [ 73%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-spec-driven-development] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-debug] 
+[gw0] [ 76%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-test-driven-development] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-review] 
+[gw3] [ 80%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-tests] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-security] 
+[gw1] [ 83%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-debug] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingNegative::test_nonexistent_skill_handles_error 
+[gw2] [ 86%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-using-agent-skills] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-planning] 
+[gw3] [ 90%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-security] 
+[gw0] [ 93%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-review] 
+[gw1] [ 96%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingNegative::test_nonexistent_skill_handles_error 
+[gw2] [100%] FAILED tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-planning] 
+
+=================================== FAILURES ===================================
+_ TestSkillDiscoveryCoverage.test_trigger_finds_correct_skill[trigger-planning] _
+[gw2] linux -- Python 3.12.4 /opt/venv-a0/bin/python
+tests/e2e/test_e2e_skill_coverage.py:192: in test_trigger_finds_correct_skill
+    assert expected_skill in response_lower, (
+E   AssertionError: Expected 'planning-and-task-breakdown' in response for trigger 'plan this feature'. Got: I searched for skills matching "plan this feature" and the search returned 16 matching skills.
+E     
+E     The **top skill name found** is: `deprecation-and-migration`
+E     
+E     This was the first result returned by the `skills_tool` search action with the query "plan this feature".
+E   assert 'planning-and-task-breakdown' in 'i searched for skills matching "plan this feature" and the search returned 16 matching skills.\n\nthe **top skill name found** is: `deprecation-and-migration`\n\nthis was the first result returned by the `skills_tool` search action with the query "plan this feature".'
+=========================== short test summary info ============================
+FAILED tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-planning]
+=================== 1 failed, 29 passed in 190.59s (0:03:10) ===================

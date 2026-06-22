@@ -1,0 +1,38 @@
+{
+  "skill_name": "ci-cd-and-automation",
+  "evals": [
+    {
+      "id": "cicd-quality-gates",
+      "name": "Sets up non-skippable quality gate pipeline",
+      "prompt": "Set up CI for my Node.js project. I need linting, type checking, tests, and build verification. It should run on every PR.",
+      "expected_output": "The model should configure a complete quality gate pipeline where no gate can be skipped, following the shift-left principle with faster checks running first.",
+      "assertions": [
+        "The output configures a pipeline with all quality gates: lint, type check, test, and build.",
+        "The output runs faster checks first (lint, type check) before slower ones (tests, build) following shift-left.",
+        "The output configures the pipeline to run on pull requests to main, not just on push.",
+        "The output does NOT include any skip flags or conditions that allow bypassing gates.",
+        "The output uses caching for dependencies to optimize pipeline speed.",
+        {
+          "type": "llm judge",
+          "prompt": "Does the output demonstrate awareness of CI/CD quality gates, feedback loops, or automated pipeline patterns \u2014 not just generic deployment advice? It should reference specific steps or concepts from the ci-cd-and-automation workflow.",
+          "expected": true,
+          "_category": "discovery"
+        }
+      ],
+      "_mutation_check": "Break by: removing assertion 'does NOT include any skip flags' and replacing with 'output mentions CI'. Expected: eval should fail with score < 0.5 because the agent could produce a CI config that skips gates and still pass the keyword check."
+    },
+    {
+      "id": "cicd-feedback-loop",
+      "name": "Feeds CI failures back into the agent loop",
+      "prompt": "The CI pipeline failed with this error from the type check step: error TS2345: Argument of type 'string | undefined' is not assignable to parameter of type 'string' in src/services/task.ts line 42. How should the agent handle this?",
+      "expected_output": "The model should describe the feedback loop pattern: feed the specific error back to the agent, fix the issue, verify locally, then push again - not just re-run CI hoping it passes.",
+      "assertions": [
+        "The output identifies the specific error location (task.ts line 42) and root cause (undefined not handled).",
+        "The output recommends fixing the issue locally and verifying before pushing again, not just re-running CI.",
+        "The output describes the pattern of feeding CI failure output directly into the agent for targeted fixes.",
+        "The output does NOT suggest disabling the type check or adding type assertions to silence the error."
+      ],
+      "_mutation_check": "Break by: removing all assertions or providing unrelated output. Expected: eval should fail with score < 0.5."
+    }
+  ]
+}

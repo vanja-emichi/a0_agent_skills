@@ -1,0 +1,15 @@
+RUN_ID=run-006-post-promotion-full-live-e2e-sequential
+COMMAND=/opt/venv/bin/python -m pytest tests/e2e -v -m e2e --tb=short
+CWD=/a0/usr/plugins/a0_agent_skills
+CREDENTIAL_PRESENCE={'A0_E2E_USERNAME': True, 'A0_E2E_PASSWORD': True, 'source_AUTH_LOGIN_present': True, 'source_AUTH_PASSWORD_present': True}
+
+============================= test session starts ==============================
+platform linux -- Python 3.13.12, pytest-9.1.1, pluggy-1.6.0 -- /opt/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /a0/usr/plugins/a0_agent_skills
+configfile: pytest.ini
+plugins: mock-3.15.1, anyio-4.14.0
+collecting ... collected 76 items / 7 deselected / 69 selected
+
+tests/e2e/test_e2e_agent_profiles.py::TestSubordinateProfileCall::test_code_reviewer_profile_responds PASSED [  1%]
+tests/e2e/test_e2e_agent_profiles.py::TestSubordinateProfileCall::test_test_engineer_profile_responds 

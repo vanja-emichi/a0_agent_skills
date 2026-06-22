@@ -1,0 +1,875 @@
+{
+  "revision": "rev-005",
+  "harness": "a0_runtime_alignment_static_v1",
+  "plugin": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/checkpoints/cp-live-20260620-0129/subject/a0_agent_skills",
+  "summary": {
+    "gate_passed": false,
+    "gate_failures": 5,
+    "advisory_failures": 1,
+    "checks_total": 12,
+    "skills_checked": 24
+  },
+  "checks": [
+    {
+      "id": "plugin.exists",
+      "passed": true,
+      "severity": "gate",
+      "message": "plugin path: /a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/checkpoints/cp-live-20260620-0129/subject/a0_agent_skills",
+      "evidence": {}
+    },
+    {
+      "id": "inventory.skills_24",
+      "passed": true,
+      "severity": "gate",
+      "message": "expected 24 skills, found 24",
+      "evidence": {
+        "skills": [
+          "api-and-interface-design",
+          "browser-testing-with-devtools",
+          "ci-cd-and-automation",
+          "code-review-and-quality",
+          "code-simplification",
+          "context-engineering",
+          "debugging-and-error-recovery",
+          "deprecation-and-migration",
+          "documentation-and-adrs",
+          "doubt-driven-development",
+          "frontend-ui-engineering",
+          "git-workflow-and-versioning",
+          "idea-refine",
+          "incremental-implementation",
+          "interview-me",
+          "observability-and-instrumentation",
+          "performance-optimization",
+          "planning-and-task-breakdown",
+          "security-and-hardening",
+          "shipping-and-launch",
+          "source-driven-development",
+          "spec-driven-development",
+          "test-driven-development",
+          "using-agent-skills"
+        ]
+      }
+    },
+    {
+      "id": "inventory.commands_8",
+      "passed": true,
+      "severity": "gate",
+      "message": "expected 8 commands, found 8",
+      "evidence": {
+        "commands": [
+          "build",
+          "code-simplify",
+          "plan",
+          "review",
+          "ship",
+          "spec",
+          "test",
+          "use-agent-skills"
+        ]
+      }
+    },
+    {
+      "id": "inventory.profiles_3",
+      "passed": true,
+      "severity": "gate",
+      "message": "expected 3 profiles, found 3",
+      "evidence": {
+        "profiles": [
+          "code-reviewer",
+          "security-auditor",
+          "test-engineer"
+        ]
+      }
+    },
+    {
+      "id": "docs.skill_count_not_stale",
+      "passed": false,
+      "severity": "gate",
+      "message": "root plugin AGENTS.md must not claim 23 skills when inventory has 24",
+      "evidence": {}
+    },
+    {
+      "id": "docs.python_envs_documented",
+      "passed": true,
+      "severity": "gate",
+      "message": "plugin docs should document both A0 runtime and plugin test Python environments",
+      "evidence": {}
+    },
+    {
+      "id": "docs.eval_framework_claim_truthful",
+      "passed": false,
+      "severity": "gate",
+      "message": "docs must not claim a cloned eval framework path unless it exists",
+      "evidence": {
+        "claimed": true,
+        "path": "/a0/usr/projects/a0_agent_skills/eval",
+        "exists": false
+      }
+    },
+    {
+      "id": "e2e.command_discovery_covers_all_commands",
+      "passed": false,
+      "severity": "gate",
+      "message": "e2e command discovery list should match installed command manifests",
+      "evidence": {
+        "manifest_commands": [
+          "build",
+          "code-simplify",
+          "plan",
+          "review",
+          "ship",
+          "spec",
+          "test",
+          "use-agent-skills"
+        ],
+        "e2e_listed": [
+          "build",
+          "code-simplify",
+          "plan",
+          "review",
+          "ship",
+          "spec",
+          "test"
+        ],
+        "missing": [
+          "use-agent-skills"
+        ],
+        "extra": []
+      }
+    },
+    {
+      "id": "e2e.no_obvious_task_uuid_bug",
+      "passed": false,
+      "severity": "gate",
+      "message": "e2e extension behavior test should not use task_uuid before assignment",
+      "evidence": {}
+    },
+    {
+      "id": "e2e.python_syntax",
+      "passed": true,
+      "severity": "gate",
+      "message": "all e2e test files should parse as Python",
+      "evidence": {
+        "syntax_errors": []
+      }
+    },
+    {
+      "id": "skills.no_invalid_tool_or_forbidden_refs",
+      "passed": false,
+      "severity": "gate",
+      "message": "skills should not contain nonexistent tools, Claude artifacts, invalid tool JSON, or missing evals",
+      "evidence": {
+        "failing": [
+          {
+            "skill": "security-and-hardening",
+            "passed": false,
+            "issues": [
+              "invalid JSON/tool examples"
+            ],
+            "warnings": [],
+            "forbidden_hits": [],
+            "tool_names": [
+              "call_subordinate",
+              "code_execution_tool",
+              "parallel"
+            ],
+            "unknown_tools": [],
+            "project_terms": {
+              "active_project": true,
+              "agents_md": true,
+              "a0proj": true
+            },
+            "project_context_pass": true,
+            "subordinate_boundary_pass": true,
+            "tool_json_examples": 2,
+            "json_errors": [
+              {
+                "fence": 1,
+                "error": "Invalid \\escape: line 6 column 104 (char 291)"
+              }
+            ],
+            "eval_exists": true,
+            "eval_a0_specific": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "skills.runtime_context_warnings",
+      "passed": false,
+      "severity": "advisory",
+      "message": "skills should fully encode project context, subordinate boundaries, and A0-specific evals",
+      "evidence": {
+        "warning_count": 4,
+        "warnings": [
+          {
+            "skill": "deprecation-and-migration",
+            "passed": true,
+            "issues": [],
+            "warnings": [
+              "mentions subordinates without clear main-agent ownership boundary"
+            ],
+            "forbidden_hits": [],
+            "tool_names": [
+              "call_subordinate",
+              "parallel"
+            ],
+            "unknown_tools": [],
+            "project_terms": {
+              "active_project": true,
+              "agents_md": true,
+              "a0proj": true
+            },
+            "project_context_pass": true,
+            "subordinate_boundary_pass": false,
+            "tool_json_examples": 2,
+            "json_errors": [],
+            "eval_exists": true,
+            "eval_a0_specific": true
+          },
+          {
+            "skill": "documentation-and-adrs",
+            "passed": true,
+            "issues": [],
+            "warnings": [
+              "mentions subordinates without clear main-agent ownership boundary"
+            ],
+            "forbidden_hits": [],
+            "tool_names": [
+              "call_subordinate",
+              "parallel"
+            ],
+            "unknown_tools": [],
+            "project_terms": {
+              "active_project": true,
+              "agents_md": true,
+              "a0proj": true
+            },
+            "project_context_pass": true,
+            "subordinate_boundary_pass": false,
+            "tool_json_examples": 2,
+            "json_errors": [],
+            "eval_exists": true,
+            "eval_a0_specific": true
+          },
+          {
+            "skill": "interview-me",
+            "passed": true,
+            "issues": [],
+            "warnings": [
+              "mentions subordinates without clear main-agent ownership boundary"
+            ],
+            "forbidden_hits": [],
+            "tool_names": [
+              "call_subordinate",
+              "parallel"
+            ],
+            "unknown_tools": [],
+            "project_terms": {
+              "active_project": true,
+              "agents_md": true,
+              "a0proj": true
+            },
+            "project_context_pass": true,
+            "subordinate_boundary_pass": false,
+            "tool_json_examples": 1,
+            "json_errors": [],
+            "eval_exists": true,
+            "eval_a0_specific": true
+          },
+          {
+            "skill": "using-agent-skills",
+            "passed": true,
+            "issues": [],
+            "warnings": [
+              "evals lack detectable A0-runtime-specific assertions"
+            ],
+            "forbidden_hits": [],
+            "tool_names": [],
+            "unknown_tools": [],
+            "project_terms": {
+              "active_project": true,
+              "agents_md": true,
+              "a0proj": true
+            },
+            "project_context_pass": true,
+            "subordinate_boundary_pass": true,
+            "tool_json_examples": 0,
+            "json_errors": [],
+            "eval_exists": true,
+            "eval_a0_specific": false
+          }
+        ]
+      }
+    }
+  ],
+  "skill_results": [
+    {
+      "skill": "api-and-interface-design",
+      "passed": true,
+      "issues": [],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 2,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "browser-testing-with-devtools",
+      "passed": true,
+      "issues": [],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 2,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "ci-cd-and-automation",
+      "passed": true,
+      "issues": [],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 2,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "code-review-and-quality",
+      "passed": true,
+      "issues": [],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 2,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "code-simplification",
+      "passed": true,
+      "issues": [],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 2,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "context-engineering",
+      "passed": true,
+      "issues": [],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 2,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "debugging-and-error-recovery",
+      "passed": true,
+      "issues": [],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "code_execution_tool",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 2,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "deprecation-and-migration",
+      "passed": true,
+      "issues": [],
+      "warnings": [
+        "mentions subordinates without clear main-agent ownership boundary"
+      ],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": false,
+      "tool_json_examples": 2,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "documentation-and-adrs",
+      "passed": true,
+      "issues": [],
+      "warnings": [
+        "mentions subordinates without clear main-agent ownership boundary"
+      ],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": false,
+      "tool_json_examples": 2,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "doubt-driven-development",
+      "passed": true,
+      "issues": [],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 1,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "frontend-ui-engineering",
+      "passed": true,
+      "issues": [],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 2,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "git-workflow-and-versioning",
+      "passed": true,
+      "issues": [],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 1,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "idea-refine",
+      "passed": true,
+      "issues": [],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 1,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "incremental-implementation",
+      "passed": true,
+      "issues": [],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 1,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "interview-me",
+      "passed": true,
+      "issues": [],
+      "warnings": [
+        "mentions subordinates without clear main-agent ownership boundary"
+      ],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": false,
+      "tool_json_examples": 1,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "observability-and-instrumentation",
+      "passed": true,
+      "issues": [],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 2,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "performance-optimization",
+      "passed": true,
+      "issues": [],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 1,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "planning-and-task-breakdown",
+      "passed": true,
+      "issues": [],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 2,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "security-and-hardening",
+      "passed": false,
+      "issues": [
+        "invalid JSON/tool examples"
+      ],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "code_execution_tool",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 2,
+      "json_errors": [
+        {
+          "fence": 1,
+          "error": "Invalid \\escape: line 6 column 104 (char 291)"
+        }
+      ],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "shipping-and-launch",
+      "passed": true,
+      "issues": [],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 1,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "source-driven-development",
+      "passed": true,
+      "issues": [],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 1,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "spec-driven-development",
+      "passed": true,
+      "issues": [],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "call_subordinate",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 2,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "test-driven-development",
+      "passed": true,
+      "issues": [],
+      "warnings": [],
+      "forbidden_hits": [],
+      "tool_names": [
+        "code_execution_tool",
+        "parallel"
+      ],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 1,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": true
+    },
+    {
+      "skill": "using-agent-skills",
+      "passed": true,
+      "issues": [],
+      "warnings": [
+        "evals lack detectable A0-runtime-specific assertions"
+      ],
+      "forbidden_hits": [],
+      "tool_names": [],
+      "unknown_tools": [],
+      "project_terms": {
+        "active_project": true,
+        "agents_md": true,
+        "a0proj": true
+      },
+      "project_context_pass": true,
+      "subordinate_boundary_pass": true,
+      "tool_json_examples": 0,
+      "json_errors": [],
+      "eval_exists": true,
+      "eval_a0_specific": false
+    }
+  ]
+}

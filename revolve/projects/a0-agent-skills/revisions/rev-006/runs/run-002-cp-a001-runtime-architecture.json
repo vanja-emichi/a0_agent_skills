@@ -1,0 +1,21 @@
+{
+  "run_id": "run-002-cp-a001-runtime-architecture",
+  "checkpoint": "cp-a001-architecture-fixes",
+  "suite": "runtime_architecture_v1",
+  "tests": 22,
+  "passed": 22,
+  "failed": 0,
+  "exit_code": 0,
+  "validity": "valid",
+  "layers": {
+    "plugin_discovery": "2/2 passed",
+    "skills_catalog": "3/3 passed",
+    "agent_profiles": "3/3 passed (4 profiles verified)",
+    "commands": "2/2 passed (9 commands verified)",
+    "project_integration": "4/4 passed",
+    "extension_hooks": "4/4 passed",
+    "source_parity": "3/3 passed (full parity)",
+    "workflow_artifacts": "1/1 passed"
+  },
+  "decision": "all runtime architecture gates passed"
+}

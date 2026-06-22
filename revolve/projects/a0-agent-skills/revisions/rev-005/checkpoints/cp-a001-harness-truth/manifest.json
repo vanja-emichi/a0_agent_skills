@@ -1,0 +1,20 @@
+{
+  "checkpoint_id": "cp-a001-harness-truth",
+  "parent": "cp-live-20260620-0129",
+  "branch": "branch-a-harness-truth",
+  "storage": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/checkpoints/cp-a001-harness-truth/subject/a0_agent_skills.tar.gz",
+  "created_cest": "2026-06-20T01:38:00+02:00",
+  "status": "pending candidate edits",
+  "base_key_hashes": {
+    "AGENTS.md": "246b3e3fbd4ece557499fb832a4e3032f0d277ee8eb1d82f2d34d0f21ac3e96f",
+    "tests/e2e/test_e2e_command_execution.py": "32dfa19868cff6ad62c327a6bab78731cddd03e46d4b26556b158b2e267d448a",
+    "tests/e2e/test_e2e_extension_behavior.py": "2f26793f40b57fd02300c70485bbffdb170671cdbcfcf46f5b738b533f5fd7bd",
+    "skills/security-and-hardening/SKILL.md": "5a189e39a1917f44cdbbc5cff240c4ff38665d5c03d6eb859f0c4b185c4a6cad",
+    "skills/deprecation-and-migration/SKILL.md": "4f111cf05e598be899c3f4ea089c05c2f9c60322e2cfab43669b52afc5eaf0f2",
+    "skills/documentation-and-adrs/SKILL.md": "a0d6711bb01842cd0709659ba49880fabf45282763026c9ba01d839f520a8fc3",
+    "skills/interview-me/SKILL.md": "ac5fb499bae734271c60149fb032b9dcbed9ee6de7ea164e8477490365963a57",
+    "skills/using-agent-skills/evals/evals.json": "24df1db305c8cd51749a91cd3cde9d62172ec903dbe59af49f5c5aba5d682fdc"
+  },
+  "storage_format": "tar.gz",
+  "restore_command": "tar xzf /a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/checkpoints/cp-a001-harness-truth/subject/a0_agent_skills.tar.gz -C /a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/checkpoints/cp-a001-harness-truth/subject/"
+}

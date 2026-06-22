@@ -1,0 +1,37 @@
+{
+  "skill_name": "documentation-and-adrs",
+  "evals": [
+    {
+      "id": "dad-adr-with-alternatives",
+      "name": "Writes ADR with alternatives and consequences",
+      "prompt": "We decided to use Redis for our session store instead of database-backed sessions. Document this decision.",
+      "expected_output": "The model should write a full ADR including context, decision, alternatives considered with pros/cons, and consequences - not just a one-line note.",
+      "assertions": [
+        "The output follows ADR format with Status, Context, Decision, and Consequences sections.",
+        "The output includes alternatives considered (e.g., database sessions, in-memory, Memcached) with explicit pros and cons for each.",
+        "The output describes consequences (both positive and negative) of the decision.",
+        "The output stores the ADR in docs/decisions/ with sequential numbering.",
+        {
+          "type": "llm judge",
+          "prompt": "Does the output demonstrate awareness of ADR format (context, decision, alternatives, consequences) \u2014 not just generic documentation advice? It should reference specific steps or concepts from the documentation-and-adrs workflow.",
+          "expected": true,
+          "_category": "discovery"
+        }
+      ],
+      "_mutation_check": "Break by: output writes a one-line note instead of full ADR with alternatives and consequences. Expected: eval should fail with score < 0.5."
+    },
+    {
+      "id": "dad-why-not-what-comments",
+      "name": "Documents why not what in code comments",
+      "prompt": "Add documentation to this code:\n\nfunction processRefund(order, amount) {\n  if (amount > order.total * 0.5) {\n    requireManagerApproval(order.id, amount);\n  }\n  applyCredit(order.userId, amount);\n  order.refunded += amount;\n  return { success: true, newBalance: order.total - order.refunded };\n}",
+      "expected_output": "The model should add comments explaining why the 50 percent threshold exists and why the logic works this way, not just restate what the code does.",
+      "assertions": [
+        "The output adds comments explaining WHY the 50 percent threshold triggers manager approval, not just that it does.",
+        "The output does NOT add comments that restate the code (e.g., check if amount is more than half the total).",
+        "The output documents non-obvious business rules or constraints the code implements.",
+        "The output avoids commenting self-explanatory lines."
+      ],
+      "_mutation_check": "Break by: output adds comments that restate the code (e.g., 'check if amount is more than half the total'). Expected: eval should fail with score < 0.5."
+    }
+  ]
+}

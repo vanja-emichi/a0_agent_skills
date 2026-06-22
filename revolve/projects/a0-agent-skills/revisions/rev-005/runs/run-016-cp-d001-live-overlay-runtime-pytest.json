@@ -1,0 +1,10 @@
+{
+  "summary": {
+    "pytest_exit_code": 0,
+    "restore_ok": true
+  },
+  "result": {
+    "exit_code": 0,
+    "stdout": "................                                                         [100%]\n16 passed, 224 deselected in 13.66s\n"
+  }
+}

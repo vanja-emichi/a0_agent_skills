@@ -1,0 +1,69 @@
+{
+  "skill_name": "planning-and-task-breakdown",
+  "evals": [
+    {
+      "id": "ptb-vertical-slicing",
+      "name": "Slices work vertically instead of horizontally",
+      "prompt": "I have a spec for a task management app with these features: user registration, login, task CRUD, and task assignment. Break this into implementation tasks.",
+      "expected_output": "The model should slice vertically (one complete user flow per task) rather than horizontally (all DB, then all API, then all UI), building foundations first.",
+      "assertions": [
+        "The output maps dependencies between components (schema, API, UI) before listing tasks.",
+        "The output organizes tasks as vertical slices where each task delivers working, testable functionality end-to-end.",
+        "The output does NOT group all database work, then all API work, then all UI work as separate phases.",
+        "Each task includes specific, testable acceptance criteria (not just 'implement the feature').",
+        {
+          "type": "llm judge",
+          "prompt": "Does the output demonstrate awareness of vertical slicing or task decomposition into small verifiable chunks \u2014 not just generic planning advice? It should reference specific steps or concepts from the planning-and-task-breakdown workflow.",
+          "expected": true,
+          "_category": "discovery"
+        }
+      ],
+      "_mutation_check": "Break by: group all DB work, then all API work, then all UI work as horizontal layers. Expected: eval should fail with score < 0.5."
+    },
+    {
+      "id": "ptb-decompose-large-task",
+      "name": "Decomposes a large feature into smaller tasks",
+      "prompt": "Break down 'add search to my app' into implementation tasks. The search needs full-text search, filters, and pagination.",
+      "expected_output": "The model should decompose this into 3-5 smaller tasks, each with clear scope and acceptance criteria, rather than treating it as one task.",
+      "assertions": [
+        "The output breaks the feature into at least 3 separate tasks, not one monolithic task.",
+        "Each task has a clear, narrow scope that could be implemented independently.",
+        "The output does NOT contain a single task titled 'implement search' that covers everything.",
+        "The output orders tasks so dependencies are built first (e.g., search infrastructure before UI)."
+      ],
+      "_mutation_check": "Break by: output a single monolithic task titled 'implement search' covering everything. Expected: eval should fail with score < 0.5."
+    },
+    {
+      "id": "ptb-a0-parallel-task-delegation",
+      "name": "Plan task breakdown using A0 parallel subordinate delegation",
+      "prompt": "Plan the implementation of a new feature that requires: (1) database schema design, (2) REST API endpoints, (3) frontend dashboard, (4) performance benchmarks, and (5) security review. Tasks 1-2 must be sequential, but 3, 4, and 5 are independent. How do you plan and execute this?",
+      "expected_output": "The response should describe using A0-native patterns: planning sequential tasks first, then using parallel to execute independent tasks concurrently via call_subordinate with appropriate specialist profiles (developer for frontend, test-engineer for benchmarks, security-auditor for security review).",
+      "assertions": [
+        "The output identifies which tasks are dependent (sequential) and which are independent (can be parallelized).",
+        "The output references using parallel for concurrent execution of independent tasks (3, 4, 5).",
+        "The output mentions using call_subordinate with specialist profiles (e.g., developer, test-engineer, security-auditor) for delegated tasks.",
+        "The output describes how results from parallel subordinates are integrated back into the main workflow.",
+        {
+          "type": "llm judge",
+          "prompt": "Does the output demonstrate awareness of A0-native task delegation patterns (parallel for independent work, call_subordinate with specialist profiles) rather than generic project management advice? It should reference specific A0 tooling concepts.",
+          "expected": true,
+          "_category": "discovery"
+        }
+      ],
+      "_mutation_check": "Break by: plan all 5 tasks sequentially with no parallelism or delegation. Expected: eval should fail with score < 0.5."
+    },
+    {
+      "id": "ptb-a0-project-context-planning",
+      "name": "Plan using A0 project context: AGENTS.md and project structure",
+      "prompt": "You are starting work on a new feature in an existing project. Walk through how you would understand the project structure and constraints before creating a task breakdown.",
+      "expected_output": "The response should describe reading A0-native project context files first: AGENTS.md for protocol and conventions, .a0proj/ for project configuration, project-relative paths, and existing skill definitions before planning.",
+      "assertions": [
+        "The output references reading AGENTS.md for project conventions, protocols, or instructions before planning.",
+        "The output mentions checking .a0proj/ or project configuration files for project metadata.",
+        "The output describes using project-relative paths and respecting the active project directory structure.",
+        "The output mentions using skills_tool to discover and load relevant skills before task decomposition."
+      ],
+      "_mutation_check": "Break by: suggest planning without reading any project context files. Expected: eval should fail with score < 0.5."
+    }
+  ]
+}

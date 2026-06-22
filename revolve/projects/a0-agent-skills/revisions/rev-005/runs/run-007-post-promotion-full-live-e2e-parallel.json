@@ -1,0 +1,100 @@
+{
+  "run_id": "run-007-post-promotion-full-live-e2e-parallel",
+  "checkpoint": "cp-a001-harness-truth-live",
+  "mode": "manual module-level parallel (4 safe groups concurrent) + extension-behavior sequential after",
+  "status": "completed",
+  "reason": "All groups completed; final interrupted test passed after quota replenished",
+  "total_passed": 68,
+  "total_failed": 1,
+  "total_collected": 69,
+  "completed_groups": [
+    {
+      "group": "group1_profiles_prompt",
+      "passed": 3,
+      "failed": 1,
+      "summary": "incomplete/interrupted",
+      "has_quota_error": false,
+      "log": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/runs/run-007-post-promotion-full-live-e2e-parallel/group1_profiles_prompt.log"
+    },
+    {
+      "group": "group2_skill_coverage",
+      "passed": 30,
+      "failed": 0,
+      "summary": "======================== 30 passed in 669.16s",
+      "has_quota_error": false,
+      "log": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/runs/run-007-post-promotion-full-live-e2e-parallel/group2_skill_coverage.log"
+    },
+    {
+      "group": "group3_skill_loading_refs_init",
+      "passed": 12,
+      "failed": 0,
+      "summary": "======================== 12 passed in 207.18s",
+      "has_quota_error": false,
+      "log": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/runs/run-007-post-promotion-full-live-e2e-parallel/group3_skill_loading_refs_init.log"
+    },
+    {
+      "group": "group4_commands_extensions",
+      "passed": 19,
+      "failed": 0,
+      "summary": "============================== 19 passed in 2.74s",
+      "has_quota_error": false,
+      "log": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/runs/run-007-post-promotion-full-live-e2e-parallel/group4_commands_extensions.log"
+    },
+    {
+      "group": "group5_extension_behavior_sequential",
+      "passed": 3,
+      "failed": 0,
+      "summary": "incomplete/interrupted",
+      "has_quota_error": false,
+      "log": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/runs/run-007-post-promotion-full-live-e2e-parallel/group5_extension_behavior_sequential.log"
+    }
+  ],
+  "interrupted_groups": [],
+  "pre_existing_failures": [
+    "test_e2e_prompt_override.py::TestPromptOverrideE2E::test_subordinate_does_not_see_override"
+  ],
+  "quota_exhaustion_groups": [],
+  "classification": "1 pre-existing failure (test_subordinate_does_not_see_override); no new subject failures",
+  "group_results": [
+    {
+      "group": "group1_profiles_prompt",
+      "passed": 3,
+      "failed": 1,
+      "summary": "incomplete/interrupted",
+      "has_quota_error": false,
+      "log": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/runs/run-007-post-promotion-full-live-e2e-parallel/group1_profiles_prompt.log"
+    },
+    {
+      "group": "group2_skill_coverage",
+      "passed": 30,
+      "failed": 0,
+      "summary": "======================== 30 passed in 669.16s",
+      "has_quota_error": false,
+      "log": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/runs/run-007-post-promotion-full-live-e2e-parallel/group2_skill_coverage.log"
+    },
+    {
+      "group": "group3_skill_loading_refs_init",
+      "passed": 12,
+      "failed": 0,
+      "summary": "======================== 12 passed in 207.18s",
+      "has_quota_error": false,
+      "log": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/runs/run-007-post-promotion-full-live-e2e-parallel/group3_skill_loading_refs_init.log"
+    },
+    {
+      "group": "group4_commands_extensions",
+      "passed": 19,
+      "failed": 0,
+      "summary": "============================== 19 passed in 2.74s",
+      "has_quota_error": false,
+      "log": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/runs/run-007-post-promotion-full-live-e2e-parallel/group4_commands_extensions.log"
+    },
+    {
+      "group": "group5_extension_behavior_sequential",
+      "passed": 3,
+      "failed": 0,
+      "summary": "incomplete/interrupted",
+      "has_quota_error": false,
+      "log": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/runs/run-007-post-promotion-full-live-e2e-parallel/group5_extension_behavior_sequential.log"
+    }
+  ]
+}

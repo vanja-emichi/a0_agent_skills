@@ -1,0 +1,27 @@
+GROUP=group3_skill_loading_refs_init
+COMMAND=/opt/venv/bin/python -m pytest tests/e2e/test_e2e_skill_loading.py tests/e2e/test_e2e_reference_access.py tests/e2e/test_e2e_message_loop_start.py -v -m e2e --tb=short
+CWD=/a0/usr/plugins/a0_agent_skills
+CREDENTIAL_PRESENCE={'A0_E2E_USERNAME': True, 'A0_E2E_PASSWORD': True, 'source_AUTH_LOGIN_present': True, 'source_AUTH_PASSWORD_present': True}
+
+============================= test session starts ==============================
+platform linux -- Python 3.13.12, pytest-9.1.1, pluggy-1.6.0 -- /opt/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /a0/usr/plugins/a0_agent_skills
+configfile: pytest.ini
+plugins: mock-3.15.1, anyio-4.14.0
+collecting ... collected 12 items
+
+tests/e2e/test_e2e_skill_loading.py::TestSkillDiscoveryViaSearch::test_search_returns_matching_skills PASSED [  8%]
+tests/e2e/test_e2e_skill_loading.py::TestSkillLoadAndRead::test_load_skill_and_read_contents PASSED [ 16%]
+tests/e2e/test_e2e_skill_loading.py::TestMetaSkillInjection::test_meta_skill_loadable PASSED [ 25%]
+tests/e2e/test_e2e_reference_access.py::TestReferenceFileAccess::test_agent_reads_reference_file PASSED [ 33%]
+tests/e2e/test_e2e_reference_access.py::TestReferenceFileAccess::test_all_reference_files_exist_and_load[performance-checklist] PASSED [ 41%]
+tests/e2e/test_e2e_reference_access.py::TestReferenceFileAccess::test_all_reference_files_exist_and_load[security-checklist] PASSED [ 50%]
+tests/e2e/test_e2e_reference_access.py::TestReferenceFileAccess::test_all_reference_files_exist_and_load[testing-patterns] PASSED [ 58%]
+tests/e2e/test_e2e_reference_access.py::TestReferenceFileAccess::test_all_reference_files_exist_and_load[accessibility-checklist] PASSED [ 66%]
+tests/e2e/test_e2e_reference_access.py::TestReferenceFileAccess::test_all_reference_files_exist_and_load[orchestration-patterns] PASSED [ 75%]
+tests/e2e/test_e2e_reference_access.py::TestSkillContentVerification::test_meta_skill_references_section PASSED [ 83%]
+tests/e2e/test_e2e_message_loop_start.py::TestAgent0LoadsUsingAgentSkills::test_agent0_loads_using_agent_skills_when_opted_in PASSED [ 91%]
+tests/e2e/test_e2e_message_loop_start.py::TestSubordinateNotAutoLoaded::test_subordinate_not_auto_loaded PASSED [100%]
+
+======================== 12 passed in 207.18s (0:03:27) ========================

@@ -1,0 +1,265 @@
+{
+  "dimension": "cross_references",
+  "total_skills": 23,
+  "passed": 23,
+  "failed": 0,
+  "score": 1.0,
+  "results": [
+    {
+      "skill": "api-and-interface-design",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": [
+          "deprecation-and-migration"
+        ]
+      }
+    },
+    {
+      "skill": "browser-testing-with-devtools",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": []
+      }
+    },
+    {
+      "skill": "ci-cd-and-automation",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": [
+          "debugging-and-error-recovery"
+        ]
+      }
+    },
+    {
+      "skill": "code-review-and-quality",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": [
+          "using-agent-skills",
+          "security-and-hardening",
+          "performance-optimization"
+        ]
+      }
+    },
+    {
+      "skill": "code-simplification",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": []
+      }
+    },
+    {
+      "skill": "context-engineering",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": []
+      }
+    },
+    {
+      "skill": "debugging-and-error-recovery",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": []
+      }
+    },
+    {
+      "skill": "deprecation-and-migration",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": []
+      }
+    },
+    {
+      "skill": "documentation-and-adrs",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": []
+      }
+    },
+    {
+      "skill": "doubt-driven-development",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": [
+          "debugging-and-error-recovery",
+          "using-agent-skills",
+          "source-driven-development",
+          "code-review-and-quality",
+          "test-driven-development"
+        ]
+      }
+    },
+    {
+      "skill": "frontend-ui-engineering",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": [
+          "using-agent-skills"
+        ]
+      }
+    },
+    {
+      "skill": "git-workflow-and-versioning",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": [
+          "code-review-and-quality"
+        ]
+      }
+    },
+    {
+      "skill": "idea-refine",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": []
+      }
+    },
+    {
+      "skill": "incremental-implementation",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": [
+          "git-workflow-and-versioning"
+        ]
+      }
+    },
+    {
+      "skill": "interview-me",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": [
+          "planning-and-task-breakdown",
+          "doubt-driven-development",
+          "spec-driven-development",
+          "idea-refine",
+          "source-driven-development"
+        ]
+      }
+    },
+    {
+      "skill": "performance-optimization",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": [
+          "using-agent-skills"
+        ]
+      }
+    },
+    {
+      "skill": "planning-and-task-breakdown",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": []
+      }
+    },
+    {
+      "skill": "security-and-hardening",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": [
+          "using-agent-skills"
+        ]
+      }
+    },
+    {
+      "skill": "shipping-and-launch",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": [
+          "using-agent-skills"
+        ]
+      }
+    },
+    {
+      "skill": "source-driven-development",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": []
+      }
+    },
+    {
+      "skill": "spec-driven-development",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": [
+          "context-engineering",
+          "incremental-implementation",
+          "test-driven-development"
+        ]
+      }
+    },
+    {
+      "skill": "test-driven-development",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": [
+          "using-agent-skills",
+          "browser-testing-with-devtools"
+        ]
+      }
+    },
+    {
+      "skill": "using-agent-skills",
+      "dimension": "cross_references",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "refs_to_other_skills": [
+          "debugging-and-error-recovery",
+          "incremental-implementation",
+          "planning-and-task-breakdown",
+          "spec-driven-development",
+          "idea-refine",
+          "shipping-and-launch",
+          "code-simplification",
+          "code-review-and-quality",
+          "test-driven-development"
+        ]
+      }
+    }
+  ]
+}

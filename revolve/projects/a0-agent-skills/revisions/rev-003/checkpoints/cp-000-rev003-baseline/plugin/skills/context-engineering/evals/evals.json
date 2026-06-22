@@ -1,0 +1,50 @@
+{
+  "skill_name": "context-engineering",
+  "evals": [
+    {
+      "id": "ce-context-hierarchy",
+      "name": "Structures context from persistent to transient layers",
+      "prompt": "I am starting a new React project with a team. The agent keeps ignoring our conventions and inventing patterns. How should I set up the project context?",
+      "expected_output": "The model should describe the context hierarchy (rules files, specs, source files, error output, memory) and guide setup of persistent rules before anything else.",
+      "assertions": [
+        "The output describes a layered context hierarchy (e.g., rules files at top, then specs, then source files, then error output).",
+        "The output recommends creating an AGENTS.md or rules file as the highest-leverage first step.",
+        "The output warns against loading too much context (context flooding) and recommends selective, task-relevant loading.",
+        "The output mentions persisting durable facts via memory or files for cross-session use.",
+        {
+          "type": "llm judge",
+          "prompt": "Does the output demonstrate awareness of context hierarchy, selective loading, or conflict management patterns \u2014 not just generic context advice? It should reference specific steps or concepts from the context-engineering workflow.",
+          "expected": true,
+          "_category": "discovery"
+        }
+      ],
+      "_mutation_check": "Break by: removing the 'does NOT silently pick one approach' assertion from ce-conflict-management and replacing with 'output mentions GraphQL'. Expected: eval should fail with score < 0.5 because the agent could mention GraphQL while silently implementing one approach without surfacing the conflict."
+    },
+    {
+      "id": "ce-conflict-management",
+      "name": "Surfaces context conflicts instead of silently picking one",
+      "prompt": "The spec says to use REST for all endpoints, but the existing codebase uses GraphQL for user queries. I need to add a new user profile endpoint. Just implement it.",
+      "expected_output": "The model should detect the conflict between spec and existing code, surface it explicitly, and present options rather than silently choosing one approach.",
+      "assertions": [
+        "The output identifies the conflict between the spec (REST) and existing code (GraphQL).",
+        "The output does NOT silently pick one approach and implement it without mentioning the discrepancy.",
+        "The output presents explicit options (follow spec, follow existing code, ask the user).",
+        "The output surfaces the conflict using the response tool or asks the user to decide."
+      ],
+      "_mutation_check": "Break by: removing all assertions or providing unrelated output. Expected: eval should fail with score < 0.5."
+    },
+    {
+      "id": "ce-selective-loading",
+      "name": "Loads only task-relevant context, not everything",
+      "prompt": "I need to fix a validation bug in the user registration form. The project has 200 files. What context should I load?",
+      "expected_output": "The model should load only the relevant files (registration route, validation utility, registration tests) and find an existing pattern to follow, not the entire codebase.",
+      "assertions": [
+        "The output recommends loading only files relevant to the registration validation bug, not the entire codebase.",
+        "The output recommends reading an existing similar pattern in the codebase before implementing the fix.",
+        "The output warns against context flooding or loading more than a few thousand lines of focused context.",
+        "The output mentions loading test files alongside source files for verification."
+      ],
+      "_mutation_check": "Break by: removing all assertions or providing unrelated output. Expected: eval should fail with score < 0.5."
+    }
+  ]
+}

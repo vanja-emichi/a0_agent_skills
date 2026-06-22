@@ -1,0 +1,80 @@
+{
+  "skill_name": "security-and-hardening",
+  "evals": [
+    {
+      "id": "sec-three-tier-boundary",
+      "name": "Apply Three-Tier Boundary System to a feature request",
+      "prompt": "A developer asks you to add a file upload feature that accepts PDFs and images, stores them in the database, and returns a URL. The feature needs to handle filenames from users. Walk through the security considerations systematically.",
+      "expected_output": "The response should categorize considerations into Always Do (validate input, parameterize queries, use HTTPS), Ask First (file upload handler, new external storage integration, CORS config), and Never Do (trust client validation, store files in database as blobs, use original filenames directly).",
+      "assertions": [
+        "The output explicitly categorizes security actions into tiers or priority levels (always/never/ask or similar mandatory/prohibited/requires-approval structure).",
+        "The output lists specific always-do security actions such as validating file type and size at the server boundary.",
+        "The output lists specific never-do actions such as trusting client-side validation or using user-provided filenames directly.",
+        "The output identifies file upload handling as requiring human approval or special security review (not something to just implement).",
+        "The output mentions OWASP Top 10 categories relevant to file uploads such as injection or broken access control.",
+        {
+          "type": "llm judge",
+          "prompt": "Does the output demonstrate awareness of three-tier boundary classification or OWASP systematic review \u2014 not just generic security tips? It should reference specific steps or concepts from the security-and-hardening workflow.",
+          "expected": true,
+          "_category": "discovery"
+        }
+      ],
+      "_mutation_check": "Break by: skip tiered categorization and just list security tips without always/never/ask structure. Expected: eval should fail with score < 0.5."
+    },
+    {
+      "id": "sec-never-do-audit",
+      "name": "Audit code against Never Do rules",
+      "prompt": "Review this code snippet for security anti-patterns:\n\n```javascript\napp.post('/api/search', (req, res) => {\n  const results = eval('({' + req.body.query + '})');\n  res.json(results);\n});\n\napp.get('/api/debug', (req, res) => {\n  try {\n    const data = riskyOperation();\n    res.json(data);\n  } catch (err) {\n    res.json({ error: err.stack });\n  }\n});\n\napp.post('/api/login', (req, res) => {\n  const token = jwt.sign({ user: req.body.user }, 'my-secret-key');\n  console.log('Login attempt for:', req.body.password);\n  res.json({ token });\n});\n```",
+      "expected_output": "The response should identify all Never Do violations: eval() with user input, exposing stack traces, hardcoding secrets, and logging passwords.",
+      "assertions": [
+        "The output identifies eval() with user input as a critical security violation that should never be done.",
+        "The output identifies that exposing err.stack or stack traces to users is a security anti-pattern.",
+        "The output identifies the hardcoded secret key 'my-secret-key' as a violation of never committing secrets to code.",
+        "The output identifies logging passwords (req.body.password) as a violation of never logging sensitive data.",
+        "The output provides specific remediation for each violation, not just identification."
+      ],
+      "_mutation_check": "Break by: only identify eval() as a vulnerability and ignore the other three (stack trace, hardcoded secret, logged password). Expected: eval should fail with score < 0.5."
+    },
+    {
+      "id": "sec-owasp-systematic-review",
+      "name": "Conduct OWASP Top 10 systematic security review",
+      "prompt": "Conduct a systematic security review of this Express.js API endpoint:\n\n```javascript\napp.post('/api/profile/:id', async (req, res) => {\n  const userId = req.params.id;\n  const { name, email, role, avatar } = req.body;\n  \n  // Update user\n  await db.query(\\`UPDATE users SET name='${name}', email='${email}', role='${role}' WHERE id=${userId}\\`);\n  \n  // Save avatar\n  if (avatar) {\n    fs.writeFileSync(\\`/uploads/${avatar.filename}\\`, avatar.data);\n  }\n  \n  // Return updated user\n  const user = await db.query(\\`SELECT * FROM users WHERE id=${userId}\\`);\n  res.json(user);\n});\n```",
+      "expected_output": "The response should systematically review against OWASP Top 10 categories: SQL injection, broken auth, sensitive data exposure, XXE, broken access control, misconfig, XSS, insecure deserialization, known vulns, and insufficient logging.",
+      "assertions": [
+        "The output systematically reviews multiple OWASP categories rather than just identifying the most obvious vulnerability.",
+        "The output identifies SQL injection from string concatenation in the UPDATE and SELECT queries.",
+        "The output identifies broken access control \u2014 no check that the user is authorized to modify this profile or change their role.",
+        "The output identifies path traversal or file write vulnerability in the avatar upload (unsanitized filename).",
+        "The output identifies that sensitive data (full user row from SELECT *) is being exposed to the client."
+      ],
+      "_mutation_check": "Break by: only flag SQL injection and ignore broken access control, path traversal, and data exposure. Expected: eval should fail with score < 0.5."
+    },
+    {
+      "id": "sec-a0-delegated-security-audit",
+      "name": "Delegate security audit using A0 subordinate with security-auditor profile",
+      "prompt": "I need to perform a comprehensive security audit of a microservices codebase with 8 services. The audit should cover authentication, input validation, dependency vulnerabilities, and infrastructure configuration. How should I approach this efficiently?",
+      "expected_output": "The response should describe using A0-native delegation: calling subordinate agents with the security-auditor profile to audit different security dimensions or services in parallel, and using skills_tool to load the security-and-hardening skill for systematic coverage.",
+      "assertions": [
+        "The output references using call_subordinate with the security-auditor profile for specialized security review.",
+        "The output suggests using parallel to audit multiple services or security dimensions concurrently.",
+        "The output mentions loading the security-and-hardening skill via skills_tool for systematic audit guidance.",
+        "The output describes consolidating findings from parallel audits into a unified security report with severity prioritization.",
+        "The output maintains the three-tier boundary system (always-do, ask-first, never-do) within delegated audit tasks."
+      ],
+      "_mutation_check": "Break by: suggest a single-person sequential audit with no delegation, parallelism, or skill loading. Expected: eval should fail with score < 0.5."
+    },
+    {
+      "id": "sec-a0-project-context-secrets",
+      "name": "Security: reference A0 project context for secrets and configuration management",
+      "prompt": "Our team needs to ensure secrets are properly managed across the project. Where should API keys, database credentials, and other sensitive configuration be stored and accessed?",
+      "expected_output": "The response should reference A0-native project context: storing secrets in .a0proj/secrets.env or .a0proj/variables.env, using \u00a7\u00a7secret() alias pattern for injection, and never hardcoding secrets in source files or committing them to version control.",
+      "assertions": [
+        "The output references A0 project configuration paths such as .a0proj/secrets.env or .a0proj/variables.env for secret storage.",
+        "The output mentions the \u00a7\u00a7secret() alias pattern for secure secret injection in code or configuration.",
+        "The output states that secrets should never be hardcoded in source files or committed to version control.",
+        "The output describes using environment variables or project-level configuration rather than inline credentials."
+      ],
+      "_mutation_check": "Break by: suggest storing secrets in a hardcoded config file checked into git. Expected: eval should fail with score < 0.5."
+    }
+  ]
+}

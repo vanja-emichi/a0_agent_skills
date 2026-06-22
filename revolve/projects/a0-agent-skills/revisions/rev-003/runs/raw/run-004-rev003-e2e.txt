@@ -1,0 +1,177 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.4, pytest-9.1.0, pluggy-1.6.0 -- /opt/venv-a0/bin/python
+cachedir: .pytest_cache
+rootdir: /a0/usr/plugins/a0_agent_skills
+configfile: pytest.ini
+plugins: mock-3.15.1, asyncio-1.4.0, xdist-3.8.0, anyio-4.13.0, langsmith-0.3.45
+asyncio: mode=Mode.STRICT, debug=False, asyncio_default_fixture_loop_scope=None, asyncio_default_test_loop_scope=function
+created: 4/4 workers
+4 workers [69 items]
+
+scheduling tests via LoadScheduling
+
+tests/e2e/test_e2e_command_rendering.py::TestCommandRendering::test_text_command_renders_skill_and_user_input[spec] 
+tests/e2e/test_e2e_agent_profiles.py::TestSubordinateProfileCall::test_code_reviewer_profile_responds 
+tests/e2e/test_e2e_command_execution.py::TestCommandDiscovery::test_plugin_commands_have_correct_type 
+tests/e2e/test_e2e_command_execution.py::TestTextCommandResolution::test_spec_command_contains_expected_sections 
+[gw1] [  1%] PASSED tests/e2e/test_e2e_command_execution.py::TestCommandDiscovery::test_plugin_commands_have_correct_type 
+tests/e2e/test_e2e_command_execution.py::TestCommandDiscovery::test_plugin_commands_have_description 
+[gw1] [  2%] PASSED tests/e2e/test_e2e_command_execution.py::TestCommandDiscovery::test_plugin_commands_have_description 
+tests/e2e/test_e2e_command_execution.py::TestCommandDiscovery::test_plugin_commands_marked_as_plugin_scope 
+[gw1] [  4%] PASSED tests/e2e/test_e2e_command_execution.py::TestCommandDiscovery::test_plugin_commands_marked_as_plugin_scope 
+tests/e2e/test_e2e_command_execution.py::TestTextCommandResolution::test_text_command_resolves_with_content 
+[gw2] [  5%] PASSED tests/e2e/test_e2e_command_execution.py::TestTextCommandResolution::test_spec_command_contains_expected_sections 
+tests/e2e/test_e2e_command_execution.py::TestTextCommandResolution::test_text_command_with_no_args_still_resolves 
+[gw3] [  7%] PASSED tests/e2e/test_e2e_command_rendering.py::TestCommandRendering::test_text_command_renders_skill_and_user_input[spec] 
+tests/e2e/test_e2e_command_rendering.py::TestCommandRendering::test_text_command_renders_skill_and_user_input[plan] 
+[gw2] [  8%] PASSED tests/e2e/test_e2e_command_execution.py::TestTextCommandResolution::test_text_command_with_no_args_still_resolves 
+[gw3] [ 10%] PASSED tests/e2e/test_e2e_command_rendering.py::TestCommandRendering::test_text_command_renders_skill_and_user_input[plan] 
+tests/e2e/test_e2e_command_rendering.py::TestCommandRendering::test_text_command_renders_skill_and_user_input[build] 
+tests/e2e/test_e2e_command_execution.py::TestScriptCommandResolution::test_ship_command_resolves 
+[gw2] [ 11%] PASSED tests/e2e/test_e2e_command_execution.py::TestScriptCommandResolution::test_ship_command_resolves 
+[gw3] [ 13%] PASSED tests/e2e/test_e2e_command_rendering.py::TestCommandRendering::test_text_command_renders_skill_and_user_input[build] 
+tests/e2e/test_e2e_command_execution.py::TestScriptCommandResolution::test_ship_command_returns_expected_structure 
+tests/e2e/test_e2e_command_rendering.py::TestCommandRendering::test_text_command_renders_skill_and_user_input[test] 
+[gw3] [ 14%] PASSED tests/e2e/test_e2e_command_rendering.py::TestCommandRendering::test_text_command_renders_skill_and_user_input[test] 
+[gw2] [ 15%] PASSED tests/e2e/test_e2e_command_execution.py::TestScriptCommandResolution::test_ship_command_returns_expected_structure 
+tests/e2e/test_e2e_extensions.py::TestExtensionFilePresence::test_all_extension_files_present 
+tests/e2e/test_e2e_extension_behavior.py::TestSimplifyIgnoreBehavior::test_simplify_ignore_guard_exists 
+[gw3] [ 17%] PASSED tests/e2e/test_e2e_extensions.py::TestExtensionFilePresence::test_all_extension_files_present 
+[gw2] [ 18%] PASSED tests/e2e/test_e2e_extension_behavior.py::TestSimplifyIgnoreBehavior::test_simplify_ignore_guard_exists 
+tests/e2e/test_e2e_extensions.py::TestExtensionFilePresence::test_all_extension_files_compile 
+tests/e2e/test_e2e_extension_behavior.py::TestSimplifyIgnoreBehavior::test_simplify_ignore_util_exists 
+[gw2] [ 20%] PASSED tests/e2e/test_e2e_extension_behavior.py::TestSimplifyIgnoreBehavior::test_simplify_ignore_util_exists 
+tests/e2e/test_e2e_extension_behavior.py::TestSimplifyIgnoreBehavior::test_agent_respects_block_level_protection 
+[gw3] [ 21%] PASSED tests/e2e/test_e2e_extensions.py::TestExtensionFilePresence::test_all_extension_files_compile 
+tests/e2e/test_e2e_message_loop_start.py::TestAgent0LoadsUsingAgentSkills::test_agent0_loads_using_agent_skills_when_opted_in 
+[gw1] [ 23%] PASSED tests/e2e/test_e2e_command_execution.py::TestTextCommandResolution::test_text_command_resolves_with_content 
+tests/e2e/test_e2e_command_rendering.py::TestCommandRendering::test_text_command_renders_skill_and_user_input[review] 
+[gw1] [ 24%] PASSED tests/e2e/test_e2e_command_rendering.py::TestCommandRendering::test_text_command_renders_skill_and_user_input[review] 
+tests/e2e/test_e2e_command_rendering.py::TestCommandRendering::test_text_command_renders_skill_and_user_input[code-simplify] 
+[gw1] [ 26%] PASSED tests/e2e/test_e2e_command_rendering.py::TestCommandRendering::test_text_command_renders_skill_and_user_input[code-simplify] 
+tests/e2e/test_e2e_command_rendering.py::TestShipCommandRendering::test_ship_command_resolves 
+[gw1] [ 27%] PASSED tests/e2e/test_e2e_command_rendering.py::TestShipCommandRendering::test_ship_command_resolves 
+tests/e2e/test_e2e_extension_behavior.py::TestSDDCacheBehavior::test_agent_reads_documentation_twice 
+[gw1] [ 28%] FAILED tests/e2e/test_e2e_extension_behavior.py::TestSDDCacheBehavior::test_agent_reads_documentation_twice 
+tests/e2e/test_e2e_prompt_override.py::TestPromptOverrideE2E::test_subordinate_does_not_see_override 
+[gw3] [ 30%] PASSED tests/e2e/test_e2e_message_loop_start.py::TestAgent0LoadsUsingAgentSkills::test_agent0_loads_using_agent_skills_when_opted_in 
+tests/e2e/test_e2e_message_loop_start.py::TestSubordinateNotAutoLoaded::test_subordinate_not_auto_loaded 
+[gw0] [ 31%] PASSED tests/e2e/test_e2e_agent_profiles.py::TestSubordinateProfileCall::test_code_reviewer_profile_responds 
+tests/e2e/test_e2e_agent_profiles.py::TestSubordinateProfileCall::test_test_engineer_profile_responds 
+[gw3] [ 33%] PASSED tests/e2e/test_e2e_message_loop_start.py::TestSubordinateNotAutoLoaded::test_subordinate_not_auto_loaded 
+tests/e2e/test_e2e_reference_access.py::TestReferenceFileAccess::test_all_reference_files_exist_and_load[testing-patterns] 
+[gw3] [ 34%] PASSED tests/e2e/test_e2e_reference_access.py::TestReferenceFileAccess::test_all_reference_files_exist_and_load[testing-patterns] 
+tests/e2e/test_e2e_reference_access.py::TestReferenceFileAccess::test_all_reference_files_exist_and_load[accessibility-checklist] 
+[gw3] [ 36%] PASSED tests/e2e/test_e2e_reference_access.py::TestReferenceFileAccess::test_all_reference_files_exist_and_load[accessibility-checklist] 
+tests/e2e/test_e2e_reference_access.py::TestReferenceFileAccess::test_all_reference_files_exist_and_load[orchestration-patterns] 
+[gw3] [ 37%] PASSED tests/e2e/test_e2e_reference_access.py::TestReferenceFileAccess::test_all_reference_files_exist_and_load[orchestration-patterns] 
+tests/e2e/test_e2e_reference_access.py::TestSkillContentVerification::test_meta_skill_references_section 
+[gw3] [ 39%] PASSED tests/e2e/test_e2e_reference_access.py::TestSkillContentVerification::test_meta_skill_references_section 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-api-and-interface-design] 
+[gw1] [ 40%] FAILED tests/e2e/test_e2e_prompt_override.py::TestPromptOverrideE2E::test_subordinate_does_not_see_override 
+tests/e2e/test_e2e_reference_access.py::TestReferenceFileAccess::test_agent_reads_reference_file 
+[gw2] [ 42%] PASSED tests/e2e/test_e2e_extension_behavior.py::TestSimplifyIgnoreBehavior::test_agent_respects_block_level_protection 
+tests/e2e/test_e2e_extensions.py::TestMetaSkillSpecificsOverride::test_specifics_override_file_absent 
+[gw2] [ 43%] PASSED tests/e2e/test_e2e_extensions.py::TestMetaSkillSpecificsOverride::test_specifics_override_file_absent 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-ci-cd-and-automation] 
+[gw3] [ 44%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-api-and-interface-design] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-browser-testing-with-devtools] 
+[gw3] [ 46%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-browser-testing-with-devtools] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-code-simplification] 
+[gw1] [ 47%] PASSED tests/e2e/test_e2e_reference_access.py::TestReferenceFileAccess::test_agent_reads_reference_file 
+tests/e2e/test_e2e_reference_access.py::TestReferenceFileAccess::test_all_reference_files_exist_and_load[performance-checklist] 
+[gw1] [ 49%] PASSED tests/e2e/test_e2e_reference_access.py::TestReferenceFileAccess::test_all_reference_files_exist_and_load[performance-checklist] 
+tests/e2e/test_e2e_reference_access.py::TestReferenceFileAccess::test_all_reference_files_exist_and_load[security-checklist] 
+[gw1] [ 50%] PASSED tests/e2e/test_e2e_reference_access.py::TestReferenceFileAccess::test_all_reference_files_exist_and_load[security-checklist] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-debugging-and-error-recovery] 
+[gw2] [ 52%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-ci-cd-and-automation] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-code-review-and-quality] 
+[gw0] [ 53%] PASSED tests/e2e/test_e2e_agent_profiles.py::TestSubordinateProfileCall::test_test_engineer_profile_responds 
+tests/e2e/test_e2e_agent_profiles.py::TestSubordinateProfileCall::test_security_auditor_profile_responds 
+[gw3] [ 55%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-code-simplification] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-context-engineering] 
+[gw1] [ 56%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-debugging-and-error-recovery] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-deprecation-and-migration] 
+[gw2] [ 57%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-code-review-and-quality] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-documentation-and-adrs] 
+[gw1] [ 59%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-deprecation-and-migration] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-git-workflow-and-versioning] 
+[gw3] [ 60%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-context-engineering] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-frontend-ui-engineering] 
+[gw2] [ 62%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-documentation-and-adrs] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-doubt-driven-development] 
+[gw3] [ 63%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-frontend-ui-engineering] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-incremental-implementation] 
+[gw2] [ 65%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-doubt-driven-development] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-interview-me] 
+[gw1] [ 66%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-git-workflow-and-versioning] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-idea-refine] 
+[gw3] [ 68%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-incremental-implementation] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-observability-and-instrumentation] 
+[gw2] [ 69%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-interview-me] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-performance-optimization] 
+[gw0] [ 71%] PASSED tests/e2e/test_e2e_agent_profiles.py::TestSubordinateProfileCall::test_security_auditor_profile_responds 
+tests/e2e/test_e2e_command_execution.py::TestCommandDiscovery::test_all_plugin_commands_discovered 
+[gw0] [ 72%] PASSED tests/e2e/test_e2e_command_execution.py::TestCommandDiscovery::test_all_plugin_commands_discovered 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-source-driven-development] 
+[gw1] [ 73%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-idea-refine] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-planning-and-task-breakdown] 
+[gw3] [ 75%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-observability-and-instrumentation] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-security-and-hardening] 
+[gw2] [ 76%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-performance-optimization] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-shipping-and-launch] 
+[gw0] [ 78%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-source-driven-development] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-spec-driven-development] 
+[gw1] [ 79%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-planning-and-task-breakdown] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-test-driven-development] 
+[gw3] [ 81%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-security-and-hardening] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-using-agent-skills] 
+[gw2] [ 82%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-shipping-and-launch] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-tests] 
+[gw0] [ 84%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-spec-driven-development] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-debug] 
+[gw1] [ 85%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-test-driven-development] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-review] 
+[gw3] [ 86%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingCoverage::test_skill_loads_successfully[load-using-agent-skills] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-planning] 
+[gw2] [ 88%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-tests] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-security] 
+[gw1] [ 89%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-review] 
+tests/e2e/test_e2e_skill_loading.py::TestSkillDiscoveryViaSearch::test_search_returns_matching_skills 
+[gw0] [ 91%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-debug] 
+tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingNegative::test_nonexistent_skill_handles_error 
+[gw3] [ 92%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-planning] 
+tests/e2e/test_e2e_skill_loading.py::TestSkillLoadAndRead::test_load_skill_and_read_contents 
+[gw2] [ 94%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillDiscoveryCoverage::test_trigger_finds_correct_skill[trigger-security] 
+tests/e2e/test_e2e_skill_loading.py::TestMetaSkillInjection::test_meta_skill_loadable 
+[gw0] [ 95%] PASSED tests/e2e/test_e2e_skill_coverage.py::TestSkillLoadingNegative::test_nonexistent_skill_handles_error 
+[gw1] [ 97%] PASSED tests/e2e/test_e2e_skill_loading.py::TestSkillDiscoveryViaSearch::test_search_returns_matching_skills 
+[gw2] [ 98%] PASSED tests/e2e/test_e2e_skill_loading.py::TestMetaSkillInjection::test_meta_skill_loadable 
+[gw3] [100%] PASSED tests/e2e/test_e2e_skill_loading.py::TestSkillLoadAndRead::test_load_skill_and_read_contents 
+
+=================================== FAILURES ===================================
+__________ TestSDDCacheBehavior.test_agent_reads_documentation_twice ___________
+[gw1] linux -- Python 3.12.4 /opt/venv-a0/bin/python
+tests/e2e/test_e2e_extension_behavior.py:37: in test_agent_reads_documentation_twice
+    result = a0_client.wait_for_task(task_uuid)
+                                     ^^^^^^^^^
+E   NameError: name 'task_uuid' is not defined
+_________ TestPromptOverrideE2E.test_subordinate_does_not_see_override _________
+[gw1] linux -- Python 3.12.4 /opt/venv-a0/bin/python
+tests/e2e/test_e2e_prompt_override.py:229: in test_subordinate_does_not_see_override
+    assert "SUB_NO_SKILL_DISCOVERY" in response, (
+E   AssertionError: Subordinate should report no skill discovery content. Response (last 500): ...Here is the **developer** subordinate's exact response (verbatim):
+E     
+E     > SUB_HAS_SKILL_DISCOVERY
+E     > 
+E     > SUB_SEES_DOX — note: there is no section literally labeled "DOX rules" in my system prompt. I see extensive `.dox.md` files in the file structure and a "Documents and OCR" section governing `document_query`/vision usage, but if you mean a dedicated DOX rules block, I do not have one. Confirming only what is actually present.
+E   assert 'SUB_NO_SKILL_DISCOVERY' in 'Here is the **developer** subordinate\'s exact response (verbatim):\n\n> SUB_HAS_SKILL_DISCOVERY\n> \n> SUB_SEES_DOX — note: there is no section literally labeled "DOX rules" in my system prompt. I see extensive `.dox.md` files in the file structure and a "Documents and OCR" section governing `document_query`/vision usage, but if you mean a dedicated DOX rules block, I do not have one. Confirming only what is actually present.'
+------------------------------ Captured log call -------------------------------
+WARNING  a0_e2e:_a0_e2e_client.py:388 Timeout on scheduler_tasks_list, retrying in 5s (attempt 2/3)
+WARNING  a0_e2e:_a0_e2e_client.py:388 Timeout on scheduler_tasks_list, retrying in 5s (attempt 2/3)
+WARNING  a0_e2e:_a0_e2e_client.py:388 Timeout on scheduler_tasks_list, retrying in 5s (attempt 2/3)
+WARNING  a0_e2e:_a0_e2e_client.py:388 Timeout on scheduler_tasks_list, retrying in 5s (attempt 2/3)
+=========================== short test summary info ============================
+FAILED tests/e2e/test_e2e_extension_behavior.py::TestSDDCacheBehavior::test_agent_reads_documentation_twice
+FAILED tests/e2e/test_e2e_prompt_override.py::TestPromptOverrideE2E::test_subordinate_does_not_see_override
+=================== 2 failed, 67 passed in 389.15s (0:06:29) ===================

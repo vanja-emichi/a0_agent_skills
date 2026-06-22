@@ -1,0 +1,39 @@
+{
+  "skill_name": "using-agent-skills",
+  "evals": [
+    {
+      "id": "uas-discover-shipping-skill",
+      "name": "Skill discovery: deploying an application",
+      "prompt": "A user wants to deploy their application to production. The app is a Node.js API with a React frontend. They have CI/CD set up but want to make sure they follow best practices for the launch. Which skills should be applied?",
+      "expected_output": "The response should identify the shipping-and-launch skill as the primary skill for deployment, and may also mention ci-cd-and-automation, code-review-and-quality, or test-driven-development as supporting skills.",
+      "assertions": [
+        "The output mentions the shipping-and-launch skill or deployment skill.",
+        "The output recommends running tests or using test-driven-development before deploying.",
+        "The output mentions code review or quality checks as a pre-deployment step.",
+        "The output references the skill discovery tree or process for finding the right skill.",
+        "The output suggests CI/CD pipeline verification or ci-cd-and-automation skill.",
+        {
+          "type": "llm judge",
+          "prompt": "Does the output demonstrate awareness of the skill discovery tree or phase-based routing \u2014 not just generic skill selection? It should reference specific steps or concepts from the using-agent-skills workflow.",
+          "expected": true,
+          "_category": "discovery"
+        }
+      ],
+      "_mutation_check": "Break by: removing all assertions or providing unrelated output. Expected: eval should fail with score < 0.5."
+    },
+    {
+      "id": "uas-discover-debugging-skills",
+      "name": "Skill discovery: tests failing after refactor",
+      "prompt": "Tests are failing after a major refactor of a Python codebase. The refactored module handles data validation and the tests are throwing assertion errors on edge cases that used to pass. Which skills should be applied?",
+      "expected_output": "The response should identify debugging-and-error-recovery as the primary skill for diagnosing failures, and test-driven-development for fixing and writing proper tests.",
+      "assertions": [
+        "The output mentions the debugging-and-error-recovery skill or debugging skill.",
+        "The output mentions the test-driven-development skill or testing skill.",
+        "The output recommends a systematic approach to diagnosing failures rather than guessing.",
+        "The output mentions investigating root cause before making changes.",
+        "The output does NOT suggest immediately rewriting the code without diagnosis."
+      ],
+      "_mutation_check": "Break by: removing all assertions or providing unrelated output. Expected: eval should fail with score < 0.5."
+    }
+  ]
+}

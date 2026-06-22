@@ -1,0 +1,6 @@
+Structural: 34 passed, 10 skipped, 212 deselected
+Runtime (venv-a0): 164 passed, 92 deselected
+E2E: 51 tests collected (down from ~80+ after cleanup)
+Test cleanup: 4 deterministic e2e files deleted, 2 cleaned of structural methods, 1 merged
+Marker fix: runtime_integration markers added to 4 test files for clean venv separation
+All green, zero regressions.

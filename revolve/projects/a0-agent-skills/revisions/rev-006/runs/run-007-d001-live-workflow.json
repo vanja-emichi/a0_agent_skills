@@ -1,0 +1,9 @@
+{
+  "test": "live_workflow_spec_creation",
+  "project": "a0-skills-test",
+  "spec_created": true,
+  "spec_path": "/a0/usr/projects/a0-skills-test/tasks/spec.md",
+  "spec_size": 1175,
+  "agent_response_length": 1191,
+  "task_state": "idle"
+}

@@ -1,0 +1,52 @@
+{
+  "skill_name": "observability-and-instrumentation",
+  "evals": [
+    {
+      "id": "obs-structured-logging",
+      "name": "Identifies structured logging and correlation ID requirements",
+      "prompt": "I'm building a new checkout API endpoint that processes payments. It calls Stripe, updates our database, and sends a confirmation email. What logging should I add to make sure I can debug production issues?",
+      "expected_output": "The model should recommend structured JSON logging with stable event names, correlation/request IDs propagated across all operations, and warn against logging secrets or full request bodies.",
+      "assertions": [
+        "The output recommends structured logging (JSON objects with event names) rather than string interpolation.",
+        "The output explicitly requires correlation IDs or request IDs to be generated and propagated across all log lines and outbound calls.",
+        "The output warns against logging secrets, tokens, passwords, or full PII/payment data.",
+        "The output defines appropriate log levels (error, warn, info, debug) for different event types.",
+        {
+          "type": "llm judge",
+          "prompt": "Does the output demonstrate awareness of structured logging, correlation IDs, RED metrics, or alerting best practices — not just generic 'add logging' advice? It should reference specific steps or concepts from the observability-and-instrumentation workflow.",
+          "expected": true,
+          "_category": "discovery"
+        }
+      ],
+      "_mutation_check": "Break by: removing the structured logging assertion (assertion 1) and replacing with 'output mentions logging'. Expected: eval should fail with score < 0.5 because the agent could pass by suggesting console.log statements without structured logging."
+    },
+    {
+      "id": "obs-metrics-cardinality",
+      "name": "Recognizes metric cardinality pitfalls and recommends RED metrics",
+      "prompt": "My team wants to track request latency for our REST API. Someone suggested using user_id as a label on our Prometheus metrics so we can debug per-user issues. Is this a good idea?",
+      "expected_output": "The model should strongly advise against using user_id as a metric label due to cardinality explosion, explain why unbounded label values crash metrics backends, and recommend RED metrics with bounded labels instead.",
+      "assertions": [
+        "The output identifies user_id as a metric label as a cardinality bomb that will crash the metrics backend.",
+        "The output recommends bounded labels (route template, status class, method) instead of unbounded values.",
+        "The output recommends RED metrics (Rate, Errors, Duration) for endpoint instrumentation.",
+        "The output recommends histograms with percentiles (p50/p95/p99) instead of averages for latency.",
+        "The output clarifies that per-user debugging belongs in logs and traces, not metrics."
+      ],
+      "_mutation_check": "Break by: removing the cardinality assertion (assertion 1) and replacing with 'output mentions metrics'. Expected: eval should fail with score < 0.5 because the agent could pass by discussing metrics without identifying the cardinality problem."
+    },
+    {
+      "id": "obs-alerting-strategy",
+      "name": "Distinguishes symptom-based vs cause-based alerting",
+      "prompt": "Our DevOps team set up alerts for CPU > 80%, memory > 75%, and disk usage > 70%. But we keep getting paged at 3am and it turns out nothing is actually wrong. How should we fix our alerting?",
+      "expected_output": "The model should identify these as cause-based alerts that create noise, and recommend shifting to symptom-based alerts (error rate, latency, queue depth) that fire when users are actually impacted.",
+      "assertions": [
+        "The output identifies CPU/memory/disk alerts as cause-based alerts that create noise.",
+        "The output recommends symptom-based alerts (error rate, p99 latency, queue age) instead.",
+        "The output states that every alert must be actionable with a runbook link.",
+        "The output recommends limiting alert severities to two tiers (page and ticket).",
+        "The output explains that cause-based alerts fire when nothing is wrong and miss real user-facing failures."
+      ],
+      "_mutation_check": "Break by: removing all assertions or providing unrelated output. Expected: eval should fail with score < 0.5."
+    }
+  ]
+}

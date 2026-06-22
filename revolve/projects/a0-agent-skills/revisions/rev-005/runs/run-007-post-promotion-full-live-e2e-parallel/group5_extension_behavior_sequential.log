@@ -1,0 +1,17 @@
+GROUP=group5_extension_behavior_sequential
+COMMAND=/opt/venv/bin/python -m pytest tests/e2e/test_e2e_extension_behavior.py -v -m e2e --tb=short
+CWD=/a0/usr/plugins/a0_agent_skills
+CREDENTIAL_PRESENCE={'A0_E2E_USERNAME': True, 'A0_E2E_PASSWORD': True, 'source_AUTH_LOGIN_present': True, 'source_AUTH_PASSWORD_present': True}
+
+============================= test session starts ==============================
+platform linux -- Python 3.13.12, pytest-9.1.1, pluggy-1.6.0 -- /opt/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /a0/usr/plugins/a0_agent_skills
+configfile: pytest.ini
+plugins: mock-3.15.1, anyio-4.14.0
+collecting ... collected 4 items
+
+tests/e2e/test_e2e_extension_behavior.py::TestSDDCacheBehavior::test_agent_reads_documentation_twice PASSED [ 25%]
+tests/e2e/test_e2e_extension_behavior.py::TestSimplifyIgnoreBehavior::test_simplify_ignore_guard_exists PASSED [ 50%]
+tests/e2e/test_e2e_extension_behavior.py::TestSimplifyIgnoreBehavior::test_simplify_ignore_util_exists PASSED [ 75%]
+tests/e2e/test_e2e_extension_behavior.py::TestSimplifyIgnoreBehavior::test_agent_respects_block_level_protection 

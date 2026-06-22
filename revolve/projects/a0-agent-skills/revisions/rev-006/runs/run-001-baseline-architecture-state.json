@@ -1,0 +1,317 @@
+{
+  "skill_roots": [
+    "/a0/skills",
+    "/a0/usr/skills",
+    "/a0/usr/projects/a0_agent_skills/.a0proj/skills",
+    "/a0/usr/projects/agent_zero/.a0proj/skills",
+    "/a0/plugins/_a0_connector/skills",
+    "/a0/plugins/_browser/skills",
+    "/a0/plugins/_desktop/skills",
+    "/a0/plugins/_document_query/skills",
+    "/a0/plugins/_office/skills",
+    "/a0/usr/plugins/a0_agent_skills/skills",
+    "/a0/usr/plugins/commands/skills"
+  ],
+  "skills_catalog_sample": [
+    {
+      "name": "a0-contribute-plugin",
+      "path": "/a0/skills/a0-contribute-plugin"
+    },
+    {
+      "name": "a0-create-agent",
+      "path": "/a0/skills/a0-create-agent"
+    },
+    {
+      "name": "a0-create-plugin",
+      "path": "/a0/skills/a0-create-plugin"
+    },
+    {
+      "name": "a0-debug-plugin",
+      "path": "/a0/skills/a0-debug-plugin"
+    },
+    {
+      "name": "a0-development",
+      "path": "/a0/skills/a0-development"
+    },
+    {
+      "name": "a0-manage-plugin",
+      "path": "/a0/skills/a0-manage-plugin"
+    },
+    {
+      "name": "a0-plugin-router",
+      "path": "/a0/skills/a0-plugin-router"
+    },
+    {
+      "name": "a0-review-plugin",
+      "path": "/a0/skills/a0-review-plugin"
+    },
+    {
+      "name": "api-and-interface-design",
+      "path": "/a0/usr/plugins/a0_agent_skills/skills/api-and-interface-design"
+    },
+    {
+      "name": "browser-automation",
+      "path": "/a0/plugins/_browser/skills/browser-automation"
+    },
+    {
+      "name": "browser-extension-control",
+      "path": "/a0/plugins/_browser/skills/browser-extension-control"
+    },
+    {
+      "name": "browser-form-workflows",
+      "path": "/a0/plugins/_browser/skills/browser-form-workflows"
+    },
+    {
+      "name": "browser-testing-with-devtools",
+      "path": "/a0/usr/plugins/a0_agent_skills/skills/browser-testing-with-devtools"
+    },
+    {
+      "name": "build-skill",
+      "path": "/a0/skills/build-skill"
+    },
+    {
+      "name": "ci-cd-and-automation",
+      "path": "/a0/usr/plugins/a0_agent_skills/skills/ci-cd-and-automation"
+    },
+    {
+      "name": "code-review-and-quality",
+      "path": "/a0/usr/plugins/a0_agent_skills/skills/code-review-and-quality"
+    },
+    {
+      "name": "code-simplification",
+      "path": "/a0/usr/plugins/a0_agent_skills/skills/code-simplification"
+    },
+    {
+      "name": "commands-create-slash-command",
+      "path": "/a0/usr/plugins/commands/skills/commands-create-slash-command"
+    },
+    {
+      "name": "context-engineering",
+      "path": "/a0/usr/plugins/a0_agent_skills/skills/context-engineering"
+    },
+    {
+      "name": "debugging-and-error-recovery",
+      "path": "/a0/usr/plugins/a0_agent_skills/skills/debugging-and-error-recovery"
+    },
+    {
+      "name": "deprecation-and-migration",
+      "path": "/a0/usr/plugins/a0_agent_skills/skills/deprecation-and-migration"
+    },
+    {
+      "name": "document-query",
+      "path": "/a0/plugins/_document_query/skills/document-query"
+    },
+    {
+      "name": "documentation-and-adrs",
+      "path": "/a0/usr/plugins/a0_agent_skills/skills/documentation-and-adrs"
+    },
+    {
+      "name": "doubt-driven-development",
+      "path": "/a0/usr/plugins/a0_agent_skills/skills/doubt-driven-development"
+    },
+    {
+      "name": "frontend-ui-engineering",
+      "path": "/a0/usr/plugins/a0_agent_skills/skills/frontend-ui-engineering"
+    },
+    {
+      "name": "git-workflow-and-versioning",
+      "path": "/a0/usr/plugins/a0_agent_skills/skills/git-workflow-and-versioning"
+    },
+    {
+      "name": "host-code-execution",
+      "path": "/a0/plugins/_a0_connector/skills/host-code-execution"
+    },
+    {
+      "name": "host-computer-use",
+      "path": "/a0/plugins/_a0_connector/skills/host-computer-use"
+    },
+    {
+      "name": "host-computer-use-linux",
+      "path": "/a0/plugins/_a0_connector/skills/host-computer-use-linux"
+    },
+    {
+      "name": "host-computer-use-macos",
+      "path": "/a0/plugins/_a0_connector/skills/host-computer-use-macos"
+    }
+  ],
+  "plugin_roots": [
+    "/a0/usr/plugins/",
+    "/a0/plugins/"
+  ],
+  "plugins_list": [
+    "_a0_connector",
+    "_browser",
+    "_chat_branching",
+    "_chat_compaction",
+    "_code_execution",
+    "_desktop",
+    "_discovery",
+    "_document_query",
+    "_editor",
+    "_email_integration",
+    "_error_retry",
+    "_infection_check",
+    "_kokoro_tts",
+    "_memory",
+    "_model_config",
+    "_oauth",
+    "_office",
+    "_onboarding",
+    "_plugin_installer",
+    "_plugin_scan",
+    "_plugin_validator",
+    "_promptinclude",
+    "_skills",
+    "_telegram_integration",
+    "_text_editor",
+    "_time_travel",
+    "_whatsapp_integration",
+    "_whisper_stt",
+    "a0_agent_skills",
+    "commands"
+  ],
+  "skill_search_using_agent_skills": [
+    "Skill(name='using-agent-skills', description='Discovers and invokes agent skills. Use when starting a session or when you need to discover which skill applies to the current task. This is the meta-skill that governs how all other skills are discovered and invoked.', path=PosixPath('/a0/usr/plugins/a0_agent_skills/skills/using-agent-skills'), skill_md_path=PosixPath('/a0/usr/plugins/a0_agent_skills/skills/using-agent-skills/SKILL.md'), version='', author='', tags=[], triggers=['skill discovery', 'which skill', 'find skill', 'agent skills', 'meta skill'], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='a0-create-agent', description='Create a new Agent Zero agent profile (subordinate). Covers where profiles live (user / plugin-distributed / project-scoped), the agent.yaml schema, the prompt inheritance & override model, and optional profile-specific tools and extensions. Use for any \"create/add/new agent profile\" request.', path=PosixPath('/a0/skills/a0-create-agent'), skill_md_path=PosixPath('/a0/skills/a0-create-agent/SKILL.md'), version='1.0.0', author='', tags=['agents', 'profile', 'create', 'new', 'subordinate'], triggers=['create agent', 'new agent profile', 'add agent profile', 'make agent profile', 'agent profile template', 'build agent profile'], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='a0-development', description='Development guide for extending and building features for the Agent Zero AI framework. Covers architecture, tools, extensions, API endpoints, agent profiles, projects, prompts, and skills \u2014 with correct paths, imports, and patterns matching the current codebase.', path=PosixPath('/a0/skills/a0-development'), skill_md_path=PosixPath('/a0/skills/a0-development/SKILL.md'), version='1.0.0', author='Agent Zero Team', tags=['development', 'framework', 'agent-zero', 'extending', 'tools', 'extensions', 'skills', 'api', 'agents', 'prompts'], triggers=['extend agent zero', 'agent zero development', 'build agent zero feature', 'create agent zero tool', 'add extension', 'framework development', 'agent zero architecture', 'how does agent zero work', 'create agent zero extension', 'add api endpoint', 'create agent profile', 'agent zero internals', 'how does the agent loop work', 'extension hook points', 'prompt system', 'agent profile'], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='context-engineering', description='Optimizes agent context setup for Agent Zero. Use when starting a new session, when agent output quality degrades, when switching between tasks, or when you need to configure rules files and context for a project.', path=PosixPath('/a0/usr/plugins/a0_agent_skills/skills/context-engineering'), skill_md_path=PosixPath('/a0/usr/plugins/a0_agent_skills/skills/context-engineering/SKILL.md'), version='', author='', tags=[], triggers=['context setup', 'rules file', 'project conventions', 'agent context', 'setup context', 'promptinclude', 'agent rules', 'agent context quality', 'hallucinated api'], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='linux-desktop', description=\"Use only for Agent Zero's built-in Docker/Xpra Linux Desktop, XFCE apps, LibreOffice GUI apps, file manager, terminal, or visual workflows inside the Agent Zero runtime. Not for A0 CLI /computer-use or computer_use_remote host control.\", path=PosixPath('/a0/plugins/_desktop/skills/linux-desktop'), skill_md_path=PosixPath('/a0/plugins/_desktop/skills/linux-desktop/SKILL.md'), version='0.3.0', author='Agent Zero Core Team', tags=['linux', 'desktop', 'xfce', 'libreoffice', 'gui', 'files', 'terminal'], triggers=['Agent Zero Desktop', 'built-in Linux Desktop', 'Xpra Desktop', 'XFCE Desktop', 'LibreOffice GUI in Desktop', 'Desktop file manager', 'Docker desktop terminal'], allowed_tools=['office_artifact', 'code_execution_tool'], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='a0-plugin-router', description='Main entry point for all Agent Zero plugin tasks. Routes to specialist skills for creating, reviewing, contributing, managing, or debugging plugins. Use when the user mentions plugins, asks how the plugin system works, wants to build/install/uninstall/publish/debug a plugin, or asks about the Plugin Hub.', path=PosixPath('/a0/skills/a0-plugin-router'), skill_md_path=PosixPath('/a0/skills/a0-plugin-router/SKILL.md'), version='1.0.0', author='', tags=['plugins', 'router', 'meta', 'create', 'review', 'contribute', 'manage', 'plugin-hub'], triggers=['plugin', 'create plugin', 'build plugin', 'review plugin', 'contribute plugin', 'publish plugin', 'install plugin', 'manage plugin', 'plugin hub', 'plugin index', 'how does the plugin system work'], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='a0-review-plugin', description='Full audit of Agent Zero plugins in usr/plugins/. Reviews manifest validity, directory structure, code patterns (Store Gating, notifications, imports), security, and duplicate detection against the community index. Use when asked to review, audit, validate, or check an existing plugin before using or contributing it.', path=PosixPath('/a0/skills/a0-review-plugin'), skill_md_path=PosixPath('/a0/skills/a0-review-plugin/SKILL.md'), version='1.0.0', author='', tags=['plugins', 'review', 'audit', 'validate', 'security', 'checklist'], triggers=['review plugin', 'audit plugin', 'validate plugin', 'check plugin', 'plugin review', 'is my plugin correct', 'plugin checklist'], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='build-skill', description='Build or improve Agent Zero skills following the official SKILL.md standard. Use when the user asks to create, rename, move, audit, test, or refactor a skill, or when a workflow should be packaged as reusable skill instructions.', path=PosixPath('/a0/skills/build-skill'), skill_md_path=PosixPath('/a0/skills/build-skill/SKILL.md'), version='', author='', tags=[], triggers=[], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='a0-contribute-plugin', description='Guide for publishing an Agent Zero plugin to the community Plugin Index (a0-plugins repo). Covers GitHub repo setup, index.yaml creation, CI validation rules, and PR submission. Use when the user wants to share, publish, submit, or contribute a plugin to the Plugin Hub so other Agent Zero users can find and install it.', path=PosixPath('/a0/skills/a0-contribute-plugin'), skill_md_path=PosixPath('/a0/skills/a0-contribute-plugin/SKILL.md'), version='1.0.0', author='', tags=['plugins', 'contribute', 'publish', 'plugin-hub', 'community', 'index', 'PR'], triggers=['contribute plugin', 'publish plugin', 'share plugin', 'submit plugin', 'contribute to plugin hub', 'plugin index', 'community plugin', 'open source plugin'], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='a0-create-plugin', description='Create, extend, or modify Agent Zero plugins. Follows strict full-stack conventions (usr/plugins, plugin.yaml, Store Gating, AgentContext, plugin settings). Use for UI hooks, API handlers, lifecycle extensions, or plugin settings UI.', path=PosixPath('/a0/skills/a0-create-plugin'), skill_md_path=PosixPath('/a0/skills/a0-create-plugin/SKILL.md'), version='1.0.0', author='', tags=['plugins', 'create', 'build', 'develop', 'extend'], triggers=['create plugin', 'build plugin', 'new plugin', 'develop plugin', 'write plugin', 'plugin template'], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='a0-debug-plugin', description=\"Diagnose and fix Agent Zero plugin problems. Covers plugin not appearing, won't enable, API endpoints not responding, frontend store errors, extension point injection, settings resolution, hooks.py issues, and log inspection. Use when a plugin is not working, not loading, crashing, missing from the list, or behaving unexpectedly.\", path=PosixPath('/a0/skills/a0-debug-plugin'), skill_md_path=PosixPath('/a0/skills/a0-debug-plugin/SKILL.md'), version='1.0.0', author='', tags=['plugins', 'debug', 'troubleshoot', 'fix', 'diagnose', 'error', 'broken'], triggers=['plugin not working', 'plugin not loading', 'plugin not showing', 'plugin broken', 'plugin error', 'plugin missing', 'plugin crash', 'debug plugin', 'troubleshoot plugin', 'fix plugin'], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='a0-manage-plugin', description='Manage Agent Zero plugins lifecycle: browse the Plugin Hub, scan for security, install from Git/ZIP/Plugin Hub, update, uninstall, enable, disable, debug, and troubleshoot. Use when asked to install, update, uninstall, remove, scan, find, search, enable, disable, debug, or troubleshoot a plugin.', path=PosixPath('/a0/skills/a0-manage-plugin'), skill_md_path=PosixPath('/a0/skills/a0-manage-plugin/SKILL.md'), version='1.2.0', author='', tags=['plugins', 'install', 'uninstall', 'update', 'scan', 'security', 'debug', 'troubleshoot', 'plugin-hub', 'manage'], triggers=['install plugin', 'uninstall plugin', 'remove plugin', 'delete plugin', 'update plugin', 'scan plugin', 'debug plugin', 'troubleshoot plugin', 'browse plugins', 'search plugins', 'plugin not working', 'enable plugin', 'disable plugin', 'plugin hub', 'list plugins'], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='browser-automation', description='Use for complex Agent Zero browser automation, including multi-tab browsing, screenshots, forms, uploads, raw pointer/keyboard actions, host-vs-container browser mode, and visual verification workflows.', path=PosixPath('/a0/plugins/_browser/skills/browser-automation'), skill_md_path=PosixPath('/a0/plugins/_browser/skills/browser-automation/SKILL.md'), version='', author='', tags=[], triggers=['browser automation', 'web automation', 'open website', 'open URL', 'navigate browser', 'interact with web page', 'JavaScript page', 'browser screenshot', 'screenshot webpage', 'visual verification', 'multi-tab browsing', 'download file from website', 'upload file in browser', 'host browser', 'local browser', 'my browser'], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='browser-extension-control', description=\"Create, inspect, install, and safely maintain Chrome extensions for Agent Zero's built-in Browser plugin. Use when the user asks to build a browser extension, modify an existing extension, install a Chrome Web Store extension, or review extension permissions.\", path=PosixPath('/a0/plugins/_browser/skills/browser-extension-control'), skill_md_path=PosixPath('/a0/plugins/_browser/skills/browser-extension-control/SKILL.md'), version='', author='', tags=[], triggers=[], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='browser-form-workflows', description='Use for complex Agent Zero Browser form workflows involving selects, checkboxes, radios, file uploads, contenteditable fields, multi-step validation, or visually verified submission.', path=PosixPath('/a0/plugins/_browser/skills/browser-form-workflows'), skill_md_path=PosixPath('/a0/plugins/_browser/skills/browser-form-workflows/SKILL.md'), version='', author='', tags=[], triggers=['browser form', 'web form', 'fill form', 'fill web form', 'submit form', 'select option', 'dropdown', 'checkbox', 'radio button', 'file upload', 'contenteditable', 'form validation'], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='browser-testing-with-devtools', description='Tests in real browsers via the Agent Zero browser tool. Use when building or debugging anything that runs in a browser \u2014 inspect the DOM, capture console errors, analyze network requests, profile performance, or verify visual output with real runtime data.', path=PosixPath('/a0/usr/plugins/a0_agent_skills/skills/browser-testing-with-devtools'), skill_md_path=PosixPath('/a0/usr/plugins/a0_agent_skills/skills/browser-testing-with-devtools/SKILL.md'), version='', author='', tags=[], triggers=['browser test', 'devtools', 'e2e test', 'playwright', 'browser automation', 'cypress', 'selenium', 'puppeteer', 'console errors', 'dom inspection'], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='code-review-and-quality', description='Conducts multi-axis code review. Use before merging any change. Use when reviewing code written by yourself, another agent, or a human. Use when you need to assess code quality across multiple dimensions before it enters the main branch.', path=PosixPath('/a0/usr/plugins/a0_agent_skills/skills/code-review-and-quality'), skill_md_path=PosixPath('/a0/usr/plugins/a0_agent_skills/skills/code-review-and-quality/SKILL.md'), version='', author='', tags=[], triggers=['review code', 'code review', 'review pull request', 'quality gate', 'review diff', 'pr review', 'merge checklist', 'code quality', 'approve pull request'], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='commands-create-slash-command', description='Create or update Agent Zero slash commands for the Commands plugin. Use when the user asks to add, edit, duplicate, or refine a reusable /command backed by YAML config plus text/python content files.', path=PosixPath('/a0/usr/plugins/commands/skills/commands-create-slash-command'), skill_md_path=PosixPath('/a0/usr/plugins/commands/skills/commands-create-slash-command/SKILL.md'), version='1.0.0', author='', tags=['commands', 'slash-commands', 'plugin', 'yaml', 'python', 'templates'], triggers=['create slash command', 'add slash command', 'update slash command', 'edit slash command', 'commands plugin'], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='documentation-and-adrs', description='Records decisions and documentation. Use when making architectural decisions, changing public APIs, shipping features, or when you need to record context that future engineers and agents will need to understand the codebase.', path=PosixPath('/a0/usr/plugins/a0_agent_skills/skills/documentation-and-adrs'), skill_md_path=PosixPath('/a0/usr/plugins/a0_agent_skills/skills/documentation-and-adrs/SKILL.md'), version='', author='', tags=[], triggers=['write documentation', 'architecture decision record', 'adr', 'document decision', 'write docs', 'openapi documentation', 'readme', 'decision record', 'changelog'], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='scheduled-tasks', description='Use for complex Agent Zero scheduler work, including creating, updating, deleting, running, waiting for, timezone-correcting, or auditing scheduled, planned, and adhoc tasks.', path=PosixPath('/a0/skills/scheduled-tasks'), skill_md_path=PosixPath('/a0/skills/scheduled-tasks/SKILL.md'), version='', author='', tags=[], triggers=[], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})",
+    "Skill(name='setup-a0-cli', description=\"Guide installing, connecting, or troubleshooting the A0 CLI connector on the user's host machine so Dockerized Agent Zero can work on real local files. Use for install A0, set up A0 CLI, connect local files, remote tools, host-vs-container confusion, or CLI connector setup problems.\", path=PosixPath('/a0/plugins/_a0_connector/skills/setup-a0-cli'), skill_md_path=PosixPath('/a0/plugins/_a0_connector/skills/setup-a0-cli/SKILL.md'), version='', author='', tags=[], triggers=[], allowed_tools=[], license='', compatibility='', metadata={}, content='', raw_frontmatter={})"
+  ],
+  "prompt_error": "No module named 'helpers.prompt_selector'",
+  "agents_md": {
+    "root_exists": true,
+    "root_path": "/a0/usr/projects/a0_agent_skills/AGENTS.md",
+    "child_count": 217,
+    "children_sample": [
+      "references/dox/AGENTS.md",
+      "references/agent-skills/AGENTS.md",
+      "references/agent-skills/skills/AGENTS.md",
+      "references/agent-skills/docs/AGENTS.md",
+      "references/agent-skills/references/AGENTS.md",
+      "references/agent-skills/hooks/AGENTS.md",
+      "references/agent-skills/commands/AGENTS.md",
+      "references/agent-skills/scripts/AGENTS.md",
+      "references/agent-skills/agents/AGENTS.md",
+      "revolve/AGENTS.md"
+    ]
+  },
+  "_skills_config_global": {
+    "max_active_skills": 20,
+    "active_skills": [],
+    "hidden_skills": []
+  },
+  "plugin_config": null,
+  "parity": {
+    "source_agents": [
+      "test-engineer",
+      "web-performance-auditor",
+      "code-reviewer",
+      "security-auditor"
+    ],
+    "plugin_agents": [
+      "",
+      "",
+      ""
+    ],
+    "missing_agents": [
+      "test-engineer",
+      "web-performance-auditor",
+      "code-reviewer",
+      "security-auditor"
+    ],
+    "source_commands": [
+      "code-simplify",
+      "spec",
+      "build",
+      "ship",
+      "webperf",
+      "review",
+      "plan",
+      "test"
+    ],
+    "plugin_commands": [
+      "review",
+      "test",
+      "plan",
+      "code-simplify",
+      "use-agent-skills",
+      "build",
+      "spec",
+      "ship"
+    ],
+    "missing_commands": [],
+    "intentionally_missing_commands": [
+      "webperf"
+    ],
+    "source_skills": [
+      "code-review-and-quality",
+      "browser-testing-with-devtools",
+      "api-and-interface-design",
+      "shipping-and-launch",
+      "source-driven-development",
+      "test-driven-development",
+      "git-workflow-and-versioning",
+      "deprecation-and-migration",
+      "observability-and-instrumentation",
+      "doubt-driven-development",
+      "code-simplification",
+      "incremental-implementation",
+      "interview-me",
+      "debugging-and-error-recovery",
+      "ci-cd-and-automation",
+      "using-agent-skills",
+      "security-and-hardening",
+      "idea-refine",
+      "planning-and-task-breakdown",
+      "documentation-and-adrs",
+      "spec-driven-development",
+      "context-engineering",
+      "frontend-ui-engineering",
+      "performance-optimization"
+    ],
+    "plugin_skills": [
+      "code-review-and-quality",
+      "browser-testing-with-devtools",
+      "api-and-interface-design",
+      "shipping-and-launch",
+      "source-driven-development",
+      "test-driven-development",
+      "git-workflow-and-versioning",
+      "deprecation-and-migration",
+      "observability-and-instrumentation",
+      "doubt-driven-development",
+      "code-simplification",
+      "incremental-implementation",
+      "interview-me",
+      "debugging-and-error-recovery",
+      "ci-cd-and-automation",
+      "using-agent-skills",
+      "security-and-hardening",
+      "idea-refine",
+      "planning-and-task-breakdown",
+      "documentation-and-adrs",
+      "spec-driven-development",
+      "context-engineering",
+      "frontend-ui-engineering",
+      "performance-optimization"
+    ],
+    "missing_skills": [],
+    "extra_plugin_skills": []
+  }
+}

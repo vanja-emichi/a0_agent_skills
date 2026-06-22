@@ -1,0 +1,987 @@
+{
+  "run_id": "run-003-branch-f-parallel-delegation",
+  "candidate_checkpoint": "cp-001f",
+  "baseline_plugin": "/a0/usr/plugins/a0_agent_skills",
+  "candidate_plugin": "/tmp/rev002_branch_f_3hpK/plugin",
+  "baseline": {
+    "total_skills": 24,
+    "total_score": 137,
+    "average_score": 5.71,
+    "results": [
+      {
+        "skill": "api-and-interface-design",
+        "score": 5,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No `call_subordinate` reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "browser-testing-with-devtools",
+        "score": 5,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No `call_subordinate` reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": true
+      },
+      {
+        "skill": "ci-cd-and-automation",
+        "score": 5,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No `call_subordinate` reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "code-review-and-quality",
+        "score": 7,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 1,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "code-simplification",
+        "score": 5,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No `call_subordinate` reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "context-engineering",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 1,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No `call_subordinate` reference found"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "debugging-and-error-recovery",
+        "score": 5,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No `call_subordinate` reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "deprecation-and-migration",
+        "score": 5,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No `call_subordinate` reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "documentation-and-adrs",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 1,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No `call_subordinate` reference found"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "doubt-driven-development",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "frontend-ui-engineering",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": true
+      },
+      {
+        "skill": "git-workflow-and-versioning",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 1,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `call_subordinate` reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "idea-refine",
+        "score": 5,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No `call_subordinate` reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "incremental-implementation",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "interview-me",
+        "score": 5,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No `call_subordinate` reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "observability-and-instrumentation",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 1,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 0,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No project context awareness",
+          "Missing ## Files section"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "performance-optimization",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 1,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `call_subordinate` reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": true
+      },
+      {
+        "skill": "planning-and-task-breakdown",
+        "score": 7,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 1,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "security-and-hardening",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "shipping-and-launch",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 1,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `call_subordinate` reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "source-driven-development",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "spec-driven-development",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 1,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 0,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No project context awareness",
+          "Missing ## Files section"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "test-driven-development",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 1,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 0,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No project context awareness",
+          "Missing ## Files section"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "using-agent-skills",
+        "score": 5,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 1,
+          "has_related_section": 1,
+          "has_files_section": 0,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No `call_subordinate` reference found",
+          "Missing ## Files section"
+        ],
+        "is_frontend": false
+      }
+    ]
+  },
+  "candidate": {
+    "total_skills": 24,
+    "total_score": 146,
+    "average_score": 6.08,
+    "results": [
+      {
+        "skill": "api-and-interface-design",
+        "score": 7,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 1,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "browser-testing-with-devtools",
+        "score": 7,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 1,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No project context awareness"
+        ],
+        "is_frontend": true
+      },
+      {
+        "skill": "ci-cd-and-automation",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "code-review-and-quality",
+        "score": 7,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 1,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "code-simplification",
+        "score": 5,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No `call_subordinate` reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "context-engineering",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 1,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No `call_subordinate` reference found"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "debugging-and-error-recovery",
+        "score": 7,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 1,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "deprecation-and-migration",
+        "score": 5,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No `call_subordinate` reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "documentation-and-adrs",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 1,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No `call_subordinate` reference found"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "doubt-driven-development",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "frontend-ui-engineering",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": true
+      },
+      {
+        "skill": "git-workflow-and-versioning",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 1,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `call_subordinate` reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "idea-refine",
+        "score": 5,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No `call_subordinate` reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "incremental-implementation",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "interview-me",
+        "score": 5,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No `call_subordinate` reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "observability-and-instrumentation",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 1,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 0,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No project context awareness",
+          "Missing ## Files section"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "performance-optimization",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 1,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `call_subordinate` reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": true
+      },
+      {
+        "skill": "planning-and-task-breakdown",
+        "score": 7,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 1,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "security-and-hardening",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "shipping-and-launch",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 1,
+          "call_subordinate_mentioned": 0,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `call_subordinate` reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "source-driven-development",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 0,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 1,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No `parallel` tool reference found",
+          "No project context awareness"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "spec-driven-development",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 1,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 0,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No project context awareness",
+          "Missing ## Files section"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "test-driven-development",
+        "score": 6,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 1,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 0,
+          "has_related_section": 1,
+          "has_files_section": 0,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "No project context awareness",
+          "Missing ## Files section"
+        ],
+        "is_frontend": false
+      },
+      {
+        "skill": "using-agent-skills",
+        "score": 7,
+        "max_score": 8,
+        "checks": {
+          "parallel_tool_mentioned": 1,
+          "call_subordinate_mentioned": 1,
+          "browser_tool_mentioned": 1,
+          "skills_tool_load_syntax": 1,
+          "project_context_aware": 1,
+          "has_related_section": 1,
+          "has_files_section": 0,
+          "has_native_triggers": 1
+        },
+        "issues": [
+          "Missing ## Files section"
+        ],
+        "is_frontend": false
+      }
+    ]
+  },
+  "delta_total": 9,
+  "delta_avg": 0.37
+}

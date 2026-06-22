@@ -1,0 +1,20 @@
+{
+  "cp-001a": {
+    "pytest_pass": true,
+    "pytest_summary": "=============== 161 passed, 10 skipped, 41 deselected in 17.84s ================",
+    "tool_names_exit": 0,
+    "cross_refs_exit": 0
+  },
+  "cp-001b": {
+    "pytest_pass": true,
+    "pytest_summary": "=============== 161 passed, 10 skipped, 41 deselected in 17.93s ================",
+    "tool_names_exit": 0,
+    "cross_refs_exit": 0
+  },
+  "cp-001c": {
+    "pytest_pass": true,
+    "pytest_summary": "=============== 161 passed, 10 skipped, 41 deselected in 18.46s ================",
+    "tool_names_exit": 0,
+    "cross_refs_exit": 0
+  }
+}

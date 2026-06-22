@@ -1,0 +1,216 @@
+{
+  "dimension": "tool_name_nativity",
+  "total_skills": 23,
+  "passed": 23,
+  "failed": 0,
+  "score": 1.0,
+  "results": [
+    {
+      "skill": "api-and-interface-design",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "browser-testing-with-devtools",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "ci-cd-and-automation",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "code-review-and-quality",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "code-simplification",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "context-engineering",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "debugging-and-error-recovery",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "deprecation-and-migration",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "documentation-and-adrs",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "doubt-driven-development",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "frontend-ui-engineering",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "git-workflow-and-versioning",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "idea-refine",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 5
+      }
+    },
+    {
+      "skill": "incremental-implementation",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "interview-me",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "performance-optimization",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "planning-and-task-breakdown",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "security-and-hardening",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "shipping-and-launch",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "source-driven-development",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "spec-driven-development",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "test-driven-development",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 1
+      }
+    },
+    {
+      "skill": "using-agent-skills",
+      "dimension": "tool_name_nativity",
+      "pass": true,
+      "issues": [],
+      "details": {
+        "files_checked": 6
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+.......sssssssss.....................F.................................. [ 42%]
+........................................................................ [ 84%]
+......................s....                                              [100%]
+=================================== FAILURES ===================================
+_________ test_plugin_helpers_resolve_plugin_and_route_lifecycle_hooks _________
+tests/test_runtime_extensions_and_hooks.py:108: in test_plugin_helpers_resolve_plugin_and_route_lifecycle_hooks
+    assert plugin_dir == PLUGIN_DIR.resolve()
+E   AssertionError: assert PosixPath('/a0/usr/plugins/a0_agent_skills') == PosixPath('/tmp/rev002_branch_e_valid_VRzy/a0_agent_skills')
+E    +  where PosixPath('/tmp/rev002_branch_e_valid_VRzy/a0_agent_skills') = resolve()
+E    +    where resolve = PosixPath('/tmp/rev002_branch_e_valid_VRzy/a0_agent_skills').resolve
+=========================== short test summary info ============================
+FAILED tests/test_runtime_extensions_and_hooks.py::test_plugin_helpers_resolve_plugin_and_route_lifecycle_hooks
+1 failed, 160 passed, 10 skipped, 69 deselected in 17.40s

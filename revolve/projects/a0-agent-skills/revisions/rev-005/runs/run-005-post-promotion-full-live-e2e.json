@@ -1,0 +1,16 @@
+{
+  "run_id": "run-005-post-promotion-full-live-e2e",
+  "checkpoint": "cp-a001-harness-truth-live",
+  "command": "/opt/venv/bin/python -m pytest tests/e2e -v -m e2e --tb=short -n 0",
+  "cwd": "/a0/usr/plugins/a0_agent_skills",
+  "exit_code": 4,
+  "elapsed_seconds": 0.44,
+  "credential_presence": {
+    "A0_E2E_USERNAME": true,
+    "A0_E2E_PASSWORD": true,
+    "source_AUTH_LOGIN_present": true,
+    "source_AUTH_PASSWORD_present": true
+  },
+  "log_path": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/runs/run-005-post-promotion-full-live-e2e.log",
+  "tail": "ERROR: usage: python -m pytest [options] [file_or_dir] [file_or_dir] [...]\npython -m pytest: error: unrecognized arguments: -n\n  inifile: /a0/usr/plugins/a0_agent_skills/pytest.ini\n  rootdir: /a0/usr/plugins/a0_agent_skills\n"
+}

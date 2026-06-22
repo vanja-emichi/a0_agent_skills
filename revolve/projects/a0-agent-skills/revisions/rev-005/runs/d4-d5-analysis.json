@@ -1,0 +1,328 @@
+{
+  "d4_weak": [
+    {
+      "skill": "browser-testing-with-devtools",
+      "d4": 1,
+      "d4_markers": [
+        ".a0proj metadata behavior"
+      ]
+    },
+    {
+      "skill": "ci-cd-and-automation",
+      "d4": 2,
+      "d4_markers": [
+        ".a0proj metadata behavior",
+        "active project path awareness",
+        "cross-session context preservation"
+      ]
+    },
+    {
+      "skill": "debugging-and-error-recovery",
+      "d4": 2,
+      "d4_markers": [
+        ".a0proj metadata behavior",
+        "active project path awareness",
+        "cross-session context preservation"
+      ]
+    },
+    {
+      "skill": "doubt-driven-development",
+      "d4": 2,
+      "d4_markers": [
+        ".a0proj metadata behavior",
+        "active project path awareness",
+        "cross-session context preservation"
+      ]
+    },
+    {
+      "skill": "frontend-ui-engineering",
+      "d4": 2,
+      "d4_markers": [
+        ".a0proj metadata behavior",
+        "active project path awareness",
+        "cross-session context preservation"
+      ]
+    },
+    {
+      "skill": "interview-me",
+      "d4": 2,
+      "d4_markers": [
+        "AGENTS.md chain behavior",
+        ".a0proj metadata behavior"
+      ]
+    },
+    {
+      "skill": "observability-and-instrumentation",
+      "d4": 2,
+      "d4_markers": [
+        "AGENTS.md chain behavior",
+        ".a0proj metadata behavior",
+        "cross-session context preservation"
+      ]
+    },
+    {
+      "skill": "performance-optimization",
+      "d4": 2,
+      "d4_markers": [
+        "AGENTS.md chain behavior",
+        ".a0proj metadata behavior"
+      ]
+    },
+    {
+      "skill": "planning-and-task-breakdown",
+      "d4": 2,
+      "d4_markers": [
+        "AGENTS.md chain behavior",
+        ".a0proj metadata behavior"
+      ]
+    },
+    {
+      "skill": "security-and-hardening",
+      "d4": 2,
+      "d4_markers": [
+        "AGENTS.md chain behavior",
+        ".a0proj metadata behavior",
+        "cross-session context preservation"
+      ]
+    },
+    {
+      "skill": "shipping-and-launch",
+      "d4": 2,
+      "d4_markers": [
+        ".a0proj metadata behavior",
+        "active project path awareness",
+        "cross-session context preservation"
+      ]
+    }
+  ],
+  "d5_weak": [
+    {
+      "skill": "api-and-interface-design",
+      "d5": 2,
+      "d5_info": {
+        "a0_terms": [
+          "call_subordinate",
+          "parallel"
+        ],
+        "has_llm_judge": true,
+        "has_mutation_check": true
+      }
+    },
+    {
+      "skill": "browser-testing-with-devtools",
+      "d5": 2,
+      "d5_info": {
+        "a0_terms": [
+          "call_subordinate",
+          "parallel",
+          "browser tool"
+        ],
+        "has_llm_judge": true,
+        "has_mutation_check": true
+      }
+    },
+    {
+      "skill": "ci-cd-and-automation",
+      "d5": 2,
+      "d5_info": {
+        "a0_terms": [
+          "call_subordinate",
+          "parallel"
+        ],
+        "has_llm_judge": true,
+        "has_mutation_check": true
+      }
+    },
+    {
+      "skill": "code-simplification",
+      "d5": 2,
+      "d5_info": {
+        "a0_terms": [
+          "call_subordinate",
+          "parallel"
+        ],
+        "has_llm_judge": true,
+        "has_mutation_check": true
+      }
+    },
+    {
+      "skill": "debugging-and-error-recovery",
+      "d5": 2,
+      "d5_info": {
+        "a0_terms": [
+          "call_subordinate",
+          "parallel"
+        ],
+        "has_llm_judge": true,
+        "has_mutation_check": true
+      }
+    },
+    {
+      "skill": "deprecation-and-migration",
+      "d5": 2,
+      "d5_info": {
+        "a0_terms": [
+          "call_subordinate",
+          "parallel"
+        ],
+        "has_llm_judge": true,
+        "has_mutation_check": true
+      }
+    },
+    {
+      "skill": "documentation-and-adrs",
+      "d5": 2,
+      "d5_info": {
+        "a0_terms": [
+          "call_subordinate",
+          "parallel"
+        ],
+        "has_llm_judge": true,
+        "has_mutation_check": true
+      }
+    },
+    {
+      "skill": "doubt-driven-development",
+      "d5": 2,
+      "d5_info": {
+        "a0_terms": [
+          "call_subordinate",
+          "parallel"
+        ],
+        "has_llm_judge": true,
+        "has_mutation_check": true
+      }
+    },
+    {
+      "skill": "frontend-ui-engineering",
+      "d5": 2,
+      "d5_info": {
+        "a0_terms": [
+          "call_subordinate",
+          "parallel"
+        ],
+        "has_llm_judge": true,
+        "has_mutation_check": true
+      }
+    },
+    {
+      "skill": "git-workflow-and-versioning",
+      "d5": 1,
+      "d5_info": {
+        "a0_terms": [
+          "parallel"
+        ],
+        "has_llm_judge": true,
+        "has_mutation_check": true
+      }
+    },
+    {
+      "skill": "idea-refine",
+      "d5": 2,
+      "d5_info": {
+        "a0_terms": [
+          "call_subordinate",
+          "parallel"
+        ],
+        "has_llm_judge": false,
+        "has_mutation_check": true
+      }
+    },
+    {
+      "skill": "incremental-implementation",
+      "d5": 2,
+      "d5_info": {
+        "a0_terms": [
+          "call_subordinate",
+          "parallel"
+        ],
+        "has_llm_judge": true,
+        "has_mutation_check": true
+      }
+    },
+    {
+      "skill": "interview-me",
+      "d5": 1,
+      "d5_info": {
+        "a0_terms": [
+          "text_editor"
+        ],
+        "has_llm_judge": true,
+        "has_mutation_check": true
+      }
+    },
+    {
+      "skill": "observability-and-instrumentation",
+      "d5": 2,
+      "d5_info": {
+        "a0_terms": [
+          "call_subordinate",
+          "parallel"
+        ],
+        "has_llm_judge": true,
+        "has_mutation_check": true
+      }
+    },
+    {
+      "skill": "performance-optimization",
+      "d5": 2,
+      "d5_info": {
+        "a0_terms": [
+          "call_subordinate",
+          "parallel"
+        ],
+        "has_llm_judge": true,
+        "has_mutation_check": true
+      }
+    },
+    {
+      "skill": "shipping-and-launch",
+      "d5": 2,
+      "d5_info": {
+        "a0_terms": [
+          "call_subordinate",
+          "parallel"
+        ],
+        "has_llm_judge": true,
+        "has_mutation_check": true
+      }
+    },
+    {
+      "skill": "source-driven-development",
+      "d5": 2,
+      "d5_info": {
+        "a0_terms": [
+          "call_subordinate",
+          "parallel"
+        ],
+        "has_llm_judge": true,
+        "has_mutation_check": true
+      }
+    },
+    {
+      "skill": "spec-driven-development",
+      "d5": 2,
+      "d5_info": {
+        "a0_terms": [
+          "call_subordinate",
+          "parallel",
+          "text_editor"
+        ],
+        "has_llm_judge": true,
+        "has_mutation_check": true
+      }
+    },
+    {
+      "skill": "test-driven-development",
+      "d5": 2,
+      "d5_info": {
+        "a0_terms": [
+          "call_subordinate",
+          "parallel"
+        ],
+        "has_llm_judge": true,
+        "has_mutation_check": true
+      }
+    }
+  ]
+}

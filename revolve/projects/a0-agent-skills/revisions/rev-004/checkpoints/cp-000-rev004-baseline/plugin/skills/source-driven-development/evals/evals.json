@@ -1,0 +1,50 @@
+{
+  "skill_name": "source-driven-development",
+  "evals": [
+    {
+      "id": "sdd-fetch-before-implement",
+      "name": "Fetches official docs before writing framework-specific code",
+      "prompt": "I need to add form handling with validation to my React 19 app. The form should show loading state during submission. Implement the form component.",
+      "expected_output": "The model should first check the project dependency file for React version, then fetch official React documentation for form handling patterns, and only then implement with citations.",
+      "assertions": [
+        "The output reads or mentions reading package.json or dependency files to detect the framework version before implementing.",
+        "The output fetches or references official documentation (react.dev, not blog posts or Stack Overflow) for the specific pattern.",
+        "The output includes source citations with full URLs for framework-specific decisions.",
+        "The output does NOT implement from memory without first checking docs for version-appropriate patterns.",
+        {
+          "type": "llm judge",
+          "prompt": "Does the output demonstrate awareness of fetch-before-implement, surface-conflict, or flag-unverified patterns \u2014 not just generic documentation advice? It should reference specific steps or concepts from the source-driven-development workflow.",
+          "expected": true,
+          "_category": "discovery"
+        }
+      ],
+      "_mutation_check": "Break by: implement the form component directly without reading package.json or fetching docs. Expected: eval should fail with score < 0.5."
+    },
+    {
+      "id": "sdd-surface-conflict",
+      "name": "Surfaces conflicts between docs and existing code",
+      "prompt": "The existing codebase uses useState for form loading state everywhere. I need to add another form with loading state. The existing pattern uses manual setIsLoading(true/false) around the submit call.",
+      "expected_output": "The model should detect that current docs may recommend a different pattern from what the codebase uses, surface the conflict with source, and ask which approach to take.",
+      "assertions": [
+        "The output detects a conflict between the documented modern pattern and the existing codebase pattern.",
+        "The output does NOT silently match existing code without mentioning the newer documented pattern.",
+        "The output presents the conflict with a citation to official documentation.",
+        "The output asks the user which approach to prefer rather than deciding unilaterally."
+      ],
+      "_mutation_check": "Break by: silently match existing code pattern without mentioning the newer documented pattern. Expected: eval should fail with score < 0.5."
+    },
+    {
+      "id": "sdd-flag-unverified",
+      "name": "Flags patterns as unverified when docs cannot be found",
+      "prompt": "I need to implement a custom debounce hook that cancels on unmount and handles rapidly changing values. Use the latest React patterns.",
+      "expected_output": "If the model cannot find official documentation for a custom debounce hook pattern, it should explicitly flag the implementation as unverified rather than presenting it with false confidence.",
+      "assertions": [
+        "The output explicitly states when a pattern could not be verified against official documentation.",
+        "The output does NOT present training-data patterns with confident language as if they were verified.",
+        "The output includes citations for any patterns that WERE found in official docs.",
+        "The output warns the user to verify the unverified pattern before production use."
+      ],
+      "_mutation_check": "Break by: present the debounce hook with full confidence as if verified by official docs. Expected: eval should fail with score < 0.5."
+    }
+  ]
+}

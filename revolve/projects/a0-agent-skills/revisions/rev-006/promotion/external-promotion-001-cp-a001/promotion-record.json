@@ -1,0 +1,30 @@
+{
+  "promotion_id": "external-promotion-001-cp-a001",
+  "checkpoint": "cp-a001-architecture-fixes",
+  "previous_incumbent": "cp-d001-d4-d5-e2e-evalrunner (rev-005)",
+  "date": "2026-06-20T03:34:00+02:00",
+  "evidence": {
+    "runtime_architecture": "22/22 passed (run-002)",
+    "structural": "145 passed, 10 skipped (run-003)",
+    "existing_runtime": "12/12 passed (run-004)"
+  },
+  "affected_files": {
+    "new_files": [
+      "agents/web-performance-auditor/agent.yaml",
+      "agents/web-performance-auditor/prompts/agent.system.main.specifics.md",
+      "commands/webperf.command.yaml",
+      "commands/webperf.txt",
+      "tests/test_runtime_architecture.py"
+    ],
+    "modified_files": [
+      "AGENTS.md (3→4 profiles, 8→9 commands)",
+      "tests/test_runtime_commands.py (EXPECTED_COMMANDS +webperf)",
+      "tests/e2e/test_e2e_command_execution.py (PLUGIN_COMMAND_NAMES +webperf)"
+    ]
+  },
+  "rollback": {
+    "method": "Remove new files; restore modified files from rev-005 cp-d001 backup",
+    "baseline_manifest": "checkpoints/cp-000-rev006-baseline/manifest.sha256",
+    "rev005_backup": "../../rev-005/promotion/external-promotion-003-cp-d001/pre-promotion-live-backup-a0_agent_skills"
+  }
+}

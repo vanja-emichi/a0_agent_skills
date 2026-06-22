@@ -1,0 +1,13 @@
+{
+  "run_id": "run-007-d001-live-workflow",
+  "checkpoint": "cp-d001-live-workflow",
+  "suite": "live_e2e_workflow_v1",
+  "result": "PASSED",
+  "project": "a0-skills-test",
+  "spec_created": true,
+  "spec_path": "/a0/usr/projects/a0-skills-test/tasks/spec.md",
+  "task_state": "idle (completed)",
+  "evidence": "Agent used spec-driven-development skill, created tasks/spec.md with problem statement, key features, and success criteria",
+  "validity": "valid; live LLM evidence (Layer 5)",
+  "decision": "workflow lifecycle proven end-to-end"
+}

@@ -1,0 +1,5 @@
+ERROR: usage: python -m pytest [options] [file_or_dir] [file_or_dir] [...]
+python -m pytest: error: unrecognized arguments: -n
+  inifile: /a0/usr/plugins/a0_agent_skills/pytest.ini
+  rootdir: /a0/usr/plugins/a0_agent_skills
+

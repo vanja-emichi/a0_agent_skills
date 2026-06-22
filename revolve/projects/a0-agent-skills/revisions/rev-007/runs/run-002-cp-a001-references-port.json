@@ -1,0 +1,14 @@
+{
+  "run_id": "run-002-cp-a001",
+  "checkpoint": "cp-a001-references-port",
+  "revision": "rev-007",
+  "structural": {"passed": 34, "skipped": 10, "deselected": 212, "failed": 0},
+  "runtime": {"passed": 164, "deselected": 92, "failed": 0},
+  "e2e_collected": 51,
+  "reference_files": 6,
+  "security_checklist_lines": 179,
+  "observability_present": true,
+  "gates_passed": ["EC-001", "EC-002", "EC-003", "EC-004", "EC-005", "EC-006"],
+  "valid": true,
+  "decision": "promoted"
+}

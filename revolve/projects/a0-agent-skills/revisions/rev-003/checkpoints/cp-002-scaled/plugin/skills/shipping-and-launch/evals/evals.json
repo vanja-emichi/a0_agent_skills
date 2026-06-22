@@ -1,0 +1,38 @@
+{
+  "skill_name": "shipping-and-launch",
+  "evals": [
+    {
+      "id": "sal-pre-launch-checklist",
+      "name": "Runs comprehensive pre-launch checklist",
+      "prompt": "I have finished the task sharing feature. All tests pass locally. Let us deploy it to production now.",
+      "expected_output": "The model should stop the immediate deploy and walk through a comprehensive pre-launch checklist covering security, performance, accessibility, monitoring, and rollback planning.",
+      "assertions": [
+        "The output does NOT proceed directly to deployment.",
+        "The output runs through multiple checklist categories (security, performance, accessibility, infrastructure, documentation).",
+        "The output checks for console.log statements, TODO comments, and secrets in code before deployment.",
+        "The output verifies monitoring and error reporting are configured before launch.",
+        "The output requires a rollback plan before deploying.",
+        {
+          "type": "llm judge",
+          "prompt": "Does the output demonstrate awareness of pre-launch checklists or staged rollout patterns \u2014 not just generic deployment advice? It should reference specific steps or concepts from the shipping-and-launch workflow.",
+          "expected": true,
+          "_category": "discovery"
+        }
+      ],
+      "_mutation_check": "Break by: proceed directly to deployment without running any pre-launch checklist. Expected: eval should fail with score < 0.5."
+    },
+    {
+      "id": "sal-staged-rollout",
+      "name": "Plans staged rollout with rollback thresholds",
+      "prompt": "The task sharing feature passed all pre-launch checks. We have feature flags set up. How do we roll it out?",
+      "expected_output": "The model should describe a staged rollout sequence (team, canary, gradual, full) with explicit decision thresholds for advancing, holding, or rolling back at each stage.",
+      "assertions": [
+        "The output describes a staged rollout sequence (deploy to staging, then team, then canary percentage, then gradual increase to 100 percent).",
+        "The output includes explicit thresholds for when to roll back (e.g., error rate more than 2x baseline, latency more than 50 percent above baseline).",
+        "The output uses feature flags to decouple deployment from release.",
+        "The output includes a monitoring window at each stage before advancing."
+      ],
+      "_mutation_check": "Break by: deploy directly to 100% without staging, canary, or thresholds. Expected: eval should fail with score < 0.5."
+    }
+  ]
+}

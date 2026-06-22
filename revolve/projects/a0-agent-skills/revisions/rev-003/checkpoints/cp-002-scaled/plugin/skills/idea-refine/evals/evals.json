@@ -1,0 +1,61 @@
+{
+  "skill_name": "idea-refine",
+  "evals": [
+    {
+      "id": "ir-trap-me-too",
+      "name": "Challenges a me-too idea instead of jumping to implementation",
+      "prompt": "I want to build a Spotify clone but with social features. Users can see what friends are listening to in real-time, share playlists, and join listening parties. What database should I use?",
+      "expected_output": "The model should NOT just answer the database question. It should challenge whether building another music streaming app makes sense, surface the crowded market, ask who specifically wants this, and explore alternative angles before any technical advice.",
+      "assertions": [
+        "The output does NOT immediately answer the database question or jump to technical architecture.",
+        "The output challenges the idea by raising market saturation, differentiation, or asking why someone would switch from Spotify/Apple Music.",
+        "The output asks or implies a question about who specifically the target user is and what pain point this solves.",
+        "The output surfaces at least one hidden assumption (e.g., licensing costs, API restrictions, user retention, network effects).",
+        {
+          "text": "The output explores at least one alternative direction that reframes the core concept beyond 'Spotify plus social'.",
+          "_category": "divergence"
+        }
+      ],
+      "_mutation_check": "Break by: output answers 'use PostgreSQL' and then lists features for the clone. Expected: eval should fail with score < 0.4 because assertions reward challenging the idea, not implementing it."
+    },
+    {
+      "id": "ir-trap-feature-creep",
+      "name": "Cuts scope on a feature-creep idea instead of planning everything",
+      "prompt": "I'm building a todo app with AI-powered task suggestions, voice commands, collaborative lists, calendar integration, habit tracking, mood journaling, weather-based productivity tips, and gamification. What tech stack should I use for the backend?",
+      "expected_output": "The model should NOT answer the tech stack question. It should push back on the massive scope, identify the one core assumption, and cut everything else.",
+      "assertions": [
+        "The output does NOT answer the tech stack question or list technologies.",
+        "The output explicitly recommends cutting or deferring at least half of the listed features.",
+        "The output identifies a single core assumption or hypothesis to test first.",
+        "The output produces or implies a 'not doing' list — explicitly naming features to exclude from initial scope."
+      ],
+      "_mutation_check": "Break by: output answers 'use Node.js with Express' and then lists features for the clone. Expected: eval should fail with score < 0.4 because assertions reward challenging scope, not tech advice."
+    },
+    {
+      "id": "ir-trap-seems-good",
+      "name": "Identifies hidden flaws in a superficially appealing idea",
+      "prompt": "I want to build a Chrome extension that uses AI to summarize any webpage you're viewing and save it to a knowledge base. It auto-runs on every page. I think this could replace bookmarking entirely. Give me your complete analysis in one response.",
+      "expected_output": "The model should surface hidden flaws: privacy concerns (auto-sending browsing data to APIs), cost at scale (every page = an API call), relevance quality (most pages aren't worth summarizing), and the gap between 'summary' and 'actionable knowledge'.",
+      "assertions": [
+        "The output identifies at least one non-obvious flaw or risk the user hasn't considered (e.g., privacy of browsing data, cost of auto-running on every page, quality of summaries for diverse page types).",
+        "The output challenges the assumption that auto-summarizing every page produces value rather than noise.",
+        "The output questions whether summarization is the right unit — or suggests the gap between 'summary' and 'actionable knowledge' is the real problem.",
+        "The output does NOT simply validate the idea and start listing features for the extension."
+      ],
+      "_mutation_check": "Break by: output validates the idea and lists features like 'export to Notion, tag support, search'. Expected: eval should fail with score < 0.4 because assertions reward critical analysis, not feature planning."
+    },
+    {
+      "id": "ir-trap-tech-chasing",
+      "name": "Pushes back on tech-chasing idea instead of architecture planning",
+      "prompt": "I want to use GPT-4, Pinecone, LangChain, a vector database, RAG pipeline, autonomous agents, and fine-tuning to build a customer support chatbot. How should I architect the agent orchestration layer?",
+      "expected_output": "The model should NOT start designing the agent orchestration layer. It should challenge whether all this complexity is needed for a customer support chatbot, question whether fine-tuning and autonomous agents add value here, and recommend starting simple.",
+      "assertions": [
+        "The output does NOT immediately design the agent orchestration layer or start listing integration steps.",
+        "The output challenges the need for at least two of: GPT-4, Pinecone, LangChain, autonomous agents, or fine-tuning.",
+        "The output recommends starting with a simpler approach before adding complexity.",
+        "The output surfaces at least one assumption about why the complexity is justified (e.g., data volume, query complexity, integration needs)."
+      ],
+      "_mutation_check": "Break by: output designs the agent orchestration layer with LangChain integration steps. Expected: eval should fail with score < 0.4 because assertions reward challenging complexity, not enabling it."
+    }
+  ]
+}

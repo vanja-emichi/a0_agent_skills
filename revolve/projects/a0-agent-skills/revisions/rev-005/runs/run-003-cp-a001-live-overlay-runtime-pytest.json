@@ -1,0 +1,31 @@
+{
+  "summary": {
+    "run_id": "run-003-cp-a001-live-overlay-runtime-pytest",
+    "candidate": "cp-a001-harness-truth",
+    "procedure": "backup -> overlay candidate on live plugin path -> run runtime_integration pytest -> restore backup -> verify hashes",
+    "backup_path": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/runs/run-003-live-overlay-backup-a0_agent_skills",
+    "candidate_path": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/checkpoints/cp-a001-harness-truth/subject/a0_agent_skills",
+    "live_path": "/a0/usr/plugins/a0_agent_skills",
+    "pre_key_hashes": {
+      "AGENTS.md": "246b3e3fbd4ece557499fb832a4e3032f0d277ee8eb1d82f2d34d0f21ac3e96f",
+      "tests/e2e/test_e2e_command_execution.py": "32dfa19868cff6ad62c327a6bab78731cddd03e46d4b26556b158b2e267d448a",
+      "tests/e2e/test_e2e_extension_behavior.py": "2f26793f40b57fd02300c70485bbffdb170671cdbcfcf46f5b738b533f5fd7bd",
+      "skills/security-and-hardening/SKILL.md": "5a189e39a1917f44cdbbc5cff240c4ff38665d5c03d6eb859f0c4b185c4a6cad"
+    },
+    "pytest_exit_code": 0,
+    "restore_ok": true,
+    "restore_diff": {
+      "missing": [],
+      "added": [],
+      "changed": []
+    },
+    "log_path": "/a0/usr/projects/a0_agent_skills/revolve/projects/a0-agent-skills/revisions/rev-005/runs/run-003-cp-a001-live-overlay-runtime-pytest.log",
+    "timestamp_cest": "2026-06-20T01:42:00+02:00"
+  },
+  "result": {
+    "command": "/opt/venv-a0/bin/python -m pytest tests -q -m runtime_integration --tb=short",
+    "cwd": "/a0/usr/plugins/a0_agent_skills",
+    "exit_code": 0,
+    "stdout": "................                                                         [100%]\n16 passed, 224 deselected in 14.04s\n"
+  }
+}

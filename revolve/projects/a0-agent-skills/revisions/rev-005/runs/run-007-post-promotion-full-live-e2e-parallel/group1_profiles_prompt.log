@@ -1,0 +1,33 @@
+GROUP=group1_profiles_prompt
+COMMAND=/opt/venv/bin/python -m pytest tests/e2e/test_e2e_agent_profiles.py tests/e2e/test_e2e_prompt_override.py -v -m e2e --tb=short
+CWD=/a0/usr/plugins/a0_agent_skills
+CREDENTIAL_PRESENCE={'A0_E2E_USERNAME': True, 'A0_E2E_PASSWORD': True, 'source_AUTH_LOGIN_present': True, 'source_AUTH_PASSWORD_present': True}
+
+============================= test session starts ==============================
+platform linux -- Python 3.13.12, pytest-9.1.1, pluggy-1.6.0 -- /opt/venv/bin/python
+cachedir: .pytest_cache
+rootdir: /a0/usr/plugins/a0_agent_skills
+configfile: pytest.ini
+plugins: mock-3.15.1, anyio-4.14.0
+collecting ... collected 11 items / 7 deselected / 4 selected
+
+tests/e2e/test_e2e_agent_profiles.py::TestSubordinateProfileCall::test_code_reviewer_profile_responds PASSED [ 25%]
+tests/e2e/test_e2e_agent_profiles.py::TestSubordinateProfileCall::test_test_engineer_profile_responds PASSED [ 50%]
+tests/e2e/test_e2e_agent_profiles.py::TestSubordinateProfileCall::test_security_auditor_profile_responds PASSED [ 75%]
+tests/e2e/test_e2e_prompt_override.py::TestPromptOverrideE2E::test_subordinate_does_not_see_override FAILED [100%]
+
+=================================== FAILURES ===================================
+_________ TestPromptOverrideE2E.test_subordinate_does_not_see_override _________
+tests/e2e/test_e2e_prompt_override.py:229: in test_subordinate_does_not_see_override
+    assert "SUB_NO_SKILL_DISCOVERY" in response, (
+E   AssertionError: Subordinate should report no skill discovery content. Response (last 500): ...what `.dox.md` files are or how to handle them. The only DOX-related content I see is `.dox.md` filenames appearing in the injected file-structure tree (e.g., `watchdog.py.dox.md`, `ws.py.dox.md`), but those are just directory listings, not rules governing DOX behavior. **→ I cannot confirm `SUB_SEES_DOX`.**
+E     
+E     If you expected a DOX rules section to be active, it may be missing from the prompt assembly or located in a promptinclude/agent-specific file that isn't currently injected into my context.
+E   assert 'SUB_NO_SKILL_DISCOVERY' in '## Subordinate Response (Verbatim)\n\nChecking my system prompt for the requested sections:\n\n1. **Skill Discovery** — ✅ Present. I see a `## skills` section describing `skills_tool` with `search`, `list`, `load`, and `read_file` actions, plus rules like "use `skills_tool` action `search` when the user\'s wording sounds like a task, trigger phrase, or keyword match for a skill." **→ `SUB_HAS_SKILL_DISCOVERY`**\n\n2. **DOX Rules** — ❌ Not present. There is no section titled "DOX rules" or any instructions defining what `.dox.md` files are or how to handle them. The only DOX-related content I see is `.dox.md` filenames appearing in the injected file-structure tree (e.g., `watchdog.py.dox.md`, `ws.py.dox.md`), but those are just directory listings, not rules governing DOX behavior. **→ I cannot confirm `SUB_SEES_DOX`.**\n\nIf you expected a DOX rules section to be active, it may be missing from the prompt assembly or located in a promptinclude/agent-specific file that isn\'t currently injected into my context.'
+------------------------------ Captured log call -------------------------------
+WARNING  a0_e2e:_a0_e2e_client.py:388 Timeout on scheduler_tasks_list, retrying in 5s (attempt 2/3)
+WARNING  a0_e2e:_a0_e2e_client.py:388 Timeout on scheduler_tasks_list, retrying in 5s (attempt 2/3)
+WARNING  a0_e2e:_a0_e2e_client.py:388 Timeout on scheduler_tasks_list, retrying in 5s (attempt 2/3)
+=========================== short test summary info ============================
+FAILED tests/e2e/test_e2e_prompt_override.py::TestPromptOverrideE2E::test_subordinate_does_not_see_override
+============ 1 failed, 3 passed, 7 deselected in 380.73s (0:06:20) =============
