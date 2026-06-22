@@ -1336,4 +1336,97 @@ Revolve is portable because it is instruction-only. It is generic because the ha
 
 The long-term value of Revolve is that it defines the discipline around self-improvement rather than freezing one implementation of it. As coding agents become more capable, they will build better local harnesses, run richer evaluations, and coordinate more effective parallel searches. Revolve remains the protocol that keeps those harnesses reproducible, navigable, and trustworthy.
 
+---
+
+## Appendix A: Case Study — Agent Skills Plugin Integration
+
+*Date: 2026-06-20*
+*Subject: `a0_agent_skills` — a plugin adapting `addyosmani/agent-skills` for the Agent Zero framework*
+*Revisions: rev-001 through rev-008*
+
+### A.1 Objective
+
+Port `addyosmani/agent-skills` (24 skills, 4 personas, 8 commands, 3 hooks, 6 reference checklists) into a native Agent Zero plugin, then iteratively improve integration quality until the plugin is provably native across all runtime layers.
+
+### A.2 Revision Arc
+
+The project progressed through 8 revisions, each changing the evaluation context when comparability shifted.
+
+| Revision | Focus | Key Metric | Result |
+|---|---|---|---|
+| rev-001 | Structural integration (tool names, triggers, frontmatter) | 161 structural tests | 6/6 dimensions green |
+| rev-002 | Content depth pilot (A0-native concepts) | +9 total / +0.37 avg | Seeds planted, comparability blocker found |
+| rev-003 | Full-scale content-depth promotion | 7.96/8 avg semantic | 161/161 regression-free |
+| rev-004 | LLM rubric quality audit | 8.0/8 avg, 192/192 | Scanner-perfect, runtime proof incomplete |
+| rev-005 | Runtime-alignment recalibration | **14.54/15 (96.9%)** semantic depth | 3 external promotions |
+| rev-006 | Architecture proof (5-layer evaluation) | **199 tests passed** | All architecture gates satisfied |
+| rev-007 | References porting + e2e test cleanup | 6/6 references, 9/9 e2e | Porting contract advanced |
+| rev-008 | Complete parity audit | Full classification table | Porting contract **fully satisfied** |
+
+### A.3 Evaluation Evolution
+
+The evaluation environment evolved across revisions, illustrating Revolve's core principle: the harness is task-specific and versioned.
+
+**rev-001 to rev-004** used automated scanners: regex-based structural checks counting keyword presence, tool-name references, and section coverage. These caught mechanical gaps but missed semantic depth.
+
+**rev-005** recalibrated evaluation to Agent Zero runtime truth: project metadata, exact tool schemas, subordinate boundaries, and live harness behavior. It introduced a 5-dimension semantic rubric scored by LLM review.
+
+**rev-006** introduced deterministic runtime/API tests: plugin discovery via `helpers.plugins.get_plugins_list()`, skills catalog via `helpers.skills.list_skill_catalog()`, prompt inheritance via `subagents.get_paths()`, and HTTP API endpoint contracts. This replaced LLM-only evidence with reproducible deterministic proof.
+
+**rev-007 to rev-008** focused on coverage gaps (missing observability-checklist.md), test quality (removing deterministic tests masquerading as e2e), and formal porting classification.
+
+### A.4 Lean Workspace Application
+
+The project accumulated 2,192 files / 24M across 6 revisions — dominated by 10 full plugin checkpoint copies. A compaction pass applied the Lean Workspace Policy:
+
+- Removed 3 non-durable run-overlay backups
+- Compressed 8 full plugin copies to verified tar.gz archives (~280K each)
+- Updated all AGENTS.md restore references and manifest.json files
+- Result: **547 files / 8.7M (75% file reduction, 64% disk reduction)**
+
+Future revisions use hash-based manifests and selective copies, not full plugin cloning.
+
+### A.5 Test Suite Evolution
+
+The e2e test suite evolved through strict criterion application:
+
+| Phase | E2e Files | Tests | Criterion |
+|---|---|---|---|
+| Initial | 10 | ~80+ | Coverage-oriented |
+| First cleanup (rev-007) | 5 | 51 | Removed deterministic tests hiding in e2e |
+| Second cleanup (rev-008) | 3 | **9** | Only tests proving PLUGIN behavior requiring live LLM |
+
+The final 9 tests prove:
+- Auto-load extension fires for agent0, not subordinates (2 tests)
+- SDD cache + simplify-ignore extensions work in live sessions (2 tests)
+- Skill descriptions route the correct skill for user intent (5 tests)
+
+Every removed test was either framework behavior (already covered by runtime tests) or deterministic checks (already covered by structural tests).
+
+### A.6 Key Lessons
+
+1. **Scanner-perfect ≠ runtime-correct.** Content that passes every regex check can still fail runtime alignment. Deterministic runtime tests are stronger evidence than keyword coverage.
+
+2. **E2e tests must prove plugin behavior.** Tests that verify framework functionality (call_subordinate works, skills_tool loads files) waste LLM cycles without proving plugin quality. The strict criterion — *does this test prove something only the plugin provides?* — reduced 80+ e2e tests to 9 without losing coverage.
+
+3. **Never bypass framework APIs.** Manually editing tasks.json to clean up test tasks bypassed `scheduler_task_delete`, which properly removes AgentContext and chat directories. This caused 37 orphaned contexts to appear as chats in the UI. The fix was using the API correctly, not adding manual cleanup.
+
+4. **Lean checkpoints scale better.** Hash-based manifests and tarballs use 75% less storage than full copies while preserving identical restore capability.
+
+5. **Porting classification is a first-class artifact.** Explicitly classifying every upstream surface as port/adapt/omit with rationale prevents both drift and incomplete coverage.
+
+### A.7 Final State
+
+The `a0_agent_skills` plugin is now:
+
+- **Fully ported**: 24 skills, 6 references, 3 hooks (as Python extensions), 9 commands, 4 agent profiles
+- **Provably native**: 199 architecture tests + 9 genuine e2e tests + 164 runtime tests
+- **Cleanly tested**: 3 e2e files, strict plugin-behavior criterion, proper API cleanup
+- **Fully classified**: Complete parity audit with documented port/adapt/omit decisions
+- **Lean workspace**: 547 files across 8 revisions, tarball-based checkpoints
+
+The Revolve protocol made this progression navigable, reproducible, and trustworthy across 8 revisions over a single working session.
+
+---
+
 [1]: https://karpathy.bearblog.dev/sequoia-ascent-2026/?utm_source=chatgpt.com "Sequoia Ascent 2026 summary"

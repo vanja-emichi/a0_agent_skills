@@ -8,6 +8,80 @@ Use for improve/optimize/evolve/research/benchmark/tune/self-improve requests. F
 
 This protocol is self-contained. Preserve reproducible research principles over runtime history.
 
+## Architecture-First Research Gate
+
+For runtime-integration projects, especially `a0_agent_skills`, architecture research is a blocking gate before candidate generation, harness edits, content expansion, or live promotion.
+
+Before changing the subject, the main agent must produce or update a compact architecture brief in the active revision that answers these questions from authoritative sources:
+
+1. What is the host runtime architecture?
+2. What owns orchestration: main agent, subordinate profiles, skills, commands, plugins, hooks, or APIs?
+3. How are prompts inherited, overridden, injected, and persisted?
+4. How do projects affect context, metadata, files, skills, agents, settings, and instructions?
+5. How are tools, skills, plugins, agents, commands, API handlers, and lifecycle extensions discovered and executed?
+6. Which checks can be deterministic runtime/API tests, and which truly require live LLM e2e?
+7. Which upstream concepts are portable, and which are platform-specific and must be adapted rather than copied?
+8. What would prove correct integration in the host runtime, not merely high documentation coverage?
+
+### Required Source Order
+
+For Agent Zero integration research, read sources in this order before implementation:
+
+1. Project DOX: active project `AGENTS.md`, `revolve/AGENTS.md`, project index, active revision, and the narrow target child docs.
+2. Agent Zero DOX: `/a0/AGENTS.md`, then relevant child DOX for `agents/`, `prompts/`, `tools/`, `helpers/`, `api/`, `extensions/`, `plugins/`, `plugins/_skills/`, `plugins/_a0_connector/`, and `skills/`.
+3. Runtime source only after DOX: code paths for prompt rendering, project loading, plugin discovery, skills loading/injection, command routing, API handlers, scheduler/chat persistence, and extension hooks.
+4. External source context: use `deep_wiki` or equivalent repository analysis for `agent0ai/agent-zero` and `addyosmani/agent-skills`; record what came from upstream, what came from local DOX, and what was verified locally.
+5. Live runtime evidence: inspect installed plugin state, active project metadata, available API endpoints, tool schemas, loaded skills, profile inventory, and test harness behavior.
+
+Do not treat upstream docs, local DOX, or source code alone as sufficient when they disagree. Classify disagreements as architecture questions and resolve them with local runtime evidence or an explicit documented assumption.
+
+### Agent Zero Native Integration Contract
+
+For `a0_agent_skills`, the default architecture assumption is:
+
+- `agent0` remains the user-facing orchestrator.
+- Skills are repeatable workflows loaded through the native skills system, not a replacement orchestrator.
+- Specialist profiles are subordinates with bounded roles; they do not own parent project state, live promotion, or revision control.
+- Plugin behavior belongs in native plugin surfaces: `plugin.yaml`, `default_config.yaml`, `skills/`, `agents/<profile>/agent.yaml`, `commands/`, `api/`, `tools/`, `prompts/`, `extensions/`, `hooks.py`, and `webui/` as appropriate.
+- Prompt/profile behavior belongs in prompts when always-on or profile-defining; skills should contain task workflows; commands should route user intent; extensions should implement runtime lifecycle effects.
+- Project `AGENTS.md` injection and child DOX traversal must match Agent Zero reality. Do not assume recursive child `AGENTS.md` injection unless verified; teach traversal as workflow behavior when it is agent responsibility rather than runtime behavior.
+
+If a candidate introduces a separate main orchestrator, changes agent0 responsibilities, bypasses the native `_skills`/`skills_tool` model, or depends on undocumented prompt inheritance, it must be treated as an architecture decision and evaluated in a new revision before promotion.
+
+### Runtime-First Harness Contract
+
+Prefer deterministic proof before live LLM e2e:
+
+1. Static contract checks: manifests, paths, tool names, prompt filenames, command/profile/skill inventory, JSON/YAML validity, and referenced files.
+2. Framework-runtime tests with `/opt/venv-a0/bin/python`: prompt resolution, plugin discovery, project metadata loading, extension import/ordering, API handler contracts, skills catalog, and hook behavior.
+3. Execution-runtime tests with `/opt/venv/bin/python`: plugin structural tests, scripts, and repository-local pytest suites when they are designed for the execution environment.
+4. HTTP/API tests: deterministic endpoints for commands, skills catalog, projects, plugins, scheduler state, and logs when available.
+5. Thin live e2e: only for behavior that requires real agent sessions, LLM turns, subordinate creation, persisted `chat.json`, or cross-turn behavioral evidence.
+
+A harness that rewards keyword presence, content length, or scanner coverage without runtime/API proof is not sufficient for architecture claims.
+
+### Agent-Skills Porting Contract
+
+When adapting `addyosmani/agent-skills`, preserve portable concepts and adapt platform-specific ones:
+
+- Preserve: skill workflows, verification gates, anti-rationalization checks, specialist personas, orchestration patterns, and spec/plan/todo/build artifacts.
+- Adapt: slash-command file formats, hook mechanisms, plugin packaging, MCP assumptions, persona invocation, and runtime-specific skill discovery.
+- Explicitly decide whether source personas/commands are ported, merged into existing A0 skills, or intentionally omitted with rationale.
+- Prove the lifecycle with artifacts: spec creation, plan breakdown, todo tracking, implementation slices, verification evidence, and documentation updates in an Agent Zero project.
+
+### Lean Workspace Policy
+
+Revolve must remain navigable. Full subject copies are allowed only when they are the cheapest reliable restore method. Before creating another full plugin copy, consider a leaner checkpoint strategy:
+
+- manifest plus content hashes,
+- patch/diff from parent checkpoint,
+- Git worktree/commit/tag when available,
+- tarball or compressed archive for rollback backups,
+- selective copy of changed files plus restore recipe,
+- run logs outside subject copies.
+
+Do not store repeated live-overlay backups, pytest caches, or copied test trees as durable research state unless they are required for rollback or reproducibility. If a revision grows large, create an archive/compaction plan and keep parent indexes short enough to resume without rereading raw history.
+
 ## Research Progress
 
 - Reliability gates are necessary, not sufficient. Passing reliability gates makes a candidate eligible; Do not stop at a merely passing candidate unless the objective, user, or budget says so.
